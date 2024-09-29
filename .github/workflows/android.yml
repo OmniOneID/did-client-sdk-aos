@@ -35,13 +35,29 @@ jobs:
         cd source/did-client-sdk-aos
         ./gradlew test
 
+    - name: Start Emulator
+      run: |
+        echo "Starting Android Emulator..."
+        nohup emulator -avd <your_avd_name> -no-window &
+
+    - name: Wait for Emulator to Start
+      run: |
+        adb wait-for-device
+        adb shell input keyevent 82 &
+
     - name: Build utility module with Gradle
       run: |
         cd source/did-client-sdk-aos
         ./gradlew -p did-utility-sdk-aos assembleDebug
-
-    - name: Run unit tests for utility module with Gradle
-      run: |
-        cd source/did-client-sdk-aos
-        ./gradlew -p did-utility-sdk-aos connectedAndroidTest
+        
+    - name: Run Android Test
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 24
+        target: default
+        arch: x86
+        profile: Nexus 6
+        script: |
+          cd source/did-client-sdk-aos
+          ./gradlew connectedAndroidTest --stacktrace
       
