@@ -2,7 +2,7 @@
  * Copyright 2024 Raonsecure
  */
 
-package org.omnione.did.sdk.walletcore;
+package org.omnione.did.sdk.core;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,15 +23,15 @@ import org.omnione.did.sdk.datamodel.did.DIDServiceType;
 import org.omnione.did.sdk.datamodel.did.Service;
 import org.omnione.did.sdk.utility.DataModels.MultibaseType;
 import org.omnione.did.sdk.utility.MultibaseUtils;
-import org.omnione.did.sdk.walletcore.didmanager.DIDManager;
-import org.omnione.did.sdk.walletcore.didmanager.datamodel.DIDKeyInfo;
-import org.omnione.did.sdk.walletcore.didmanager.datamodel.DIDMethodType;
-import org.omnione.did.sdk.walletcore.keymanager.KeyManager;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.DetailKeyInfo;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.KeyGenWalletMethodType;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.KeyInfo;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.StorageOption;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.WalletKeyGenRequest;
+import org.omnione.did.sdk.core.didmanager.DIDManager;
+import org.omnione.did.sdk.core.didmanager.datamodel.DIDKeyInfo;
+import org.omnione.did.sdk.core.didmanager.datamodel.DIDMethodType;
+import org.omnione.did.sdk.core.keymanager.KeyManager;
+import org.omnione.did.sdk.core.keymanager.datamodel.DetailKeyInfo;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyGenWalletMethodType;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyInfo;
+import org.omnione.did.sdk.core.keymanager.datamodel.StorageOption;
+import org.omnione.did.sdk.core.keymanager.datamodel.WalletKeyGenRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class DIDManagerTest {
 //        assertNotNull(a) : a객체가 null이 아님을 확인
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        assertEquals("com.opendid.walletcore.test", appContext.getPackageName());
+//        assertEquals("com.opendid.core.test", appContext.getPackageName());
 
         KeyManager<DetailKeyInfo> keyManager = new KeyManager<>("didTest", appContext);
         if(keyManager.isAnyKeySaved())
