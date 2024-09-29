@@ -2,7 +2,7 @@
  * Copyright 2024 Raonsecure
  */
 
-package org.omnione.did.sdk.walletcore;
+package org.omnione.did.sdk.core;
 
 import android.content.Context;
 import android.util.Log;
@@ -19,20 +19,20 @@ import org.omnione.did.sdk.utility.DataModels.DigestEnum;
 import org.omnione.did.sdk.utility.DataModels.MultibaseType;
 import org.omnione.did.sdk.utility.DigestUtils;
 import org.omnione.did.sdk.utility.MultibaseUtils;
-import org.omnione.did.sdk.walletcore.common.KeystoreManager;
-import org.omnione.did.sdk.walletcore.didmanager.DIDManager;
-import org.omnione.did.sdk.walletcore.keymanager.KeyManager;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.DetailKeyInfo;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.KeyGenWalletMethodType;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.KeyInfo;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.KeyStoreAccessMethod;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.SecureKeyGenRequest;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.StorageOption;
-import org.omnione.did.sdk.walletcore.keymanager.datamodel.WalletKeyGenRequest;
-import org.omnione.did.sdk.walletcore.keymanager.supportalgorithm.Secp256R1Manager;
-import org.omnione.did.sdk.walletcore.storagemanager.StorageManager;
-import org.omnione.did.sdk.walletcore.storagemanager.datamodel.FileExtension;
-import org.omnione.did.sdk.walletcore.storagemanager.datamodel.UsableInnerWalletItem;
+import org.omnione.did.sdk.core.common.KeystoreManager;
+import org.omnione.did.sdk.core.didmanager.DIDManager;
+import org.omnione.did.sdk.core.keymanager.KeyManager;
+import org.omnione.did.sdk.core.keymanager.datamodel.DetailKeyInfo;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyGenWalletMethodType;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyInfo;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyStoreAccessMethod;
+import org.omnione.did.sdk.core.keymanager.datamodel.SecureKeyGenRequest;
+import org.omnione.did.sdk.core.keymanager.datamodel.StorageOption;
+import org.omnione.did.sdk.core.keymanager.datamodel.WalletKeyGenRequest;
+import org.omnione.did.sdk.core.keymanager.supportalgorithm.Secp256R1Manager;
+import org.omnione.did.sdk.core.storagemanager.StorageManager;
+import org.omnione.did.sdk.core.storagemanager.datamodel.FileExtension;
+import org.omnione.did.sdk.core.storagemanager.datamodel.UsableInnerWalletItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public class KeyManagerTest {
 //        assertNotNull(a) : a객체가 null이 아님을 확인
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        //assertEquals("com.opendid.walletcore.test", appContext.getPackageName());
+        //assertEquals("com.opendid.core.test", appContext.getPackageName());
 
         for(String alias : KeystoreManager.getKeystoreAliasList()){
             Log.d("KeyManagerTest","Bio key 생성 전 alias : " + alias);
