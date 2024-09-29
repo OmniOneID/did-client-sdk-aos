@@ -29,3 +29,8 @@ jobs:
       run: |
         cd source/did-client-sdk-aos
         ./gradlew test
+
+    - name: Run instrumentation tests with Gradle
+      run: |
+        cd source/did-client-sdk-aos
+        ./gradlew connectedAndroidTest
