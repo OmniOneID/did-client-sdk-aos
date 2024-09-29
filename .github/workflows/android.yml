@@ -20,17 +20,12 @@ jobs:
         distribution: 'temurin'
         cache: gradle
         
-    - name: Start Android Emulator
+    - name: Run Android Test
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 24
+        api-level: 34
         target: default
         arch: x86
         profile: Nexus 6
-
-    - name: Run Android Tests
-      run: |
-        cd source/did-client-sdk-aos
-        chmod +x gradlew # Make sure gradlew is executable
-        ./gradlew connectedAndroidTest --stacktrace
+        script: ./gradlew connectedAndroidTest --stacktrace
       
