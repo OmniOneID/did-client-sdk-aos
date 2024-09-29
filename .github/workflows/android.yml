@@ -20,11 +20,22 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
+
+    - name: Run Android tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        script: |
+          cd source/did-client-sdk-aos
+          ./gradlew connectedAndroidTest
+        
     - name: Run Android Test
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 30
-        target: google_apis_playstore
+        api-level: 24
+        target: default
         arch: x86
         profile: Nexus 6
         script: |
