@@ -20,16 +20,13 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug
-
     - name: Run Android tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
-        script: |
-          cd source/did-client-sdk-aos
-          ./gradlew connectedAndroidTest
+        script: ./gradlew connectedAndroidTest
+        working-directory: source/did-client-sdk-aos  # 경로를 명시적으로 지정 
+
         
     - name: Run Android Test
       uses: reactivecircus/android-emulator-runner@v2
