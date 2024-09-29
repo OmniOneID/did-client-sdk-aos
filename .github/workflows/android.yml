@@ -37,11 +37,9 @@ jobs:
 
     - name: Build utility module with Gradle
       run: |
-        cd source/did-client-sdk-aos/did-utility-sdk-aos
-        ./gradlew assembleDebug
+        ./gradlew -p source/did-client-sdk-aos/did-utility-sdk-aos assembleDebug
 
     - name: Run unit tests for utility module with Gradle
       run: |
-        cd source/did-client-sdk-aos/did-utility-sdk-aos
-        ./gradlew connectedAndroidTest
+        ./gradlew -p source/did-client-sdk-aos/did-utility-sdk-aos test
       
