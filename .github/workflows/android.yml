@@ -27,12 +27,10 @@ jobs:
         target: default
         arch: x86
         profile: Nexus 6
-        script: |
-          cd source/did-client-sdk-aos
-          ./gradlew connectedAndroidTest --stacktrace
 
-    - name: Build utility module with Gradle
+    - name: Run Android Tests
       run: |
         cd source/did-client-sdk-aos
-        ./gradlew -p did-utility-sdk-aos assembleDebug
+        chmod +x gradlew # Make sure gradlew is executable
+        ./gradlew connectedAndroidTest --stacktrace
       
