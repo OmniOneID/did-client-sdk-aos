@@ -20,10 +20,15 @@ jobs:
         distribution: 'temurin'
         cache: gradle
         
+    - name: Install Dependencies
+      run: |
+        cd source/did-client-sdk-aos
+        ./gradlew dependencies
+    
     - name: Build with Gradle
       run: |
         cd source/did-client-sdk-aos
-        ./gradlew build
+        ./gradlew assembleDebug
         
     - name: Run tests with Gradle
       run: |
