@@ -35,15 +35,26 @@ jobs:
         cd source/did-client-sdk-aos
         ./gradlew test
 
-    - name: Start Emulator
+    - name: Set up Android SDK
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 24
+        target: default
+        arch: x86
+        profile: Nexus 6
+
+    - name: Create AVD
+      run: |
+        echo no | sdkmanager --install "system-images;android-24;default;x86"
+        echo "no" | avdmanager create avd -n Nexus_6_API_24 -k "system-images;android-24;default;x86" --device "Nexus 6"
+    
+    - name: Start Android Emulator
       run: |
         echo "Starting Android Emulator..."
-        nohup emulator -avd <your_avd_name> -no-window &
-
-    - name: Wait for Emulator to Start
-      run: |
+        emulator -avd Nexus_6_API_24 -no-snapshot-load -no-audio -no-boot-anim -gpu swiftshader_indirect &
+        # AVD가 시작될 때까지 대기
         adb wait-for-device
-        adb shell input keyevent 82 &
+        adb shell input keyevent 82 # 홈 화면으로 이동
 
     - name: Build utility module with Gradle
       run: |
