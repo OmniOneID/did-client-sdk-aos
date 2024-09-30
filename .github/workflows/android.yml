@@ -19,14 +19,14 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-
-    - name: Run connected tests
-      uses: ReactiveCircus/android-emulator-runner@v2
-      with:
-        api-level: 34               # Android 14
-        target: google_apis          # Google APIs 포함 이미지 사용
-        arch: x86_64                 # 64비트 아키텍처
-        emulator-options: "-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim"
-        channel: stable
-        script: ./gradlew connectedAndroidTest
-        working-directory: source/did-client-sdk-aos
+        
+    - name: Build with Gradle
+      run: |
+        cd source/did-client-sdk-aos
+        ./gradlew build
+        
+    - name: Run tests with Gradle
+      run: |
+        cd source/did-client-sdk-aos
+        ./gradlew connectedAndroidTest
+      
