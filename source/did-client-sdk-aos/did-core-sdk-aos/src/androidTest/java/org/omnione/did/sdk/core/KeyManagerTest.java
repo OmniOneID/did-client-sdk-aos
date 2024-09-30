@@ -14,13 +14,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.omnione.did.sdk.datamodel.common.enums.AlgorithmType;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
-import org.omnione.did.sdk.datamodel.did.DIDDocument;
 import org.omnione.did.sdk.utility.DataModels.DigestEnum;
 import org.omnione.did.sdk.utility.DataModels.MultibaseType;
 import org.omnione.did.sdk.utility.DigestUtils;
 import org.omnione.did.sdk.utility.MultibaseUtils;
 import org.omnione.did.sdk.core.common.KeystoreManager;
-import org.omnione.did.sdk.core.didmanager.DIDManager;
 import org.omnione.did.sdk.core.keymanager.KeyManager;
 import org.omnione.did.sdk.core.keymanager.datamodel.DetailKeyInfo;
 import org.omnione.did.sdk.core.keymanager.datamodel.KeyGenWalletMethodType;
@@ -53,7 +51,7 @@ public class KeyManagerTest {
 //        assertNotNull(a) : a객체가 null이 아님을 확인
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        //assertEquals("com.opendid.core.test", appContext.getPackageName());
+        //assertEquals("com.opendid.walletcore.test", appContext.getPackageName());
 
         for(String alias : KeystoreManager.getKeystoreAliasList()){
             Log.d("KeyManagerTest","Bio key 생성 전 alias : " + alias);

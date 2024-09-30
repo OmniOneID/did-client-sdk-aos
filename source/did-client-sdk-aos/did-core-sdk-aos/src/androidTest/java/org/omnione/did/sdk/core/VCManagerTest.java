@@ -7,6 +7,7 @@ package org.omnione.did.sdk.core;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -16,7 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.omnione.did.sdk.datamodel.util.MessageUtil;
 import org.omnione.did.sdk.datamodel.common.enums.AlgorithmType;
-import org.omnione.did.sdk.datamodel.common.enums.ProofType;
 import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.utility.CryptoUtils;
@@ -306,7 +306,7 @@ public class VCManagerTest {
 //        assertNotNull(a) : a객체가 null이 아님을 확인
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        assertEquals("com.opendid.core.test", appContext.getPackageName());
+//        assertEquals("com.opendid.walletcore.test", appContext.getPackageName());
 
 
         KeyManager<DetailKeyInfo> keyManager = new KeyManager<>("vcTest", appContext);

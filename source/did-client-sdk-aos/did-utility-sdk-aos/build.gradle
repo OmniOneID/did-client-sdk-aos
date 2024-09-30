@@ -9,6 +9,7 @@ android {
     defaultConfig {
         minSdk 26
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments = ["notPackage": "org.bouncycastle.pqc.crypto.qtesla"]
     }
 
     buildTypes {

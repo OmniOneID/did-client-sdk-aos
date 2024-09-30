@@ -52,7 +52,7 @@ public class DIDManagerTest {
 //        assertNotNull(a) : a객체가 null이 아님을 확인
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        assertEquals("com.opendid.core.test", appContext.getPackageName());
+//        assertEquals("com.opendid.walletcore.test", appContext.getPackageName());
 
         KeyManager<DetailKeyInfo> keyManager = new KeyManager<>("didTest", appContext);
         if(keyManager.isAnyKeySaved())
