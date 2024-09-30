@@ -23,9 +23,10 @@ jobs:
     - name: Run connected tests
       uses: ReactiveCircus/android-emulator-runner@v2
       with:
-        api-level: 29
-        target: google_apis
-        arch: x86_64
-        emulator-options: "-no-window -no-boot-anim"
+        api-level: 30
+        target: default
+        arch: x86
+        emulator-options: "-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim"
+        channel: stable
         script: ./gradlew connectedAndroidTest
         working-directory: source/did-client-sdk-aos
