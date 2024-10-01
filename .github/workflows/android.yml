@@ -1,49 +1,61 @@
-name: Android CI
+name: Android Instrumentation Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  android-test:
+    runs-on: macos-latest
+    timeout-minutes: 45  # 전체 작업 시간 제한 증가
 
     steps:
-    - uses: actions/checkout@v4
-    - name: set up JDK 17
-      uses: actions/setup-java@v4
+    - uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: gradle
-        
-    # 3. Set up Android SDK
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
 
-    # 4. Download dependencies
-    - name: Install Dependencies
-      run: |
-        cd source/did-client-sdk-aos
-        ./gradlew dependencies
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
-    # 5. Start Android Emulator for API level 34
-    - name: Run Instrumentation Tests
-      uses: ReactiveCircus/android-emulator-runner@v2
+    - name: Create and start emulator
+      uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 34
+        api-level: 29  # API 레벨을 낮춤 (29 = Android 10)
         arch: x86_64
-        profile: pixel_6
+        profile: Nexus 6  # 더 가벼운 디바이스 프로필 사용
         script: |
+          echo "Emulator is up and running"
           adb devices
-          ./gradlew connectedAndroidTest
-        working-directory: source/did-client-sdk-aos
-        disable-animations: true      # Optional: Disable animations for faster tests
-        emulator-options: -no-window  # Optional: Run emulator in headless mode
+          # 에뮬레이터 상태 확인
+          adb shell getprop sys.boot_completed
+          # ADB 서버 재시작
+          adb kill-server
+          adb start-server
+          # Instrumentation 테스트 실행
+          ./gradlew connectedCheck
+        working-directory: source/did-client-sdk-aos  
+        emulator-options: |
+          -no-snapshot-save
+          -no-window
+          -gpu swiftshader_indirect
+          -noaudio
+          -no-boot-anim
+          -camera-back none
+        disable-animations: true
+        verbose: true
+        force-avd-creation: false
+        emulator-boot-timeout: 1200  # 20분으로 증가
+        disk-size: 2000M
 
-    # 6. Stop Emulator
-    - name: Kill Emulator
-      run: adb emu kill
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: app/build/outputs/androidTest-results
