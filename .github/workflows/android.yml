@@ -8,7 +8,7 @@ on:
 
 jobs:
   android-test:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest  # Linux 러너 사용
     timeout-minutes: 60
 
     defaults:
@@ -27,50 +27,16 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Create and start emulator
+    - name: Run Instrumentation Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 33
-        arch: arm64-v8a  # ARM 아키텍처 사용
+        arch: x86_64
         profile: pixel_6
         working-directory: source/did-client-sdk-aos
         script: |
-          echo "Starting emulator"
-          emulator -avd test -no-audio -no-boot-anim -no-window &
-          
-          echo "Waiting for emulator to boot"
-          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 3; done;'
-          
-          echo "Emulator booted"
           adb devices
-          
-          echo "Retry ADB connection"
-          for i in {1..10}; do
-            if adb shell getprop sys.boot_completed | grep -q '1'; then
-              echo "ADB connected successfully"
-              break
-            fi
-            echo "Retrying ADB connection... (attempt $i)"
-            adb kill-server
-            adb start-server
-            sleep 15
-          done
-          
-          echo "Running tests"
           ./gradlew connectedAndroidTest
-        emulator-options: |
-          -no-snapshot-save
-          -no-window
-          -gpu swiftshader_indirect
-          -noaudio
-          -no-boot-anim
-          -camera-back none
-          -accel on
-        disable-animations: true
-        verbose: true
-        force-avd-creation: false
-        emulator-boot-timeout: 3600  # 1시간으로 증가
-        disk-size: 6000M
 
     - name: Upload test results
       uses: actions/upload-artifact@v3
