@@ -26,7 +26,9 @@ jobs:
 
     # 4. Download dependencies
     - name: Install Dependencies
-      run: ./gradlew dependencies
+      run: |
+        cd source/did-client-sdk-aos
+        ./gradlew dependencies
 
     # 5. Start Android Emulator for API level 34
     - name: Run Instrumentation Tests
