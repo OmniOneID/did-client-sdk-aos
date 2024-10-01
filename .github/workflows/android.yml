@@ -9,7 +9,7 @@ on:
 jobs:
   android-test:
     runs-on: macos-latest
-    timeout-minutes: 60  # 전체 작업 시간 제한 증가
+    timeout-minutes: 60
 
     defaults:
       run:
@@ -30,19 +30,33 @@ jobs:
     - name: Create and start emulator
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 33  # Android 13
+        api-level: 33
         arch: x86_64
         profile: pixel_6
         working-directory: source/did-client-sdk-aos
         script: |
-          echo "Emulator is up and running"
+          echo "Starting emulator"
+          emulator -avd test -no-audio -no-boot-anim -no-window &
+          
+          echo "Waiting for emulator to boot"
+          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+          
+          echo "Emulator booted"
           adb devices
-          # 에뮬레이터 상태 확인
-          adb shell getprop sys.boot_completed
-          # ADB 서버 재시작
-          adb kill-server
-          adb start-server
-          # Instrumentation 테스트 실행
+          
+          echo "Retry ADB connection"
+          for i in {1..5}; do
+            if adb shell getprop sys.boot_completed | grep -q '1'; then
+              echo "ADB connected successfully"
+              break
+            fi
+            echo "Retrying ADB connection... (attempt $i)"
+            adb kill-server
+            adb start-server
+            sleep 10
+          done
+          
+          echo "Running tests"
           ./gradlew connectedAndroidTest
         emulator-options: |
           -no-snapshot-save
@@ -54,7 +68,7 @@ jobs:
         disable-animations: true
         verbose: true
         force-avd-creation: false
-        emulator-boot-timeout: 1800  # 30분으로 증가
+        emulator-boot-timeout: 1800
         disk-size: 4000M
 
     - name: Upload test results
