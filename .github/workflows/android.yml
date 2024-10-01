@@ -34,10 +34,12 @@ jobs:
     - name: Run Instrumentation Tests
       uses: ReactiveCircus/android-emulator-runner@v2
       with:
-        api-level: 34                # API Level 34 (Android 14)
-        target: google_apis           # Use Google APIs image
-        arch: x86_64                  # x86_64 architecture for 64-bit testing
-        script: ./gradlew connectedAndroidTest
+        api-level: 34
+        arch: x86_64
+        profile: pixel_6
+        script: |
+          adb devices
+          ./gradlew connectedAndroidTest
         working-directory: source/did-client-sdk-aos
         disable-animations: true      # Optional: Disable animations for faster tests
         emulator-options: -no-window  # Optional: Run emulator in headless mode
