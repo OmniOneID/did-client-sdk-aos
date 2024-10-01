@@ -9,7 +9,11 @@ on:
 jobs:
   android-test:
     runs-on: macos-latest
-    timeout-minutes: 45  # 전체 작업 시간 제한 증가
+    timeout-minutes: 60  # 전체 작업 시간 제한 증가
+
+    defaults:
+      run:
+        working-directory: source/did-client-sdk-aos
 
     steps:
     - uses: actions/checkout@v3
@@ -26,9 +30,10 @@ jobs:
     - name: Create and start emulator
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29  # API 레벨을 낮춤 (29 = Android 10)
+        api-level: 33  # Android 13
         arch: x86_64
-        profile: Nexus 6  # 더 가벼운 디바이스 프로필 사용
+        profile: pixel_6
+        working-directory: source/did-client-sdk-aos
         script: |
           echo "Emulator is up and running"
           adb devices
@@ -38,8 +43,7 @@ jobs:
           adb kill-server
           adb start-server
           # Instrumentation 테스트 실행
-          ./gradlew connectedCheck
-        working-directory: source/did-client-sdk-aos  
+          ./gradlew connectedAndroidTest
         emulator-options: |
           -no-snapshot-save
           -no-window
@@ -50,12 +54,12 @@ jobs:
         disable-animations: true
         verbose: true
         force-avd-creation: false
-        emulator-boot-timeout: 1200  # 20분으로 증가
-        disk-size: 2000M
+        emulator-boot-timeout: 1800  # 30분으로 증가
+        disk-size: 4000M
 
     - name: Upload test results
       uses: actions/upload-artifact@v3
       if: always()
       with:
         name: test-results
-        path: app/build/outputs/androidTest-results
+        path: source/did-client-sdk-aos/app/build/outputs/androidTest-results
