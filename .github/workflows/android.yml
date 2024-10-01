@@ -36,6 +36,7 @@ jobs:
         working-directory: source/did-client-sdk-aos
         script: |
           adb devices
+          adb -s emulator-5554 emu finger touch 1  # 에뮬레이터에서 지문 등록
           ./gradlew connectedAndroidTest
 
     - name: Upload test results
