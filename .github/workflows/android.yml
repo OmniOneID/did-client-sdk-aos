@@ -20,13 +20,27 @@ jobs:
         distribution: 'temurin'
         cache: gradle
         
-    - name: Build with Gradle
-      run: |
-        cd source/did-client-sdk-aos
-        ./gradlew build
-        
-    - name: Run tests with Gradle
-      run: |
-        cd source/did-client-sdk-aos
-        ./gradlew connectedAndroidTest
-      
+    # 3. Set up Android SDK
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v2
+
+    # 4. Download dependencies
+    - name: Install Dependencies
+      run: ./gradlew dependencies
+
+    # 5. Start Android Emulator for API level 34
+    - name: Run Instrumentation Tests
+      uses: ReactiveCircus/android-emulator-runner@v2
+      with:
+        api-level: 34                # API Level 34 (Android 14)
+        target: google_apis           # Use Google APIs image
+        arch: x86_64                  # x86_64 architecture for 64-bit testing
+        profile: nexus_5              # You can specify device profile, e.g., Nexus 5
+        script: ./gradlew connectedAndroidTest
+        working-directory: source/did-client-sdk-aos
+        disable-animations: true      # Optional: Disable animations for faster tests
+        emulator-options: -no-window  # Optional: Run emulator in headless mode
+
+    # 6. Stop Emulator
+    - name: Kill Emulator
+      run: adb emu kill
