@@ -8,7 +8,7 @@ on:
 
 jobs:
   android-test:
-    runs-on: ubuntu-latest  # Linux 러너 사용
+    runs-on: ubuntu-latest
     timeout-minutes: 60
 
     defaults:
@@ -36,12 +36,5 @@ jobs:
         working-directory: source/did-client-sdk-aos
         script: |
           adb devices
-          adb -s emulator-5554 emu finger touch 1  # 에뮬레이터에서 지문 등록
+          adb -s emulator-5554 emu finger touch 1
           ./gradlew connectedAndroidTest
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: test-results
-        path: source/did-client-sdk-aos/app/build/outputs/androidTest-results
