@@ -106,9 +106,9 @@ public class KeystoreManager {
             if (isKeySaved(prefix, alias)) {
                 throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEYSTORE_MANAGER_DUPLICATED_PARAMETER, "alias");
             }
-            if (!isBiometric(context)) {
-                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEYSTORE_MANAGER_NO_REGISTERED_BIO_AUTH_INFO);
-            }
+            //if (!isBiometric(context)) {
+            //    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEYSTORE_MANAGER_NO_REGISTERED_BIO_AUTH_INFO);
+            //}
             byte[] ecPubKeyX = generateECKeyWithKeyStore(prefix + alias, context);
             keyGenerationInfo.setPublicKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, ecPubKeyX));
 
