@@ -1,4 +1,4 @@
-name: Android Instrumentation Tests
+name: Android CI and Instrumentation Tests
 
 on:
   push:
