@@ -20,14 +20,12 @@ Android DataModel SDK
 
 - 주제: DataModel
 - 작성: Sangjun Kim
-- 일자: 2024-07-11
+- 일자: 2024-08-28
 - 버전: v1.0.0
 
 | 버전   | 일자       | 변경 내용                 |
 | ------ | ---------- | -------------------------|
-| v1.0.0 | 2024-07-11 | 초기 작성                 |
-| v1.0.1 | 2024-09-03 | Service Vo 추가           |
-
+| v1.0.0 | 2024-08-28 | 초기 작성                 |
 
 
 <div style="page-break-after: always;"></div>
@@ -439,7 +437,7 @@ public class Claim {
 | hideValue | Bool                         | 값 숨김                   |    O    | Default(false)           |
 | location  | LOCATION                     | 값 위치                   |    O    | Default(inline) <br> [LOCATION](#12-location) |
 | digestSRI | String                       | Digest Subresource Integrity |    O    |                          |
-| i18n      |Map\<String, Internationalization> | 국제화                  |    O    | Claim 값의 해시값 <br> [Internationalization](#26-internationalization) |
+| i18n      |Map\<String, Internationalization> | 국제화                  |    O    | [Internationalization](#26-internationalization) |
 
 <br>
 

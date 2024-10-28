@@ -4,6 +4,8 @@ on:
     branches:
       - main
     types: [closed]
+permissions:
+  contents: write
 jobs:
   build:
     if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/QA-')
@@ -56,7 +58,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: source/did-client-sdk-aos/did-datamodel-sdk-aos/build/intermediates/aar_main_jar/release/classes.jar
-          asset_name: did-datamodel-sdk-aos-${{ steps.create_release.outputs.tag_name }}.jar
+          asset_name: did-datamodel-sdk-aos-${{ steps.set_release_title.outputs.release_tag }}.jar
           asset_content_type: application/java-archive
       - name: Upload JAR from did-core-sdk-aos
         uses: actions/upload-release-asset@v1
@@ -65,7 +67,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: source/did-client-sdk-aos/did-core-sdk-aos/build/intermediates/aar_main_jar/release/classes.jar
-          asset_name: did-core-sdk-aos-${{ steps.create_release.outputs.tag_name }}.jar
+          asset_name: did-core-sdk-aos-${{ steps.set_release_title.outputs.release_tag }}.jar
           asset_content_type: application/java-archive
       - name: Upload JAR from did-utility-sdk-aos
         uses: actions/upload-release-asset@v1
@@ -74,7 +76,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: source/did-client-sdk-aos/did-utility-sdk-aos/build/intermediates/aar_main_jar/release/classes.jar
-          asset_name: did-utility-sdk-aos-${{ steps.create_release.outputs.tag_name }}.jar
+          asset_name: did-utility-sdk-aos-${{ steps.set_release_title.outputs.release_tag }}.jar
           asset_content_type: application/java-archive
       - name: Upload JAR from did-communication-sdk-aos
         uses: actions/upload-release-asset@v1
@@ -83,7 +85,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: source/did-client-sdk-aos/did-communication-sdk-aos/build/intermediates/aar_main_jar/release/classes.jar
-          asset_name: did-communication-sdk-aos-${{ steps.create_release.outputs.tag_name }}.jar
+          asset_name: did-communication-sdk-aos-${{ steps.set_release_title.outputs.release_tag }}.jar
           asset_content_type: application/java-archive
       - name: Upload JAR from did-wallet-sdk-aos
         uses: actions/upload-release-asset@v1
@@ -92,5 +94,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: source/did-client-sdk-aos/did-wallet-sdk-aos/build/intermediates/aar_main_jar/release/classes.jar
-          asset_name: did-wallet-sdk-aos-${{ steps.create_release.outputs.tag_name }}.jar
+          asset_name: d-wallet-sdk-aos-${{ steps.set_release_title.outputs.release_tag }}.jar
           asset_content_type: application/java-archive    

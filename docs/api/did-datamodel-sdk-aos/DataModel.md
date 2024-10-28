@@ -20,14 +20,12 @@ Android DataModel SDK
 
 - Topic: DataModel
 - Author: Sangjun Kim
-- Date: 2024-07-11
+- Date: 2024-08-28
 - Version: v1.0.0
 
 | Version | Date       | Changes                    |
 | ------- | ---------- | -------------------------- |
-| v1.0.0  | 2024-07-11 | Initial version            |
-| v1.0.1  | 2024-09-03 | Add Service Vo            |
-
+| v1.0.0  | 2024-08-28 | Initial version            |
 
 <div style="page-break-after: always;"></div>
 
@@ -437,7 +435,7 @@ public class Claim {
 | hideValue | Bool                              | Hide value                     |    O    | Default (false)                           |
 | location  | LOCATION                          | Value location                 |    O    | Default (inline) <br> [LOCATION](#12-location) |
 | digestSRI | String                            | Digest Subresource Integrity   |    O    |                                           |
-| i18n      | Map\<String, Internationalization> | Internationalization           |    O    | Hash of claim value <br> [Internationalization](#26-internationalization) |
+| i18n      | Map\<String, Internationalization> | Internationalization           |    O   | [Internationalization](#26-internationalization) |
 
 <br>
 
