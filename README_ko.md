@@ -48,7 +48,7 @@ did-client-sdk-aos
         ├── build.gradle
         ├── did-communication-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -56,7 +56,7 @@ did-client-sdk-aos
         │   └── src
         ├── did-core-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -64,7 +64,7 @@ did-client-sdk-aos
         │   └── src
         ├── did-datamodel-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -72,7 +72,7 @@ did-client-sdk-aos
         │   └── src
         ├── did-utility-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -80,7 +80,7 @@ did-client-sdk-aos
         │   └── src
         ├── did-wallet-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
