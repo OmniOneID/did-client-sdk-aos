@@ -10,7 +10,7 @@ did-client-sdk-aos
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE
-├── LICENSE-dependencies.md
+├── dependencies-license.md
 ├── MAINTAINERS.md
 ├── README.md
 ├── README_ko.md
@@ -48,7 +48,7 @@ did-client-sdk-aos
         ├── build.gradle
         ├── did-communication-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -56,7 +56,7 @@ did-client-sdk-aos
         │   └── src
         ├── did-core-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -64,7 +64,7 @@ did-client-sdk-aos
         │   └── src
         ├── did-datamodel-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -72,7 +72,7 @@ did-client-sdk-aos
         │   └── src
         ├── did-utility-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -80,7 +80,7 @@ did-client-sdk-aos
         │   └── src
         ├── did-wallet-sdk-aos
         │   ├── CHANGELOG.md
-        │   ├── LICENSE-dependencies.md
+        │   ├── dependencies-license.md
         │   ├── README.md
         │   ├── README_ko.md
         │   ├── SECURITY.md
@@ -108,7 +108,7 @@ did-client-sdk-aos
 | CODE_OF_CONDUCT.md| 기여자의 행동강령            |
 | CONTRIBUTING.md| 기여 절차 및 방법           |
 | LICENSE                 | Apache 2.0                                      |
-| LICENSE-dependencies.md| 프로젝트 의존성 라이브러리에 대한 라이선스            |
+| dependencies-license.md| 프로젝트 의존성 라이브러리에 대한 라이선스            |
 | MAINTAINERS.md          | 유지관리 가이드              |
 | RELEASE-PROCESS.md      | 릴리즈 절차                                |
 | SECURITY.md| 보안취약점 보고 및 보안정책            | 
