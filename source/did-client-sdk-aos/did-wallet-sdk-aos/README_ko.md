@@ -1,7 +1,6 @@
 # Android Wallet SDK Guide
-본 문서는 OpenDID WalletAPI SDK 사용을 위한 가이드로,
-통신 인터페이스를 제공하여 HTTP 요청 및 응답을 관리하며,<br> 
-GET과 POST 메서드와 JSON payload를 지원한다.
+본 문서는 OpenDID Wallet SDK 사용을 위한 가이드로, 
+Open DID에 필요한 WalletToken, Lock/Unlock, Key, DID Document(DID 문서), Verifiable Credential(이하 VC) 정보를 생성 및 보관, 관리하는 기능을 제공한다.
 
 
 ## S/W 사양
