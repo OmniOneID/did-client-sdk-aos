@@ -215,6 +215,11 @@ ChangeLog can be found :
 - [Wallet SDK](source/did-client-sdk-aos/did-wallet-sdk-aos/CHANGELOG.md)  
 - [Communication SDK](source/did-client-sdk-aos/did-communication-sdk-aos/CHANGELOG.md)  
 
+## OpenDID Demonstration Videos <br>
+To watch our demonstration videos of the OpenDID system in action, please visit our [Demo Repository](https://github.com/OmniOneID/did-demo-server). <br>
+
+These videos showcase key features including user registration, VC issuance, and VP submission processes.
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details on our code of conduct, and the process for submitting pull requests to us.
