@@ -106,6 +106,8 @@ public enum WalletErrorCode {
 | Error Code   | Error Message                        | Description                       | Action Required                   |
 |--------------|--------------------------------------|-----------------------------------|-----------------------------------|
 | MSDKWLT05020 | Wallet is locked                     | Wallet access is restricted       | Unlock the wallet                 |
+| MSDKWLT05021 | Given new pin is equal to old pin                     | The PIN to be changed is the same as the existing PIN.       | Use another new pin                 |
+| MSDKWLT05022 | Wallet is not a lock-type                     | Wallet is not a lock-type       | Set the wallet to lock-type                 |
 
 <br>
 

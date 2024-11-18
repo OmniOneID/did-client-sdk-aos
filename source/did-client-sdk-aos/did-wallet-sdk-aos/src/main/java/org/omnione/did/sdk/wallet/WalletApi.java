@@ -470,5 +470,25 @@ public class WalletApi {
     public boolean isSavedKey(String id) throws UtilityException, WalletCoreException, WalletException {
         return walletCore.isSavedKey(id);
     }
-
+    /**
+     * Changes the Signing PIN for a given ID.
+     *
+     * @param keyId The identifier of the key to be changed.
+     * @param oldPin The current PIN.
+     * @param newPin The new PIN.
+     * @throws Exception Throws an exception if parameter validation fails or if an error occurs during encryption/decryption.
+     */
+    public void changePin(String keyId, String oldPin, String newPin) throws UtilityException, WalletCoreException {
+        walletCore.changePin(keyId, oldPin, newPin);
+    }
+    /**
+     * Changes the Unlock PIN.
+     *
+     * @param oldPin The current PIN.
+     * @param newPin The new PIN.
+     * @throws Exception Throws an exception if parameter validation fails or if an error occurs during encryption/decryption.
+     */
+    public void changeLock(String oldPin, String newPin) throws UtilityException, WalletCoreException, WalletException {
+        lockManager.changeLock(oldPin, newPin);
+    }
 }

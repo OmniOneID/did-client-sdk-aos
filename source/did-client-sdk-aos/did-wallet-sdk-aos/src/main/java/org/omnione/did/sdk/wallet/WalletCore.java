@@ -371,4 +371,9 @@ public class WalletCore implements WalletCoreInterface{
         return keyManager.isKeySaved(id);
     }
 
+    @Override
+    public void changePin(String keyId, String oldPin, String newPin) throws WalletCoreException, UtilityException {
+        keyManager.changePin(keyId, oldPin.getBytes(), newPin.getBytes());
+    }
+
 }

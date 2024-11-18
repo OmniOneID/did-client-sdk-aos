@@ -19,6 +19,8 @@ import org.omnione.did.sdk.wallet.walletservice.db.User;
 import org.omnione.did.sdk.wallet.walletservice.db.UserDao;
 import org.omnione.did.sdk.core.common.SecureEncryptor;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.wallet.walletservice.exception.WalletErrorCode;
+import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
 import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 
 import java.util.Arrays;
@@ -117,6 +119,46 @@ public class LockManager {
                 fek = userDao.getAll().get(0).fek;
         }
         return fek;
+    }
+
+    public void changeLock(String oldPassCode, String newPassCode) throws UtilityException, WalletCoreException, WalletException {
+        // lock type setting
+        if(getFinalEncCek().length() != 0){
+            if(oldPassCode.equals(newPassCode))
+                throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_NEW_PIN_EQUALS_OLD_PIN);
+            byte[] pwd = oldPassCode.getBytes();
+            byte[] walletId = DigestUtils.getDigest(Preference.loadWalletId(context).getBytes(), DigestEnum.DIGEST_ENUM.SHA_384);
+            byte[] finalEncCek = Base16.toBytes(getFinalEncCek());
+            byte[] encCek = SecureEncryptor.decrypt(finalEncCek);
+
+            int dk_keySize = 32;
+            int iterator = 2048;
+            byte[] salt = Arrays.copyOfRange(walletId, 0, 32);
+
+            byte[] kek = CryptoUtils.pbkdf2(pwd, salt, iterator, dk_keySize);
+            byte[] key = Arrays.copyOfRange(kek, 0, 32);
+            byte[] iv = Arrays.copyOfRange(walletId, 32, walletId.length);
+            byte[] cek = CryptoUtils.decrypt(
+                    encCek,
+                    new CipherInfo(CipherInfo.ENCRYPTION_TYPE.AES, CipherInfo.ENCRYPTION_MODE.CBC, CipherInfo.SYMMETRIC_KEY_SIZE.AES_256, CipherInfo.SYMMETRIC_PADDING_TYPE.PKCS5),
+                    key,
+                    iv);
+            byte[] newPwd = newPassCode.getBytes();
+            byte[] newKek = CryptoUtils.pbkdf2(newPwd, salt, iterator, dk_keySize);
+            byte[] newKey = Arrays.copyOfRange(newKek, 0, 32);
+            byte[] newEncCek = CryptoUtils.encrypt(
+                    cek,
+                    new CipherInfo(CipherInfo.ENCRYPTION_TYPE.AES, CipherInfo.ENCRYPTION_MODE.CBC, CipherInfo.SYMMETRIC_KEY_SIZE.AES_256, CipherInfo.SYMMETRIC_PADDING_TYPE.PKCS5),
+                    newKey,
+                    iv);
+
+            byte[] newFinalEncCek = SecureEncryptor.encrypt(newEncCek, context);
+            updateFinalEncCek(Base16.toHex(newFinalEncCek));
+
+        } else {
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_NOT_LOCK_TYPE);
+        }
+        WalletApi.isLock = false;
     }
 
 }

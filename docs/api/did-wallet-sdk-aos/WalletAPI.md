@@ -25,13 +25,13 @@ Android Wallet SDK API
 
 | Version | Date       | History                 |
 | ------- | ---------- | ------------------------|
-| v1.0.0  | 2024-08-19 | 초기 작성                 |
+| v1.0.0  | 2024-08-19 | Initial                 |
 
 
 <div style="page-break-after: always;"></div>
 
-# 목차
-- [APIs](#api-목록)
+# Table of Contents
+- [APIs](#api-list)
     - [0. constructor](#0-constructor)
     - [1. isExistWallet](#1-isexistwallet)
     - [2. createWallet](#2-createwallet)
@@ -60,6 +60,8 @@ Android Wallet SDK API
     - [25. authenticateBioKey](#25-authenticatebiokey)
     - [26. addProofsToDocument](#26-addproofstodocument)
     - [27. isSavedBioKey](#27-issavedbiokey)
+    - [28. changePin](#28-changepin)
+    - [29. changeLock](#29-changelock)
 
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
@@ -70,7 +72,7 @@ Android Wallet SDK API
     - [4. SignedDIDDoc](#4-signeddiddoc)
     - [5. SignedWalletInfo](#5-signedwalletinfo)
     - [6. DIDAuth](#6-didauth)
-# API 목록
+# API List
 ## 0. constructor
 
 ### Description
@@ -958,6 +960,68 @@ boolean hasBioKey = walletApi.isSavedBioKey();
 
 <br>
 
+## 28. changePin
+
+### Description
+`Change PIN for signing`
+
+### Declaration
+
+```java
+public void changePin(String keyId, String oldPin, String newPin) throws Exception
+```
+
+### Parameters
+
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| keyId     | String | key ID for signing | M       |          |
+| oldPIN | String | old PIN      | M       |          |
+| newPIN | String | new PIN    | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+String oldPin = "123456";
+String newPin = "654321";
+walletApi.changePin(Constants.KEY_ID_PIN, oldPin, newPin);
+```
+
+<br>
+
+## 29. changeLock
+
+### Description
+`Change PIN for Unlock`
+
+### Declaration
+
+```java
+public void changeLock(String oldPin, String newPin) throws Exception
+```
+
+### Parameters
+
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| oldPIN | String | old PIN      | M       |          |
+| newPIN | String | new PIN    | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+String oldPin = "123456";
+String newPin = "654321";
+walletApi.changeLock(oldPin, newPin);
+```
+
+<br>
 
 # Enumerators
 ## 1. WALLET_TOKEN_PURPOSE

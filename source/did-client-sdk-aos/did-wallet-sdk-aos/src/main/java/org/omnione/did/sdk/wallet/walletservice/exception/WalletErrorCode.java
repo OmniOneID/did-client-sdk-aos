@@ -40,6 +40,8 @@ public enum WalletErrorCode {
     ERR_CODE_WALLET_CREATE_WALLET_TOKEN_FAIL(WALLET_BASE, 11, "Failed to create wallet token"),
 
     ERR_CODE_WALLET_LOCKED_WALLET(WALLET_BASE, 20, "Wallet is locked"),
+    ERR_CODE_WALLET_NEW_PIN_EQUALS_OLD_PIN(WALLET_BASE, 21, "Given new pin is equal to old pin"),
+    ERR_CODE_WALLET_NOT_LOCK_TYPE(WALLET_BASE, 22, "Wallet is not a lock-type"),
 
     ERR_CODE_WALLET_INSERT_QUERY_FAIL(WALLET_BASE, 30, "Failed to execute insert query"),
     ERR_CODE_WALLET_SELECT_QUERY_FAIL(WALLET_BASE, 31, "Failed to execute select query"),

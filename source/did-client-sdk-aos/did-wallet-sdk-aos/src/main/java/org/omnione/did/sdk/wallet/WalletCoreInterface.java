@@ -50,4 +50,5 @@ public interface WalletCoreInterface {
     byte[] sign(String id, byte[] pin, byte[] digest, int type) throws WalletCoreException, UtilityException, WalletException;
     boolean verify(byte[] publicKey, byte[] digest, byte[] signature) throws WalletCoreException, UtilityException, WalletException;
     boolean isSavedKey(String id) throws WalletCoreException, UtilityException, WalletException;
+    void changePin(String keyId, String oldPin, String newPin) throws WalletCoreException, UtilityException;
 }

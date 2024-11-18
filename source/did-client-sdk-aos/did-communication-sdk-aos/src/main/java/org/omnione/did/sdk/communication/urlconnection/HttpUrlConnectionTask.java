@@ -33,7 +33,7 @@ public class HttpUrlConnectionTask {
         communicationLogger = CommunicationLogger.getInstance();
     }
     public String makeHttpRequest(String urlString, String method, String payload) throws CommunicationException {
-        communicationLogger.d("request : " + payload + " / " + urlString);
+        communicationLogger.d("request : " + payload + " / " + urlString + " / [" + method + "]");
         if(urlString.isEmpty()){
             throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_INVALID_PARAMETER, "urlString");
         }
