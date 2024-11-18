@@ -126,7 +126,7 @@ public class KeystoreManager {
 
             return keyGenerationInfo;
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeySpecException | NoSuchProviderException e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEYSTORE_MANAGER_FAILED_TO_CREATE_SECURE_KEY);
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEYSTORE_MANAGER_FAILED_TO_CREATE_SECURE_KEY, e.getMessage());
         }
     }
 
@@ -327,7 +327,7 @@ public class KeystoreManager {
             byte[] pubKey = getPublicKey(SIGNATURE_MANAGER_ALIAS_PREFIX, alias);
             return compressedSignValue(signedMsgFromKeyStore, pubKey, digest);
         } catch(KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException | InvalidKeyException | SignatureException | UnrecoverableEntryException e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEYSTORE_MANAGER_FAILED_TO_SIGN);
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEYSTORE_MANAGER_FAILED_TO_SIGN, e.getMessage());
         }
 
     }

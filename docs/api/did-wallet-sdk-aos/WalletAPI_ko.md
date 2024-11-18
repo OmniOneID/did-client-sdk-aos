@@ -60,6 +60,8 @@ Android Wallet SDK API
     - [25. authenticateBioKey](#25-authenticatebiokey)
     - [26. addProofsToDocument](#26-addproofstodocument)
     - [27. isSavedBioKey](#27-issavedbiokey)
+    - [28. changePin](#28-changepin)
+    - [29. changeLock](#29-changelock)
 
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
@@ -144,7 +146,11 @@ public boolean createWallet() throws Exception
 
 ### Parameters
 
-Void
+| Name      | Type   | Description                      | **M/O** | **Note** |
+|-----------|--------|----------------------------------|---------|----------|
+| walletUrl    | String | Wallet URL                          | M       |          |
+| tasUrl | String | TAS URL                       | M       |          |
+
 
 ### Returns
 
@@ -563,13 +569,14 @@ SignedWalletInfo signedInfo = walletApi.getSignedWalletInfo();
 ### Declaration
 
 ```java
-public CompletableFuture<String> requestRegisterUser(String hWalletToken, String txId, String serverToken, SignedDidDoc signedDIDDoc) throws Exception
+public CompletableFuture<String> requestRegisterUser(String hWalletToken, String tasUrl, String txId, String serverToken, SignedDidDoc signedDIDDoc) throws Exception
 ```
 
 ### Parameters
 
 | Name         | Type           | Description                        | **M/O** | **Note** |
 |--------------|----------------|-----------------------------|---------|----------|
+| tasUrl | String         | TAS URL                   | M       |          |
 | hWalletToken | String         | 월렛토큰                   | M       |          |
 | txId     | String       | 거래코드               | M       |          |
 | serverToken     | String       | 서버토큰                | M       |          |
@@ -636,6 +643,7 @@ public CompletableFuture<String> requestIssueVc(String hWalletToken, String txId
 
 | Name        | Type           | Description                        | **M/O** | **Note** |
 |-------------|----------------|-----------------------------|---------|----------|
+| tasUrl | String         | TAS URL                  | M       |          |
 | hWalletToken | String         | 월렛토큰                   | M       |          |
 | txId     | String       | 거래코드               | M       |          |
 | serverToken     | String       | 서버토큰                | M       |          |
@@ -674,11 +682,13 @@ public CompletableFuture<String> requestRevokeVc(String hWalletToken, String ser
 | Name        | Type           | Description                        | **M/O** | **Note** |
 |-------------|----------------|-----------------------------|---------|----------|
 | hWalletToken | String         | 월렛토큰                   | M       |          |
+| tasUrl | String         | TAS URL                   | M       |          |
 | txId     | String       | 거래코드               | M       |          |
 | serverToken     | String       | 서버토큰                | M       |          |
 | vcId     | String       | VC ID                | M       |          |
 | issuerNonce|String | 발급처 nonce   | M       |[데이터모델 참조]          |
 | passcode|String | 서명용 PIN   | M       |[DIDAuth](#6-didauth)         |
+| authType|VERIFY_AUTH_TYPE | 제출 인증수단 타입   | M       |       |
 
 ### Returns
 
@@ -949,6 +959,68 @@ boolean hasBioKey = walletApi.isSavedBioKey();
 
 <br>
 
+## 28. changePin
+
+### Description
+`서명용 PIN 변경`
+
+### Declaration
+
+```java
+public void changePin(String keyId, String oldPin, String newPin) throws Exception
+```
+
+### Parameters
+
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| keyId     | String | 서명용 키아이디 | M       |          |
+| oldPIN | String | 현재 PIN      | M       |          |
+| newPIN | String | 변경할 PIN    | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+String oldPin = "123456";
+String newPin = "654321";
+walletApi.changePin(Constants.KEY_ID_PIN, oldPin, newPin);
+```
+
+<br>
+
+## 29. changeLock
+
+### Description
+`Unlock PIN 변경`
+
+### Declaration
+
+```java
+public void changeLock(String oldPin, String newPin) throws Exception
+```
+
+### Parameters
+
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| oldPIN | String | 현재 PIN      | M       |          |
+| newPIN | String | 변경할 PIN    | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+String oldPin = "123456";
+String newPin = "654321";
+walletApi.changeLock(oldPin, newPin);
+```
+
+<br>
 
 # Enumerators
 ## 1. WALLET_TOKEN_PURPOSE

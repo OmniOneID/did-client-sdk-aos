@@ -258,10 +258,9 @@ public class KeyManager<E extends BaseObject>{
         if (newPin.length < 1) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_INVALID_PARAMETER, "newPin");
         }
-        if (oldPin == newPin) {
+        if (Arrays.equals(oldPin, newPin)) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_NEW_PIN_EQUALS_OLD_PIN);
         }
-
         KeyInfo oldKeyInfo = walletItems.get(0).getMeta();
         DetailKeyInfo oldDetailKeyInfo = walletItems.get(0).getItem();
 

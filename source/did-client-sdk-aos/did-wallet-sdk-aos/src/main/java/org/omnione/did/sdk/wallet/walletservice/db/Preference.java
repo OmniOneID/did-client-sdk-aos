@@ -25,27 +25,6 @@ public class Preference {
         return context.getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
     }
 
-    public static void savePin(Context context, String pin) {
-        SharedPreferences prefs = getPreference(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("pin", pin);
-        editor.apply();
-    }
-    public static String loadPin(Context context) {
-        SharedPreferences prefs = getPreference(context);
-        return prefs.getString("pin", "0000");
-    }
-
-    public static void saveFinalEncCek(Context context, String fec) {
-        SharedPreferences prefs = getPreference(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("fec", fec);
-        editor.apply();
-    }
-    public static String loadFinalEncCek(Context context) {
-        SharedPreferences prefs = getPreference(context);
-        return prefs.getString("fec", "");
-    }
     public static void saveWalletId(Context context, String walletId) {
         SharedPreferences prefs = getPreference(context);
         SharedPreferences.Editor editor = prefs.edit();
