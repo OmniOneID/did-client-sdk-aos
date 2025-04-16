@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2024-2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,10 @@ public class WalletLogger {
     }
 
     public void d(String logMsg) {
-        if(isEnabled)
-            Log.d("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+        if(isEnabled) {
+            Log.d("WALLET_LOG", logMsg);
+//            Log.d("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+        }
     }
     public void e(String logMsg) {
         if(isEnabled)

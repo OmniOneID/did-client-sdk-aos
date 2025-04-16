@@ -12,7 +12,7 @@ import org.omnione.did.sdk.utility.DataModels.DigestEnum;
 import org.omnione.did.sdk.utility.DigestUtils;
 import org.omnione.did.sdk.utility.Encodings.Base16;
 import org.omnione.did.sdk.utility.Errors.UtilityException;
-import org.omnione.did.sdk.wallet.WalletApi;
+import org.omnione.did.sdk.core.api.WalletApi;
 import org.omnione.did.sdk.wallet.walletservice.db.DBManager;
 import org.omnione.did.sdk.wallet.walletservice.db.Preference;
 import org.omnione.did.sdk.wallet.walletservice.db.User;

@@ -10,10 +10,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/did-communication-sdk-aos" />
-            <option value="$PROJECT_DIR$/did-core-sdk-aos" />
-            <option value="$PROJECT_DIR$/did-datamodel-sdk-aos" />
-            <option value="$PROJECT_DIR$/did-utility-sdk-aos" />
             <option value="$PROJECT_DIR$/did-wallet-sdk-aos" />
           </set>
         </option>
