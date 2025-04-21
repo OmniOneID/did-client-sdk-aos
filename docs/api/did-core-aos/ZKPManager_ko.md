@@ -13,16 +13,16 @@
 
 - [APIs](#api-목록)
   - [1. constructor](#1-constructor)
-  - [2. addCredentials](#3-addcredentials)
-  - [3. getCredentials](#4-getcredentials)
-  - [4. getAllCredentials](#5-getallcredentials)
-  - [5. deleteCredentials](#6-deletecredentials)
-  - [6. deleteAllCredentials](#7-deleteallcredentials)
-  - [7. createCredentialRequest](#8-createcredentialrequest)
-  - [8. verifyAndStoreCredential](#9-verifyandstorecredential)
-  - [9. searchCredentials](#10-searchcredentials)
-  - [10. createReferent](#11-createreferent)
-  - [11. createProof](#12-createproof)
+  - [2. addCredentials](#2-addcredentials)
+  - [3. getCredentials](#3-getcredentials)
+  - [4. getAllCredentials](#4-getallcredentials)
+  - [5. deleteCredentials](#5-deletecredentials)
+  - [6. deleteAllCredentials](#6-deleteallcredentials)
+  - [7. createCredentialRequest](#7-createcredentialrequest)
+  - [8. verifyAndStoreCredential](#8-verifyandstorecredential)
+  - [9. searchCredentials](#9-searchcredentials)
+  - [10. createReferent](#10-createreferent)
+  - [11. createProof](#11-createproof)
 
 # API 목록
 
@@ -35,15 +35,14 @@ ZKPManager 자바 생성자.
 ### Declaration
 
 ```java
-ZKPManager(Context context);
 ZKPManager(String fileName, Context context);
 ```
 
 ### Parameters
 
-| Parameter | Type    | Description     | **M/O** | **비고**   |
+| Parameter | Type    | Description     | **M/O** | **비고**  |
 | --------- | ------- | --------------- | ------- | -------- |
-| fileName  | String  | 저장 파일명           | O       |  |
+| fileName  | String  | 저장 파일명        | M       |          |
 | context   | Context | Android context | M       |          |
 
 ### Returns
@@ -53,30 +52,8 @@ ZKPManager(String fileName, Context context);
 | ZKPManager | ZKPManager 객체 | M       |        |
 
 
-## 2. addCredentials
 
-### Description
-
-지정한 Credential 정보를 저장.
-
-### Declaration
-
-```java
-void addCredentials(Credential credential, String credentialId)
-```
-
-### Parameters
-
-| Parameter    | Type       | Description       |
-| ------------ | ---------- | ----------------- |
-| credential   | Credential | 저장할 credential 객체 |
-| credentialId | String     | 특정 credential의 ID |
-
-### Returns
-
-void
-
-## 3. getCredentials
+## 2. getCredentials
 
 ### Description
 
@@ -100,7 +77,7 @@ List<CredentialInfo> getCredentials(List<String> identifiers)
 | ---- | ----------------- |
 | List | 저장된 credential 목록 |
 
-## 4. getAllCredentials
+## 3. getAllCredentials
 
 ### Description
 
@@ -118,7 +95,7 @@ ArrayList<CredentialInfo> getAllCredentials()
 | --------- | ---------------- |
 | ArrayList | 모든 credential 목록 |
 
-## 5. deleteCredentials
+## 4. deleteCredentials
 
 ### Description
 
@@ -140,7 +117,7 @@ void deleteCredentials(List<String> identifiers)
 
 void
 
-## 6. deleteAllCredentials
+## 5. deleteAllCredentials
 
 ### Description
 
@@ -156,6 +133,23 @@ void deleteAllCredentials()
 
 void
 
+
+## 6. isAnyCredentialsSaved
+
+### Description
+
+저장된 credential 유무 확인
+
+### Declaration
+
+```java
+boolean isAnyCredentialsSaved()
+```
+
+### Returns
+
+boolean
+
 ## 7. createCredentialRequest
 
 ### Description
@@ -167,9 +161,7 @@ ZKP 기능의 Credential Request 생성
 ```java
 ZkpRequestCredentialBuilder createCredentialRequest(String proverDid,
                                                     CredentialPrimaryPublicKey credentialPublicKey,
-                                                    CredentialOffer credOffer,
-                                                    LinkedHashMap<String, String> credentialValueMap,
-                                                    BigInteger proverNonce)
+                                                    CredentialOffer credOffer)
 ```
 
 ### Parameters
@@ -179,14 +171,12 @@ ZkpRequestCredentialBuilder createCredentialRequest(String proverDid,
 | proverDid           | String                         | Prover DID            |
 | credentialPublicKey | CredentialPrimaryPublicKey     | Credential Public Key |
 | credOffer           | CredentialOffer                | Credential Offer      |
-| credentialValueMap  | LinkedHashMap<String, String> | Attribute Value Map   |
-| proverNonce         | BigInteger                     | Nonce for prover      |
 
 ### Returns
 
 | Type                        | Description                |
 | --------------------------- | -------------------------- |
-| ZkpRequestCredentialBuilder | Credential Request Builder |
+| CredentialRequestContainer | Credential Request Container |
 
 ## 8. verifyAndStoreCredential
 
@@ -197,22 +187,19 @@ ZkpRequestCredentialBuilder createCredentialRequest(String proverDid,
 ### Declaration
 
 ```java
-boolean verifyAndStoreCredential(MasterSecretBlindingData masterSecretBlindingData,
+boolean verifyAndStoreCredential(CredentialRequestMeta credentialRequestMeta,
                                   CredentialPrimaryPublicKey credentialPrimaryPublicKey,
-                                  String credentialId,
-                                  Credential credential,
-                                  BigInteger proverNonce)
+                                  Credential credential)
 ```
 
 ### Parameters
 
-| Parameter                  | Type                       | Description                |
-| -------------------------- | -------------------------- | -------------------------- |
-| masterSecretBlindingData   | MasterSecretBlindingData   | Blinded Master Secret Data |
-| credentialPrimaryPublicKey | CredentialPrimaryPublicKey | Credential Public Key      |
-| credentialId               | String                     | Credential ID              |
-| credential                 | Credential                 | Credential Object          |
-| proverNonce                | BigInteger                 | Nonce for prover           |
+| Parameter                  | Type                       | Description                       |
+| -------------------------- | -------------------------- | ----------------------------------|
+| CredentialRequestMeta      | CredentialRequestMeta      | Blinded Master Secret Data, nonce |
+| credentialPrimaryPublicKey | CredentialPrimaryPublicKey | Credential Public Key             |
+| credential                 | Credential                 | Credential Object                 |
+
 
 ### Returns
 
@@ -248,7 +235,7 @@ ZkpSearchCredentialBuilder searchCredentials(ProofRequest proofRequest)
 
 ### Description
 
-사용자가 선택한 Referent 정보를 기반으로 각 credential에 대한 Referent 만들기
+사용자가 선택한 Referent 정보를 기반으로 각 credential에 대한 Referent 생성
 
 ### Declaration
 
@@ -277,9 +264,7 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 ### Declaration
 
 ```java
-ZkpCreateProofBuilder createProof(ProofRequest proofRequest,
-                                  List<ProofParam> proofParams,
-                                  Map<String, String> selfAttributes)
+Proof createProof(ProofRequest proofRequest, List<ProofParam> proofParams, Map<String, String> selfAttributes)
 ```
 
 ### Parameters
@@ -294,4 +279,4 @@ ZkpCreateProofBuilder createProof(ProofRequest proofRequest,
 
 | Type                  | Description   |
 | --------------------- | ------------- |
-| ZkpCreateProofBuilder | Proof Builder |
+| Proof                 | Proof         |

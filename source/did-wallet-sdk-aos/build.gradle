@@ -1,6 +1,8 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.library'
+    id 'com.android.library' version '8.2.1'
 }
+
 android {
     namespace 'org.omnione.did.sdk.wallet'
     compileSdk 34
@@ -23,7 +25,7 @@ android {
 }
 
 ext {
-    customVersionMajorMinorBuild = "1.0.0"
+    customVersionMajorMinorBuild = "2.0.0"
 }
 
 task deleteObjectJar(type: Delete){

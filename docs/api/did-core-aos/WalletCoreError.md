@@ -167,44 +167,35 @@ public enum WalletCoreErrorCode {
   <br>
 
   ## 8. ZKP
-  | Error Code   | Error Message                                             | Description                                               | Action Required                                     |
-  |--------------|-----------------------------------------------------------|-----------------------------------------------------------|-----------------------------------------------------|
-  | MSDKWLT13100 | Failed to validate parameter : {detail error}             | The input parameters are invalid or incorrectly formatted.| Verify and correct the input parameters.            |
-  | MSDKWLT13101 | Failed to generate nonce                                  | Failed to generate a cryptographic nonce.                 |Retry the operation or check entropy sources.        |
-  | MSDKWLT13102 | Failed to convert byte to big number                      | Conversion from byte array to big number failed.          |Ensure input bytes are valid and correctly formatted.|
-  | MSDKWLT13103 | Failed to parse big number from json                      | Failed to parse big number from JSON format.              | Validate the JSON structure and value types.        |
-  | MSDKWLT13104 | Failed to convert hexadecimal string to big number        | Hexadecimal string could not be converted to big number.  |Check if hex string is valid.                        |
-  | MSDKWLT13105 | Failed to compare big numbers                             | Comparison of big number values failed.                   | Inspect input values for consistency.               |
-  | MSDKWLT13106 | No data in wallet                                         | No corresponding data found in the wallet storage.        | Ensure data is saved before accessing.              |
-  | MSDKWLT13107 | Failed to finalize hash computation                       | Final step of hashing process failed.                     | Check hashing input and algorithm compatibility.    |
-  | MSDKWLT13108 | Failed to confirm big number is prime                     | The given big number is not a prime number.               | Provide a valid prime number as required.           |
-  | MSDKWLT13109 | Failed to calculate TEQ proof                             | TEQ proof calculation failed.                             | Verify cryptographic parameters.                    |
-  | MSDKWLT13110 | Failed to calculate TNE proof                             | TNE proof calculation failed.                             | Verify cryptographic parameters.                    |
-  | MSDKWLT13111 | Error IO                                                  | An I/O error occurred during operation.                   | Check file paths and system permissions.            |
-  | MSDKWLT13112 | No such algorithm                                         | Requested cryptographic algorithm is not available.       | Use a supported algorithm.                          |
-  | MSDKWLT13113 | Data is null                                              | Required data is missing or null.                         | Ensure data is properly initialized.                |
-  | MSDKWLT13114 | Duplicated key                                            | A key with the same identifier already exists.            | Use a unique key identifier.                        |
-  | MSDKWLT13115 | Not supported type                                        | The data type is not supported by the operation.          | Use a valid supported data type.                    |
-  | MSDKWLT13116 | Not supported predicate type                              | The predicate type is not supported.                      | Use one of the supported predicate types.           |
-  | MSDKWLT13117 | Failed to generate master secret                          | Failed to generate the master secret.                     | Check randomness and retry.                         |
-  | MSDKWLT13118 | Failed to verify credential key correctness proof         | Credential key correctness proof verification failed.     | Validate credential key and proof inputs.           |
-  | MSDKWLT13119 | Failed to generate new blinded primary credential secrets factors  | Blinded secrets factor generation failed.                 | Check secret input values and retry.       |
-  | MSDKWLT13120 | Failed to generate blinded credential secrets correctness proof    | Failed to generate correctness proof for blinded secrets. | Ensure correct secret inputs.              |
-  | MSDKWLT13121 | Failed to encode raw data                                 | Failed to encode raw data.                                | Verify raw data format.                             |
-  | MSDKWLT13122 | Failed to select master secret from wallet                | Master secret could not be retrieved from wallet.         |	Check if master secret exists in wallet.           |
-  | MSDKWLT13123 | Failed to verify signature correctness proof              | Signature correctness proof validation failed.	           | Recheck input values and proof components.          |
-  | MSDKWLT13124 | Failed to insert credential into wallet                   | Storing the credential in wallet failed.                  |	Check wallet state and retry.                      |
-  | MSDKWLT13125 | Failed to select credential from wallet                   | Failed to retrieve credential from wallet.                |	Ensure credential exists and is accessible.        |
-  | MSDKWLT13126 | Not found available request attribute                     | No matching attribute found for the request.              |	Check requested attribute names.                   |
-  | MSDKWLT13127 | Not found available predicate attribute                   | No matching predicate attribute found.                    |	Verify predicate attributes in credential.         |
-  | MSDKWLT13128 | Failed to build credential for proving                    | Failed to build credential structure for proving.         |	Check credential and referent mapping.             |
-  | MSDKWLT13129 | Not found schema from list                                | Schema information not found in provided list.	           | Ensure correct schema ID is included.               |
-  | MSDKWLT13130 | Not found credential definition from list                 | Credential definition missing from list.	                 | Verify definition ID exists in input.               |
-  | MSDKWLT13131 | Failed to initialize primary equal proof                  | Initialization of primary equal proof failed.             |	Inspect equal predicate values.                    |
-  | MSDKWLT13132 | Failed to initialize primary non-equal proof              | Initialization of primary non-equal proof failed.	       | Inspect non-equal predicate values.                 |
-  | MSDKWLT13133 | Failed to initialize primary proof                        | Primary proof initialization failed.                      |	Review all related proof parameters.               |
-  | MSDKWLT13134 | Failed to finalize primary equal proof                    | Finalization of primary equal proof failed.	             | Check final proof input structure.                  |
-  | MSDKWLT13135 | Failed to finalize primary non-equal proof                | Finalization of primary non-equal proof failed.           |	Check final proof input structure.                 |
-  | MSDKWLT13136 | Failed to convert hexadecimal string to big number        | Hexadecimal to big number conversion failed.              |	Ensure valid hexadecimal input.                    |
-
+  | Error Code   | Error Message                                            | Description                                           | Action Required|
+  |--------------|-----------------------------------------------------------|------------------------------------------------------|----------------|
+  | MSDKWLT04100 | Invalid parameter                                         | Invalid parameter                                    | -              |
+  | MSDKWLT04101 | Duplicated parameter                                      | Duplicated parameter                                 | -              |
+  | MSDKWLT04102 | Fail to decode                                            | Fail to decode                                       | -              |
+  | MSDKWLT04100 | Data is null                                              | Data is null                                         | -              |
+  | MSDKWLT04101 | Delta value must be positive                              | Delta value must be positive                         | -              |
+  | MSDKWLT04102 | Failed to compare big numbers                             | Failed to compare big numbers                        | -              |
+  | MSDKWLT04104 | Failed to convert byte to big number                      | Failed to convert byte to big number                 | -              |
+  | MSDKWLT04105 | Failed to convert big number to byte                      | Failed to convert big number to byte                 | -              |
+  | MSDKWLT04106 | Error IO                                                  | Error IO                                             | -              |
+  | MSDKWLT04107 | Not supported type                                        | Not supported type                                   | -              |
+  | MSDKWLT04200 | Master secret not found                                   | Master secret not found                              | -              |
+  | MSDKWLT04201 | Failed to generate master secret                          | Failed to generate master secret                     | -              |
+  | MSDKWLT04300 | Failed to verify signature correctness proof              | Failed to verify signature correctness proof         | -              |
+  | MSDKWLT04400 | Credential not found in storage                           | Credential not found in storage                      | -              |
+  | MSDKWLT04401 | Credential not found by identifiers in storage            | Credential not found by identifiers in storage       | -              |
+  | MSDKWLT04500 | Proof request's predicate must have restrictions          | Proof request's predicate must have restrictions     | -              |
+  | MSDKWLT04501 | Not found available request attribute                     | Not found available request attribute                | -              |
+  | MSDKWLT04502 | Not found available predicate attribute                   | Not found available predicate attribute              | -              |
+  | MSDKWLT04602 | Failed to build credential for proving                    | Failed to build credential for proving               | -              |
+  | MSDKWLT04603 | Not found schema from list                                | Not found schema from list                           | -              |
+  | MSDKWLT04604 | Not found credential definition from list                 | Not found credential definition from list            | -              |
+  | MSDKWLT04605 | Duplicated key                                            | Duplicated key                                       | -              |
+  | MSDKWLT04900 | Failed to calculate TEQ proof                             | Failed to calculate TEQ proof                        | -              |
+  | MSDKWLT04901 | Failed to calculate TNE proof                             | Failed to calculate TNE proof	                      | -              |
+  | MSDKWLT04902 | Failed to initialize primary equal proof                  | Failed to initialize primary equal proof             | -              |
+  | MSDKWLT04903 | Failed to initialize primary non-equal proof              | Failed to initialize primary non-equal proof         | -              |
+  | MSDKWLT04904 | Failed to finalize primary equal proof                    | Failed to finalize primary equal proof               | -              |
+  | MSDKWLT04905 | Failed to finalize primary non-equal proof                | Failed to finalize primary non-equal proof           | -              |
+  
   <br>

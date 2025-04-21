@@ -77,14 +77,14 @@ public enum WalletCoreErrorCode {
     // [04] ZKPManager
     ZKP_MANAGER_BASE("04"),
 
-    ERR_CODE_ZKP_PARAMETER_VALID_FAIL                                    (ZKP_MANAGER_BASE, 000, "Invalid parameter : "),
-    ERR_CODE_ZKP_DUPLICATED_PARAMETER                                    (ZKP_MANAGER_BASE, 001, "Duplicated parameter : "),
-    ERR_CODE_ZKP_FAIL_TO_DECODE                                          (ZKP_MANAGER_BASE, 002, "Fail to decode : "),
+    ERR_CODE_ZKP_PARAMETER_VALID_FAIL                                    (ZKP_MANAGER_BASE, 000, "Invalid parameter"),
+    ERR_CODE_ZKP_DUPLICATED_PARAMETER                                    (ZKP_MANAGER_BASE, 001, "Duplicated parameter"),
+    ERR_CODE_ZKP_FAIL_TO_DECODE                                          (ZKP_MANAGER_BASE, 002, "Fail to decode"),
 
     // common
     ERR_CODE_ZKP_NULL                                                    (ZKP_MANAGER_BASE,100,"Data is null"),
     ERR_CODE_ZKP_NEGATIVE_DELTA                                          (ZKP_MANAGER_BASE,101,"Delta value must be positive"),
-    ERR_CODE_ZKP_BIG_NUMBER_COMPARE_FAIL                                 (ZKP_MANAGER_BASE,102,"Failed to compare big numbers: "),
+    ERR_CODE_ZKP_BIG_NUMBER_COMPARE_FAIL                                 (ZKP_MANAGER_BASE,102,"Failed to compare big numbers"),
     ERR_CODE_ZKP_BIG_NUMBER_FROM_BYTE_FAIL                               (ZKP_MANAGER_BASE,104,"Failed to convert byte to big number"),
     ERR_CODE_ZKP_BIG_NUMBER_TO_BYTE_FAIL                                 (ZKP_MANAGER_BASE,105,"Failed to convert big number to byte"),
 
@@ -110,9 +110,8 @@ public enum WalletCoreErrorCode {
     // proof
     ERR_CODE_ZKP_PROVER_BUILD_CREDENTIAL_FOR_PROVING_FAIL                (ZKP_MANAGER_BASE,602,"Failed to build credential for proving"),
     ERR_CODE_ZKP_PROVER_NOT_FOUND_SCHEMA_FROM_LIST                       (ZKP_MANAGER_BASE,603,"Not found schema from list"),
-    ERR_CODE_ZKP_PROVER_NOT_FOUND_CRED_DEF_FROM_LIST                     (ZKP_MANAGER_BASE,604,"Not found credential definition from list"),
+    ERR_CODE_ZKP_PROVER_INSUFFICIENT_PROOF_REQUEST_REFERENTS             (ZKP_MANAGER_BASE,604,"Insufficient referents for proof request"),
     ERR_CODE_ZKP_DUPLICATED                                              (ZKP_MANAGER_BASE,605,"Duplicated key"),
-
 
     // integrated
     ERR_CODE_ZKP_CALCULATE_TEQ_FAIL                                      (ZKP_MANAGER_BASE,900, "Failed to calculate TEQ proof"),

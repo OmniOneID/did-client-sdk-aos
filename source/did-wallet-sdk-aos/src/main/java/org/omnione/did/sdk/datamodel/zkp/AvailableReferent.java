@@ -103,17 +103,18 @@ public class AvailableReferent {
 
         try {
             Map<String, AttrReferent> attrMap = new HashMap<String, AttrReferent>();
-
             // LOOP: attribute referent
             for (String attrReferentKey : attrInfoMap.keySet()) {
                 AttributeInfo attrReferentValue = attrInfoMap.get(attrReferentKey);
-
                 if (attrReferentValue.getRestrictions().size() == 0) {
                     List<SubReferent> subList = new LinkedList<SubReferent>();
-                    attrMap.put(attrReferentKey, new AttrReferent.Builder().setName(attrReferentValue.getName()).setCheckRevealed(true).setAttrSubReferent(subList).build());
+                    attrMap.put(attrReferentKey, new AttrReferent.Builder()
+                            .setName(attrReferentValue.getName())
+                            .setCheckRevealed(true)
+                            .setAttrSubReferent(subList)
+                            .build());
                 }
             }
-
             return attrMap;
         } catch (Exception e) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
@@ -146,7 +147,11 @@ public class AvailableReferent {
                                     if (attrKey.equals(attrReferentValue.getName())) {
                                         // attrReferent 생성
                                         subList.add(new SubReferent(attrValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
-                                        attrMap.put(attrReferentKey, new AttrReferent.Builder().setName(attrKey).setCheckRevealed(true).setAttrSubReferent(subList).build());
+                                        attrMap.put(attrReferentKey, new AttrReferent.Builder()
+                                                .setName(attrKey)
+                                                .setCheckRevealed(true)
+                                                .setAttrSubReferent(subList)
+                                                .build());
                                     }
                                 }
                             }

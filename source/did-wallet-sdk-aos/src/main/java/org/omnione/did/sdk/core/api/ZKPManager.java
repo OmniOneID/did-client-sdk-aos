@@ -76,6 +76,10 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class ZKPManager<E extends BaseObject> {
     Context context;
@@ -545,34 +549,48 @@ class ZKPManager<E extends BaseObject> {
         WalletLogger.getInstance().d("credentialList: "+GsonWrapper.getGson().toJson(credentialList));
 
         // User 에게 반환할 데이터 생성
-        Map<String, AttrReferent> selfAttrMap = new HashMap<String, AttrReferent>();
-        Map<String, AttrReferent> attrMap = new HashMap<String, AttrReferent>();
-        Map<String, PredicateReferent> predicateMap = new HashMap<String, PredicateReferent>();
+        Map<String, AttrReferent> availableSelfAttribute = new HashMap<String, AttrReferent>();
+        Map<String, AttrReferent> availableAttribute = new HashMap<String, AttrReferent>();
+        Map<String, PredicateReferent> availablePredicate = new HashMap<String, PredicateReferent>();
 
-        Map<String, AttributeInfo> attrInfoMap = proofRequest.getRequestedAttributes();
-        Map<String, PredicateInfo> predInfoMap = proofRequest.getRequestedPredicates();
+        Map<String, AttributeInfo> proofRequestAttribute = proofRequest.getRequestedAttributes();
+        Map<String, PredicateInfo> proofRequestPredicate = proofRequest.getRequestedPredicates();
 
-        WalletLogger.getInstance().d("attrInfo: "+ GsonWrapper.getGsonPrettyPrinting().toJson(attrInfoMap));
-        WalletLogger.getInstance().d("predicateInfo: "+ GsonWrapper.getGsonPrettyPrinting().toJson(predInfoMap));
+        availableSelfAttribute = AvailableReferent.addSelfAttrReferent(proofRequestAttribute);
 
-        selfAttrMap = AvailableReferent.addSelfAttrReferent(attrInfoMap);
+        // 공통 key 삭제
+        for (String key : availableSelfAttribute.keySet()) {
+            proofRequestAttribute.remove(key);
+        }
+
+
         // VC안에 속성을 못찾은 경우
-        attrMap = AvailableReferent.addAttrReferent(attrInfoMap, credentialList);
+        availableAttribute = AvailableReferent.addAttrReferent(proofRequestAttribute, credentialList);
         // attrMap -> 0개
-        predicateMap = AvailableReferent.addPredicateReferent(predInfoMap, credentialList);
+        availablePredicate = AvailableReferent.addPredicateReferent(proofRequestPredicate, credentialList);
+
+        WalletLogger.getInstance().d("proofRequestAttribute: "+ GsonWrapper.getGson().toJson(proofRequestAttribute));
+        WalletLogger.getInstance().d("proofRequestPredicate: "+ GsonWrapper.getGson().toJson(proofRequestPredicate));
+
+        WalletLogger.getInstance().d("availableSelfAttribute: "+ GsonWrapper.getGson().toJson(availableSelfAttribute));
+
+        WalletLogger.getInstance().d("availableAttribute: "+ GsonWrapper.getGson().toJson(availableAttribute));
+        WalletLogger.getInstance().d("availablePredicate: "+ GsonWrapper.getGson().toJson(availablePredicate));
+
 
         // proofRequest 조건에 부합하지 않으면 실패 리턴
-//        if (attrInfoMap.size() != attrMap.size()) {
-//            throw new ZkpException(ZkpErrorCode.OMNI_ERROR_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
-//        }
-        if (predInfoMap.size() != predicateMap.size()) {
+        if (proofRequestAttribute.size() != availableAttribute.size()) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
+        }
+
+        if (proofRequestPredicate.size() != availablePredicate.size()) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_PREDICATE_ATTRIBUTE);
         }
 
         AvailableReferent availableReferent = new AvailableReferent.Builder()
-                .setSelfAttrReferent(selfAttrMap)
-                .setAttrReferent(attrMap)
-                .setPredicateReferent(predicateMap)
+                .setSelfAttrReferent(availableSelfAttribute)
+                .setAttrReferent(availableAttribute)
+                .setPredicateReferent(availablePredicate)
                 .build();
 
         WalletLogger.getInstance().d("availableReferent: "+ GsonWrapper.getGsonPrettyPrinting().toJson(availableReferent));
@@ -670,7 +688,7 @@ class ZKPManager<E extends BaseObject> {
                 for (String attrKey : referent.getAttributes().keySet()) {
                     ReferentAttributeValue referentAttributeValue = referent.getAttributes().get(attrKey);
 
-                    // revealed Attrs 생성
+                    // create revealed Attrs
                     for (String proofRequestAttrKey : proofRequest.getRequestedAttributes().keySet()) {
                         AttributeInfo requestAttrInfo = proofRequest.getRequestedAttributes().get(proofRequestAttrKey);
 
@@ -686,7 +704,7 @@ class ZKPManager<E extends BaseObject> {
                         }
                     }
 
-                    // predicate Attrs 생성
+                    // create predicate Attrs
                     for (String proofRequestPredicateKey : proofRequest.getRequestedPredicates().keySet()) {
                         PredicateInfo requestPredicateInfo = proofRequest.getRequestedPredicates().get(proofRequestPredicateKey);
 
@@ -714,7 +732,7 @@ class ZKPManager<E extends BaseObject> {
         }
 
         if (proveCredentialList.size() == 0)
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_BUILD_CREDENTIAL_FOR_PROVING_FAIL, "validRequest fail [proofRequest has null parameter]");
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_BUILD_CREDENTIAL_FOR_PROVING_FAIL, "Failed to build credential for proving");
 
         WalletLogger.getInstance().d("credential for proving: " + GsonWrapper.getGsonPrettyPrinting().toJson(proveCredentialList));
         WalletLogger.getInstance().d("=============================================================== proving end");
@@ -748,26 +766,46 @@ class ZKPManager<E extends BaseObject> {
         if (selfAttributes == null)
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "validRequest fail [selfAttributes has null parameter]");
 
-        WalletLogger.getInstance().d("proofParams: " + GsonWrapper.getGsonPrettyPrinting().toJson(proofParams));
-        WalletLogger.getInstance().d("selfAttributes: " + GsonWrapper.getGsonPrettyPrinting().toJson(selfAttributes));
+        WalletLogger.getInstance().d("proofParams: "+GsonWrapper.getGsonPrettyPrinting().toJson(proofParams));
+        WalletLogger.getInstance().d("selfAttributes: "+GsonWrapper.getGsonPrettyPrinting().toJson(selfAttributes));
 
         List<ProveCredential> proveCredentialList = this.getProvingCredential(proofRequest, proofParams);
+        WalletLogger.getInstance().d("proveCredentialList: "+GsonWrapper.getGson().toJson(proveCredentialList));
+
+        for (ProveCredential proveCredential : proveCredentialList) {
+
+            WalletLogger.getInstance().d("proveCredential.getRevealedAttrs(): "+GsonWrapper.getGson().toJson(proveCredential.getRevealedAttrs()));
+            WalletLogger.getInstance().d("proveCredential.getUnrevealedAttrs(): "+GsonWrapper.getGson().toJson(proveCredential.getUnrevealedAttrs()));
+
+            Set<String> proofRequestRestrictionAttrs = proofRequest.getRequestedAttributes().keySet();
+            WalletLogger.getInstance().d("proofRequestRestrictionAttrs: "+proofRequestRestrictionAttrs);
+
+            Set<String> combinedReferentKeys = Stream.concat(
+                            proveCredential.getRevealedAttrs().stream().map(ProveRevealedAttribute::getReferentKey),
+                            proveCredential.getUnrevealedAttrs().stream().map(ProveUnrevealedAttribute::getReferentKey)
+                    ).filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            WalletLogger.getInstance().d("combinedReferentKeys: "+combinedReferentKeys);
+            // proofRequestRestrictionAttrs의 모든 항목이 combinedReferentKeys에 존재하는지 확인
+            boolean allMatch = proofRequestRestrictionAttrs.equals(combinedReferentKeys);
+            // 결과 출력
+            if (!allMatch) {
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
+            }
+        }
 
         // proof 생성
         ProofBuilder builder = new ProofBuilder(ZkpConstants.MASTER_SECRET_KEY);
-
         List<Identifiers> identifierList = new LinkedList<Identifiers>();
         RequestedProof requestedProof = new RequestedProof();
-
         ArrayList<Credential> credentialList = this.getAllCredentials();
 
         //LOOP proving, credential,schema, def
         for (int i = 0 ; i < proveCredentialList.size() ; i ++) {
-
             ProveCredential proveCredential = proveCredentialList.get(i);
             // LOOP: Credential Key/Value
             for (Credential credential : credentialList) {
-
                 if (credential.getCredentialId().equals(proveCredential.getCredentialId())) {
                     // Referent : credential 1개가 subProof
                     Map<String, Map<String, String>> revealedAttrs = new LinkedHashMap<String, Map<String, String>>();
@@ -856,6 +894,7 @@ class ZKPManager<E extends BaseObject> {
 
         Proof proof = builder.build(proofRequest.getNonce(), requestedProof, identifierList);
         WalletLogger.getInstance().d("proof: "+GsonWrapper.getGson().toJson(proof));
+        WalletLogger.getInstance().d("proof.getRequestedProof: "+GsonWrapper.getGson().toJson(proof.getRequestedProof()));
 
         return proof;
     }

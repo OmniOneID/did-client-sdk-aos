@@ -12,5 +12,4 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "did-client-sdk-aos"
-include ':did-wallet-sdk-aos'
+rootProject.name = "did-wallet-sdk-aos"
