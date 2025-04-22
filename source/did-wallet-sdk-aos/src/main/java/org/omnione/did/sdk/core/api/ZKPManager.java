@@ -772,15 +772,12 @@ class ZKPManager<E extends BaseObject> {
         List<ProveCredential> proveCredentialList = this.getProvingCredential(proofRequest, proofParams);
         WalletLogger.getInstance().d("proveCredentialList: "+GsonWrapper.getGson().toJson(proveCredentialList));
 
-        int t = 0;
-
         Set<String> proofRequestRestrictionAttrs = proofRequest.getRequestedAttributes().keySet();
         WalletLogger.getInstance().d("proofRequestRestrictionAttrs: "+proofRequestRestrictionAttrs);
 
         Set<String> combinedReferentKeys = new HashSet<>();
 
         for (ProveCredential proveCredential : proveCredentialList) {
-            WalletLogger.getInstance().d("-------------------------------------index: "+t);
             WalletLogger.getInstance().d("proveCredential.getRevealedAttrs(): "+GsonWrapper.getGson().toJson(proveCredential.getRevealedAttrs()));
             WalletLogger.getInstance().d("proveCredential.getUnrevealedAttrs(): "+GsonWrapper.getGson().toJson(proveCredential.getUnrevealedAttrs()));
 
@@ -791,10 +788,7 @@ class ZKPManager<E extends BaseObject> {
                     .collect(Collectors.toSet());
             WalletLogger.getInstance().d("referentKeys: "+referentKeys);
 
-            for (String referentKey : referentKeys) {
-                combinedReferentKeys.add(referentKey);
-            }
-            t++;
+            combinedReferentKeys.addAll(referentKeys);
         }
 
         WalletLogger.getInstance().d("combinedReferentKeys: "+combinedReferentKeys);
