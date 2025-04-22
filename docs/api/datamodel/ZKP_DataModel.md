@@ -34,6 +34,8 @@ Android ZKP DataModel SDK
     - [1.1. BlindedCredentialSecrets](#11-blindedcredentialsecrets)
     - [1.2. BlindedCredentialSecretsCorrectnessProof](#12-blindedcredentialsecretscorrectnessproof)
 - [2. Credential](#2-credential)
+    - [2.1. CredentialSignature](#21-credentialsignature)
+    - [2.2. SignatureCorrectnessProof](#22-signaturecorrectnessproof)
 - [3. ReferentInfo](#3-referentinfo)
 - [4. AvailableReferent](#4-availablereferent)
     - [4.1. AttrReferent](#41-attrreferent)
@@ -156,6 +158,52 @@ public class Credential {
 | values                    | Map<String, CredentialValue>  | Attribute name-value pairs         | M       |          |
 | signature                 | CredentialSignature           | Signature information              | M       |          |
 | signatureCorrectnessProof | SignatureCorrectnessProof     | Proof of correctness of the signature | M    |          |
+<br>
+
+### 2.1. CredentialSignature
+
+#### Description
+
+`Contains the signature information of the credential.`
+
+#### Declaration
+
+```java
+public class CredentialSignature {
+    PrimaryCredentialSignature pCredential;
+}
+```
+
+#### Property
+
+| Name        | Type                       | Description                  | **M/O** | **Note** |
+| ----------- | -------------------------- | ---------------------------- | ------- | -------- |
+| pCredential | PrimaryCredentialSignature | Each primary signature value and its associated data. | O       |          |
+
+<br>
+
+### 2.2. SignatureCorrectnessProof
+
+#### Description
+
+`The SignatureCorrectnessProof data used to verify the integrity of the signature.`
+
+#### Declaration
+
+```java
+public class SignatureCorrectnessProof {
+    BigInteger se;
+    BigInteger c;
+}
+```
+
+#### Property
+
+| Name | Type       | Description                                | **M/O** | **Note** |
+| ---- | ---------- | ------------------------------------------ | ------- | -------- |
+| se   | BigInteger | The hash value that proves the signature has not been tampered with.          | O       |          |
+| c    | BigInteger | An auxiliary hash value used to verify consistency.              | O       |          |
+
 <br>
 
 ## 3. ReferentInfo

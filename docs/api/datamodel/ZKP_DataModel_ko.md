@@ -30,12 +30,14 @@ Android ZKP DataModel SDK
 
 <div style="page-break-after: always;"></div>
 
-
 # 목차
+
 - [1. CredentialRequest](#1-credentialrequest)
     - [1.1. BlindedCredentialSecrets](#11-blindedcredentialsecrets)
     - [1.2. BlindedCredentialSecretsCorrectnessProof](#12-blindedcredentialsecretscorrectnessproof)
 - [2. Credential](#2-credential)
+    - [2.1. CredentialSignature](#21-credentialsignature)
+    - [2.2. SignatureCorrectnessProof](#22-signaturecorrectnessproof)
 - [3. ReferentInfo](#3-referentinfo)
 - [4. AvailableReferent](#4-availablereferent)
     - [4.1. AttrReferent](#41-attrreferent)
@@ -48,6 +50,7 @@ Android ZKP DataModel SDK
     - [5.3. RequestedProof](#53-requestedproof)
     - [5.4. Identifiers](#54-identifiers)
 ---
+
 <br>
 
 ## 1. CredentialRequest
@@ -163,6 +166,53 @@ public class Credential {
 | signatureCorrectnessProof | SignatureCorrectnessProof     | 서명의 정당성 증명 정보            | M       |          |
 
 <br>
+
+### 2.1. CredentialSignature
+
+#### Description
+
+`Credential(자격 증명)의 서명(Signature) 정보를 포함`
+
+#### Declaration
+
+```java
+public class CredentialSignature {
+    PrimaryCredentialSignature pCredential;
+}
+```
+
+#### Property
+
+| Name        | Type                       | Description                  | **M/O** | **Note** |
+| ----------- | -------------------------- | ---------------------------- | ------- | -------- |
+| pCredential | PrimaryCredentialSignature | "Primary 각 서명 값과 데이터 | O       |          |
+
+<br>
+
+### 2.2. SignatureCorrectnessProof
+
+#### Description
+
+`서명(Signature)의 무결성을 검증하는 데 사용되는 SignatureCorrectnessProof 데이터`
+
+#### Declaration
+
+```java
+public class SignatureCorrectnessProof {
+    BigInteger se;
+    BigInteger c;
+}
+```
+
+#### Property
+
+| Name | Type       | Description                                | **M/O** | **Note** |
+| ---- | ---------- | ------------------------------------------ | ------- | -------- |
+| se   | BigInteger | 서명이 변조되지 않았음을 증명하는 해시 값.           | O       |          |
+| c    | BigInteger | 정합성을 검증하기 위한 보조 해시 값.               | O       |          |
+
+<br>
+
 
 ## 3. ReferentInfo
 
