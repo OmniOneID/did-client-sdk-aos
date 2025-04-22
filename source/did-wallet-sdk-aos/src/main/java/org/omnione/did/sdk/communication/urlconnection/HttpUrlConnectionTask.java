@@ -19,6 +19,7 @@ package org.omnione.did.sdk.communication.urlconnection;
 import org.omnione.did.sdk.communication.exception.CommunicationErrorCode;
 import org.omnione.did.sdk.communication.exception.CommunicationException;
 import org.omnione.did.sdk.communication.logger.CommunicationLogger;
+import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,12 +29,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class HttpUrlConnectionTask {
-    CommunicationLogger communicationLogger;
     public HttpUrlConnectionTask(){
-        communicationLogger = CommunicationLogger.getInstance();
+
     }
     public String makeHttpRequest(String urlString, String method, String payload) throws CommunicationException {
-        communicationLogger.d("request : " + payload + " / " + urlString + " / [" + method + "]");
+        WalletLogger.getInstance().d("request : " + payload + " / " + urlString + " / [" + method + "]");
         if(urlString.isEmpty()){
             throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_INVALID_PARAMETER, "urlString");
         }
@@ -75,7 +75,7 @@ public class HttpUrlConnectionTask {
                     response.append(inputLine);
                 }
                 in.close();
-                communicationLogger.d("response : " + response.toString() + " / " + responseCode);
+                WalletLogger.getInstance().d("response : " + response.toString() + " / " + responseCode);
                 return response.toString();
             } else if( responseCode == HttpURLConnection.HTTP_BAD_REQUEST
                     || responseCode == HttpURLConnection.HTTP_SERVER_ERROR) {

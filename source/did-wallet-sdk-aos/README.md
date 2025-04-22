@@ -18,7 +18,7 @@ This document is a guide for using the OpenDID Wallet SDK, and provides function
 1. Open the project's `build.gradle` file and add the following `export JAR` task.
 ```groovy
 ext {
-    version = "1.0.0"
+    version = "2.0.0"
 }
 
 task exportJar(type: Copy){
@@ -29,20 +29,16 @@ task exportJar(type: Copy){
 }
 ```
 2. Open the `Gradle` window in Android Studio, and run the `Tasks > other > exportJar` task of the project.
-3. Once the execution is complete, the `did-wallet-sdk-aos-1.0.0.jar` file will be generated in the `release/` folder.
+3. Once the execution is complete, the `did-wallet-sdk-aos-2.0.0.jar` file will be generated in the `release/` folder.
 
 <br>
 
 ## SDK Application Method
-1. Copy the `did-core-sdk-aos-1.0.0.jar`, `did-utility-sdk-aos-1.0.0.jar`, `did-datamodel-sdk-aos-1.0.0.jar`, `did-wallet-sdk-aos-1.0.0.jar`, `did-communication-sdk-aos-1.0.0.jar` file to the libs of the app project.
+1. Copy the `did-wallet-sdk-aos-2.0.0.jar` file to the libs of the app project.
 2. Add the following dependencies to the build.gradle of the app project.
 
 ```groovy
-    implementation files('libs/did-wallet-sdk-aos-1.0.0.jar')
-    implementation files('libs/did-core-sdk-aos-1.0.0.jar')
-    implementation files('libs/did-utility-sdk-aos-1.0.0.jar')
-    implementation files('libs/did-datamodel-sdk-aos-1.0.0.jar')
-    implementation files('libs/did-communication-sdk-aos-1.0.0.jar')
+    implementation files('libs/did-wallet-sdk-aos-2.0.0.jar')
     api "androidx.room:room-runtime:2.6.1"
     annotationProcessor "androidx.room:room-compiler:2.6.1"
     implementation 'androidx.biometric:biometric:1.1.0'

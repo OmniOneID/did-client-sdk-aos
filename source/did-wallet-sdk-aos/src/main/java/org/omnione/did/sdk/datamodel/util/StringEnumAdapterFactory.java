@@ -41,7 +41,6 @@ public class StringEnumAdapterFactory implements TypeAdapterFactory {
 
             @Override
             public void write(JsonWriter out, StringEnum value) throws IOException {
-                //Log.d("test", "String enum write : " + value + " / " + rawType);
                 out.value(value.getValue());
             }
 

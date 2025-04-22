@@ -772,27 +772,37 @@ class ZKPManager<E extends BaseObject> {
         List<ProveCredential> proveCredentialList = this.getProvingCredential(proofRequest, proofParams);
         WalletLogger.getInstance().d("proveCredentialList: "+GsonWrapper.getGson().toJson(proveCredentialList));
 
-        for (ProveCredential proveCredential : proveCredentialList) {
+        int t = 0;
 
+        Set<String> proofRequestRestrictionAttrs = proofRequest.getRequestedAttributes().keySet();
+        WalletLogger.getInstance().d("proofRequestRestrictionAttrs: "+proofRequestRestrictionAttrs);
+
+        Set<String> combinedReferentKeys = new HashSet<>();
+
+        for (ProveCredential proveCredential : proveCredentialList) {
+            WalletLogger.getInstance().d("-------------------------------------index: "+t);
             WalletLogger.getInstance().d("proveCredential.getRevealedAttrs(): "+GsonWrapper.getGson().toJson(proveCredential.getRevealedAttrs()));
             WalletLogger.getInstance().d("proveCredential.getUnrevealedAttrs(): "+GsonWrapper.getGson().toJson(proveCredential.getUnrevealedAttrs()));
 
-            Set<String> proofRequestRestrictionAttrs = proofRequest.getRequestedAttributes().keySet();
-            WalletLogger.getInstance().d("proofRequestRestrictionAttrs: "+proofRequestRestrictionAttrs);
-
-            Set<String> combinedReferentKeys = Stream.concat(
+            Set<String> referentKeys = Stream.concat(
                             proveCredential.getRevealedAttrs().stream().map(ProveRevealedAttribute::getReferentKey),
                             proveCredential.getUnrevealedAttrs().stream().map(ProveUnrevealedAttribute::getReferentKey)
                     ).filter(Objects::nonNull)
                     .collect(Collectors.toSet());
+            WalletLogger.getInstance().d("referentKeys: "+referentKeys);
 
-            WalletLogger.getInstance().d("combinedReferentKeys: "+combinedReferentKeys);
-            // proofRequestRestrictionAttrs의 모든 항목이 combinedReferentKeys에 존재하는지 확인
-            boolean allMatch = proofRequestRestrictionAttrs.equals(combinedReferentKeys);
-            // 결과 출력
-            if (!allMatch) {
-                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
+            for (String referentKey : referentKeys) {
+                combinedReferentKeys.add(referentKey);
             }
+            t++;
+        }
+
+        WalletLogger.getInstance().d("combinedReferentKeys: "+combinedReferentKeys);
+        // proofRequestRestrictionAttrs의 모든 항목이 combinedReferentKeys에 존재하는지 확인
+        boolean allMatch = proofRequestRestrictionAttrs.equals(combinedReferentKeys);
+        // 결과 출력
+        if (!allMatch) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
         }
 
         // proof 생성

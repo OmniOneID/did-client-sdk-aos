@@ -66,7 +66,6 @@ public class WalletLogger {
     public void d(String logMsg) {
         if(isEnabled) {
             Log.d("WALLET_LOG", logMsg);
-//            Log.d("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
         }
     }
     public void e(String logMsg) {

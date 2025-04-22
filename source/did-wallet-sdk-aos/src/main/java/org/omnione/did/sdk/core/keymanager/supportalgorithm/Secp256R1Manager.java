@@ -137,64 +137,6 @@ public class Secp256R1Manager implements SignableInterface {
         }
     }
 
-//    private byte[] exactLength(byte[] input) {
-//        if (input.length == 32) {
-//            return input;
-//        } else if (input.length > 32) {
-//            return Arrays.copyOfRange(input, input.length - 32, input.length);
-//        } else {
-//            byte[] padded = new byte[32];
-//            System.arraycopy(input, 0, padded, 32 - input.length, input.length);
-//            return padded;
-//        }
-//    }
-//
-//    private byte getOffsetValue(byte[] rBytes, byte[] sBytes) {
-//        int rFirstByte = rBytes[0] & 0xFF;
-//        int sFirstByte = sBytes[0] & 0xFF;
-//
-//        if (rFirstByte % 2 == 0 && sFirstByte % 2 == 0) {
-//            return 0x00;
-//        } else if (rFirstByte % 2 != 0 && sFirstByte % 2 == 0) {
-//            return 0x01;
-//        } else if (rFirstByte % 2 == 0 && sFirstByte % 2 != 0) {
-//            return 0x02;
-//        } else {
-//            return 0x03;
-//        }
-//
-//    }
-
-//    private  byte[] compressedSignValue(byte[] derSignature) throws WalletCoreException{
-
-//        ASN1InputStream asn1InputStream = new ASN1InputStream(new ByteArrayInputStream(derSignature));
-//        ASN1Primitive asn1Primitive = asn1InputStream.readObject();
-//        DLSequence sequence = (DLSequence) asn1Primitive;
-//
-//        BigInteger r = ((ASN1Integer) sequence.getObjectAt(0)).getValue();
-//        BigInteger s = ((ASN1Integer) sequence.getObjectAt(1)).getValue();
-//
-//        byte[] rBytes = exactLength(r.toByteArray());
-//        byte[] sBytes = exactLength(s.toByteArray());
-//
-//        byte[] compressedSign = new byte[64 + 1];
-//
-//        int recId = getOffsetValue(rBytes, sBytes);
-//        int recId2 = (derSignature[0] & 255) - 27 - 4;
-//        int recId3 = (compressedSign[0] & 255) - 27 - 4;
-//
-//        Log.d("test","recId : " + recId + " / recId2 : " + recId2 + " / recId3 : " + recId3);
-//
-//
-//
-//        int headerByte = recId + 27 + 4;
-//        compressedSign[0] = (byte) headerByte;
-//
-//        System.arraycopy(rBytes, 0, compressedSign, 1, 32);
-//        System.arraycopy(sBytes, 0, compressedSign, 1 + 32, 32);
-//        return compressedSign;
-//    }
-
     private byte[] compressedSignValue(byte[] derSignature, byte[] compressedPubKey, byte[] hashedsource) throws IOException, WalletCoreException {
 
         ASN1Sequence asn1Sequence = parseASN1Sequence(derSignature);

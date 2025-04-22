@@ -184,12 +184,15 @@ public class ProofInitiator {
             // unrevealedAttrs 연산
             Set<String> unrevealedAttrs = new HashSet<String>();
 
+
             for (String value : nonCredSchema.getNonCredSchema()) {
+                WalletLogger.getInstance().d("initEqProof getNonCredSchema value: "+value);
                 unrevealedAttrs.add(value);
             }
 
             for (String value : credSchema.getAttrNames()) {
                 if (!subProofReq.getRevealedAttrs().contains(value)) {
+                    WalletLogger.getInstance().d("initEqProof !subProofReq.getRevealedAttrs().contains(value) value: "+value);
                     unrevealedAttrs.add(value);
                 }
             }

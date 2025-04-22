@@ -19,7 +19,7 @@ Open DID에 필요한 WalletToken, Lock/Unlock, Key, DID Document(DID 문서), V
 1. 프로젝트의 `build.gradle` 파일을 열고, 아래와 같은 `export JAR` 태스크를 추가한다.
 ```groovy
 ext {
-    version = "1.0.0"
+    version = "2.0.0"
 }
 
 task exportJar(type: Copy){
@@ -30,20 +30,16 @@ task exportJar(type: Copy){
 }
 ```
 2. Android Studio에서 `Gradle` 창을 열고, 프로젝트의 `Tasks > other > exportJar` 태스크를 실행한다.
-3. 실행이 완료되면 `release/` 폴더에 `did-wallet-sdk-aos-1.0.0.jar` 파일을 생성한다.
+3. 실행이 완료되면 `release/` 폴더에 `did-wallet-sdk-aos-2.0.0.jar` 파일을 생성한다.
 
 <br>
 
 ## SDK 적용 방법
-1. 앱 프로젝트의 libs에 `did-core-sdk-aos-1.0.0.jar`, `did-utility-sdk-aos-1.0.0.jar`, `did-datamodel-sdk-aos-1.0.0.jar`, `did-wallet-sdk-aos-1.0.0.jar`, `did-communication-sdk-aos-1.0.0.jar` 파일을 복사한다.
+1. 앱 프로젝트의 libs에 `did-wallet-sdk-aos-2.0.0.jar` 파일을 복사한다.
 2. 앱 프로젝트의 build gradle에 아래 의존성을 추가한다.
 
 ```groovy
-    implementation files('libs/did-wallet-sdk-aos-1.0.0.jar')
-    implementation files('libs/did-core-sdk-aos-1.0.0.jar')
-    implementation files('libs/did-utility-sdk-aos-1.0.0.jar')
-    implementation files('libs/did-datamodel-sdk-aos-1.0.0.jar')
-    implementation files('libs/did-communication-sdk-aos-1.0.0.jar')
+    implementation files('libs/did-wallet-sdk-aos-2.0.0.jar')
     api "androidx.room:room-runtime:2.6.1"
     annotationProcessor "androidx.room:room-compiler:2.6.1"
     implementation 'androidx.biometric:biometric:1.1.0'
