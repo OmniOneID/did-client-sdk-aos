@@ -81,7 +81,7 @@ did-client-sdk-aos
 
 ## Libraries
 
-Libraries can be found in the [releases folder](source/did-wallet-sdk-aos/release).
+Libraries can be found in the [releases folder](./source/did-wallet-sdk-aos/release).
 
 
 

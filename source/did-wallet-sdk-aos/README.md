@@ -39,9 +39,32 @@ task exportJar(type: Copy){
 
 ```groovy
     implementation files('libs/did-wallet-sdk-aos-2.0.0.jar')
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.navigation:navigation-fragment:2.7.7'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
+    implementation 'com.google.android.gms:play-services-vision:20.1.3'
+
+    implementation "androidx.navigation:navigation-fragment-ktx:2.7.7"
+    implementation "androidx.navigation:navigation-ui-ktx:2.7.7"
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'org.bitcoinj:bitcoinj-core:0.15.7'
+
+    implementation 'com.madgag.spongycastle:core:1.54.0.0'
+    implementation 'com.madgag.spongycastle:prov:1.54.0.0'
+    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
+    implementation 'com.madgag.spongycastle:pg:1.54.0.0'
+
     api "androidx.room:room-runtime:2.6.1"
     annotationProcessor "androidx.room:room-compiler:2.6.1"
-    implementation 'androidx.biometric:biometric:1.1.0'
 ```
 3. Sync `Gradle` to ensure the dependencies are properly added.
 
@@ -50,5 +73,5 @@ task exportJar(type: Copy){
 ## API Specification
 | Category | API Document Link |
 |------|----------------------------|
-| WalletAPI  | [Wallet SDK API](../../../docs/api/did-wallet-sdk-aos/WalletAPI.md) |
-| ErrorCode      | [Error Code](../../../docs/api/did-wallet-sdk-aos/WalletError.md) |
+| WalletAPI  | [Wallet SDK API](../../docs/api/wallet/WalletAPI.md) |
+| ErrorCode      | [Error Code](../../docs/api/wallet/WalletError.md) |
