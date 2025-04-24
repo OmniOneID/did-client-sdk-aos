@@ -47,6 +47,8 @@ did-client-sdk-aos
 │           ├── WalletAPI_ko.md
 │           └── WalletError.md
 └── source
+    └── release
+    │   └── did-wallet-sdk-aos-2.0.0.jar
     └── did-wallet-sdk-aos
         ├── build.gradle
         ├── gradle
@@ -55,8 +57,6 @@ did-client-sdk-aos
         ├── local.properties
         ├── README_ko.md
         ├── README.md
-        ├── release
-        │   └── did-wallet-sdk-aos-2.0.0.jar
         ├── settings.gradle
         └── src
 ```
@@ -66,7 +66,6 @@ did-client-sdk-aos
 | source                  | SDK source code project                         |
 | docs                    | Documentation                                   |
 | ┖ api                   | API guide documentation                         |
-| ┖ design                | Design documentation                            |
 | sample                  | Samples and data                                |
 | README.md               | Overview and description of the project         |
 | CLA.md                  | Contributor License Agreement                   |
@@ -132,9 +131,9 @@ API Reference can be found :
 
 ## Change Log
 
-ChangeLog can be found : 
+ChangeLog can be found : [here](./CHANGELOG.md)  
 <br>
-- [Wallet SDK](./CHANGELOG.md)  
+
 
 
 ## OpenDID Demonstration Videos <br>

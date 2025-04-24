@@ -46,6 +46,8 @@ did-client-sdk-aos
 │           ├── WalletAPI_ko.md
 │           └── WalletError.md
 └── source
+    └── release
+        └── did-wallet-sdk-aos-2.0.0.jar
     └── did-wallet-sdk-aos
         ├── build.gradle
         ├── gradle
@@ -54,8 +56,6 @@ did-client-sdk-aos
         ├── local.properties
         ├── README_ko.md
         ├── README.md
-        ├── release
-        │   └── did-wallet-sdk-aos-2.0.0.jar
         ├── settings.gradle
         └── src
 ```
@@ -65,7 +65,6 @@ did-client-sdk-aos
 | source  |  SDK 소스코드 프로젝트             |
 | docs  |   문서            |
 | ┖ api  |  API 가이드 문서          |
-| ┖ design |  설계 문서            |
 | sample  |  샘플 및 데이터            |
 | README.md  |  프로젝트의 전체적인 개요 설명            |
 | CLA.md             | Contributor License Agreement                |
@@ -129,7 +128,7 @@ API 참조는 아래에서 확인할 수 있습니다.
 
 ChangeLog는 아래에서 확인할 수 있습니다.
 <br>
-- [Wallet SDK](./CHANGELOG.md)  
+- [Here](./CHANGELOG.md)  
 
 
 ## 데모 영상 <br>
