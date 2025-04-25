@@ -23,23 +23,30 @@ Android WalletCoreError
 - Date: 2024-08-12
 - Version: v1.0.0
 
-| Version          | Date       | Changes                  |
-| ---------------- | ---------- | ------------------------ |
-| v1.0.0  | 2024-08-12 | Initial version          |
+| Version | Date       | Changes         |
+| ------- | ---------- | --------------- |
+| v1.0.0  | 2024-08-12 | Initial version |
+| v2.0.0  | 2025-04-30 | add ZKP error   |
 
 <div style="page-break-after: always;"></div>
 
 # Table of Contents
 
-- [WalletCoreError](#walletcoreerror)
+- [Android WalletCoreError](#android-walletcoreerror)
+- [Table of Contents](#table-of-contents)
+  - [WalletCoreError](#walletcoreerror)
+    - [Description](#description)
+    - [Declaration](#declaration)
+    - [Property](#property)
 - [Error Code](#error-code)
   - [1. Common](#1-common)
   - [2. KeyManager](#2-keymanager)
   - [3. DIDManager](#3-didmanager)
   - [4. VCManager](#4-vcmanager)
   - [5. StorageManager](#5-storagemanager)
-  - [6. Signable](#5-signable)
+  - [6. Signable](#6-signable)
   - [7. Keystore](#7-keystore)
+  - [8. ZKP](#8-zkp)
 
 
 ## WalletCoreError
@@ -166,36 +173,32 @@ public enum WalletCoreErrorCode {
 
   <br>
 
-  ## 8. ZKP
-  | Error Code   | Error Message                                            | Description                                           | Action Required|
-  |--------------|-----------------------------------------------------------|------------------------------------------------------|----------------|
-  | MSDKWLT04100 | Invalid parameter                                         | Invalid parameter                                    | -              |
-  | MSDKWLT04101 | Duplicated parameter                                      | Duplicated parameter                                 | -              |
-  | MSDKWLT04102 | Fail to decode                                            | Fail to decode                                       | -              |
-  | MSDKWLT04100 | Data is null                                              | Data is null                                         | -              |
-  | MSDKWLT04101 | Delta value must be positive                              | Delta value must be positive                         | -              |
-  | MSDKWLT04102 | Failed to compare big numbers                             | Failed to compare big numbers                        | -              |
-  | MSDKWLT04104 | Failed to convert byte to big number                      | Failed to convert byte to big number                 | -              |
-  | MSDKWLT04105 | Failed to convert big number to byte                      | Failed to convert big number to byte                 | -              |
-  | MSDKWLT04106 | Error IO                                                  | Error IO                                             | -              |
-  | MSDKWLT04107 | Not supported type                                        | Not supported type                                   | -              |
-  | MSDKWLT04200 | Master secret not found                                   | Master secret not found                              | -              |
-  | MSDKWLT04201 | Failed to generate master secret                          | Failed to generate master secret                     | -              |
-  | MSDKWLT04300 | Failed to verify signature correctness proof              | Failed to verify signature correctness proof         | -              |
-  | MSDKWLT04400 | Credential not found in storage                           | Credential not found in storage                      | -              |
-  | MSDKWLT04401 | Credential not found by identifiers in storage            | Credential not found by identifiers in storage       | -              |
-  | MSDKWLT04500 | Proof request's predicate must have restrictions          | Proof request's predicate must have restrictions     | -              |
-  | MSDKWLT04501 | Not found available request attribute                     | Not found available request attribute                | -              |
-  | MSDKWLT04502 | Not found available predicate attribute                   | Not found available predicate attribute              | -              |
-  | MSDKWLT04602 | Failed to build credential for proving                    | Failed to build credential for proving               | -              |
-  | MSDKWLT04603 | Not found schema from list                                | Not found schema from list                           | -              |
-  | MSDKWLT04604 | Not found credential definition from list                 | Not found credential definition from list            | -              |
-  | MSDKWLT04605 | Duplicated key                                            | Duplicated key                                       | -              |
-  | MSDKWLT04900 | Failed to calculate TEQ proof                             | Failed to calculate TEQ proof                        | -              |
-  | MSDKWLT04901 | Failed to calculate TNE proof                             | Failed to calculate TNE proof	                      | -              |
-  | MSDKWLT04902 | Failed to initialize primary equal proof                  | Failed to initialize primary equal proof             | -              |
-  | MSDKWLT04903 | Failed to initialize primary non-equal proof              | Failed to initialize primary non-equal proof         | -              |
-  | MSDKWLT04904 | Failed to finalize primary equal proof                    | Failed to finalize primary equal proof               | -              |
-  | MSDKWLT04905 | Failed to finalize primary non-equal proof                | Failed to finalize primary non-equal proof           | -              |
+## 8. ZKP
+   
+
+| Error Code   | Error Message                                          | Description                                      | Action Required |
+| ------------ | ------------------------------------------------       | ------------------------------------------------ | --------------- |
+| MSDKWLT04000 | Invalid parameter                                      | Invalid parameter                                | -               |
+| MSDKWLT04001 | Duplicated parameter                                   | Duplicated parameter                             | -               |
+| MSDKWLT04002 | Fail to decode                                         | Fail to decode                                   | -               |
+| MSDKWLT04100 | Data is null                                           | Data is null                                     | -               |
+| MSDKWLT04101 | Delta value must be positive                           | Delta value must be positive                     | -               |
+| MSDKWLT04102 | Error IO                                               | Error IO                                         | -               |
+| MSDKWLT04103 | Not supported type                                     | Not supported type                               | -               |
+| MSDKWLT04200 | Master secret not found                                | Master secret not found                          | -               |
+| MSDKWLT04201 | Failed to generate master secret                       | Failed to generate master secret                 | -               |
+| MSDKWLT04300 | Calculated signature value is invalid                  | Calculated signature value is invalid.           | -               |
+| MSDKWLT04301 | Failed to verify credential key correctness proof      | Failed to verify credential key correctness proof  | -              |
+| MSDKWLT04302 | Failed to verify credential signature correctness proof| Failed to verify credential signature correctness proof | -         |
+| MSDKWLT04400 | Credential not found in storage                        | Credential not found in storage                  | -               |
+| MSDKWLT04401 | Credential not found by identifiers in storage         | Credential not found by identifiers in storage   | -               |
+| MSDKWLT04500 | Not found available request attribute                  | Not found available request attribute            | -               |
+| MSDKWLT04501 | Not found available predicate attribute                | Not found available predicate attribute          | -               |
+| MSDKWLT04600 | Failed to build credential for proving                 | Failed to build credential for proving           | -               |
+| MSDKWLT04601 | Not found schema from list                             | Not found schema from list                       | -               |
+| MSDKWLT04602 | Not found credential definition from list              | Not found credential definition from list        | -               |
+| MSDKWLT04603 | Duplicated key                                         | Duplicated key                                   | -               |
+| MSDKWLT04900 | Failed to calculate TEQ proof                          | Failed to calculate TEQ proof                    | -               |
+| MSDKWLT04901 | Failed to calculate TNE proof                          | Failed to calculate TNE proof                    | -               |
   
   <br>

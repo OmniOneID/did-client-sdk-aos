@@ -15,7 +15,7 @@ puppeteer:
         fullPage: false
 ---
 
-Android Utility SDK API
+Android Utility API
 ==
 
 - 주제: CryptoUtils / MultibaseUtils / DigestUtils

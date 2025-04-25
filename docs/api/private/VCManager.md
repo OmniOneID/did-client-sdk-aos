@@ -15,7 +15,7 @@ puppeteer:
         fullPage: false
 ---
 
-Android VCManager Core SDK API
+Android VCManager API
 ==
 
 - Topic: VCManager

@@ -15,7 +15,7 @@ puppeteer:
         fullPage: false
 ---
 
-Android DIDManager Core SDK API
+Android DIDManager API
 ==
 
 - 주제: DIDManager

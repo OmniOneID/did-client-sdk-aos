@@ -15,7 +15,7 @@ puppeteer:
         fullPage: false
 ---
 
-Android DataModel SDK
+Android DataModel
 ==
 
 - Topic: DataModel

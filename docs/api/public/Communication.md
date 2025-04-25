@@ -15,10 +15,10 @@ puppeteer:
         fullPage: false
 ---
 
-Android Communication SDK API
+Android Communication API
 ==
 
-- Subject: Communication SDK
+- Subject: Communication
 - Author: Sangjun Kim
 - Date: 2024-09-04
 - Version: v1.0.0

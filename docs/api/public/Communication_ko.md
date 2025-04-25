@@ -15,10 +15,10 @@ puppeteer:
         fullPage: false
 ---
 
-Android Communication SDK API
+Android Communication API
 ==
 
-- 주제: Communication SDK
+- 주제: Communication
 - 작성: Sangjun Kim
 - 일자: 2024-09-04
 - 버전: v1.0.0

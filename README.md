@@ -18,34 +18,34 @@ did-client-sdk-aos
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
+│   └── README.md
 │   └── api
-│       ├── communication
-│       │   ├── Communication.md
-│       │   ├── CommunicationError.md
-│       │   └── Communication_ko.md
-│       ├── core
-│       │   ├── DIDManager.md
+│       ├── private
 │       │   ├── DIDManager_ko.md
-│       │   ├── KeyManager.md
+│       │   ├── DIDManager.md
 │       │   ├── KeyManager_ko.md
-│       │   ├── SecureEncryptor.md
+│       │   ├── KeyManager.md
 │       │   ├── SecureEncryptor_ko.md
-│       │   ├── VCManager.md
+│       │   ├── SecureEncryptor.md
 │       │   ├── VCManager_ko.md
+│       │   ├── VCManager.md
 │       │   ├── ZKPManager_ko.md
-│       │   ├── ZKPManager.md
-│       │   └── WalletCoreError.md
-│       ├── datamodel
-│       │   ├── DataModel.md
-│       │   └── DataModel_ko.md
-│       ├── utility
-│       │   ├── Utility.md
-│       │   ├── UtilityError.md
-│       │   └── Utility_ko.md
-│       └── wallet
-│           ├── WalletAPI.md
-│           ├── WalletAPI_ko.md
-│           └── WalletError.md
+│       │   └── ZKPManager.md
+│       └── public
+│           ├── Communication_ko.md
+│           ├── Communication.md
+│           ├── CommunicationError.md
+│           ├── DataModel_ko.md
+│           ├── DataModel.md
+│           ├── Utility_ko.md
+│           ├── Utility.md
+│           ├── UtilityError.md
+│           ├── WalletAPI_ko.md
+│           ├── WalletAPI.md
+│           ├── WalletCoreError.md
+│           ├── WalletError.md
+│           ├── ZKP_DataModel_ko.md
+│           └── ZKP_DataModel.md
 └── source
     └── release
     │   └── did-wallet-sdk-aos-2.0.0.jar

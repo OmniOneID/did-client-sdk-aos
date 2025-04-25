@@ -15,17 +15,17 @@ puppeteer:
         fullPage: false
 ---
 
-Android ZKP DataModel SDK
+Android ZKP DataModel
 ==
 
 - Subject: ZKP-Based Data Model
 - Author: Dongjun Park
-- Date: 2025-04-16
+- Date: 2025-04-30
 - Version: v1.0.0
 
 | Version | Date       | Change Description |
 |---------|------------|--------------------|
-| v1.0.0  | 2025-04-16 | Initial version    |
+| v1.0.0  | 2025-04-30 | Initial version    |
 
 <div style="page-break-after: always;"></div>
 

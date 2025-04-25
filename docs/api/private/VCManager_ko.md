@@ -15,7 +15,7 @@ puppeteer:
         fullPage: false
 ---
 
-Android VCManager Core SDK API
+Android VCManager API
 ==
 
 - 주제: VCManager

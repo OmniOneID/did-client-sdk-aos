@@ -1,5 +1,25 @@
-# Android ZKPManager Core SDK API
 
+---
+puppeteer:
+    pdf:
+        format: A4
+        displayHeaderFooter: true
+        landscape: false
+        scale: 0.8
+        margin:
+            top: 1.2cm
+            right: 1cm
+            bottom: 1cm
+            left: 1cm
+    image:
+        quality: 100
+        fullPage: false
+
+---
+
+Android ZKPManager API
+
+==
 - Subject: ZKPManager
 - Author: Dongjun Park
 - Date: 2025-04-07

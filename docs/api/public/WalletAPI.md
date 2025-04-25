@@ -15,7 +15,7 @@ puppeteer:
         fullPage: false
 ---
 
-Android Wallet SDK API
+Android Wallet API
 ==
 
 - Subject: WalletAPI
