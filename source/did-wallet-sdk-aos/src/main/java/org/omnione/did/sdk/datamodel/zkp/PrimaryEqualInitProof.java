@@ -78,12 +78,11 @@ public class PrimaryEqualInitProof {
         this.m2 = m2;
     }
 
-    public byte[] getCommonValue() throws WalletCoreException {
+    public byte[] getCommonValue() {
         return BigIntegerUtil.asUnsignedByteArray(aPrime);
     }
 
-    public byte[] getTvalue() throws WalletCoreException {
-//        WalletLogger.getInstance().d("t: "+ BigIntegerUtil.fromBytes(BigIntegerUtil.asUnsignedByteArray(t)));
+    public byte[] getTvalue() {
         return BigIntegerUtil.asUnsignedByteArray(t);
     }
 

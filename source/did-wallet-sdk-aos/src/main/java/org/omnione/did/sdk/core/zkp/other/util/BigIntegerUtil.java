@@ -32,40 +32,6 @@ import java.util.Set;
 import java.util.Vector;
 
 public class BigIntegerUtil {
-    public static String createNonce1() {
-        String nonce = "";
-
-        try {
-            SecureRandom prng = SecureRandom.getInstance("SHA1PRNG");
-            String randomNum = String.valueOf(prng.nextInt());
-
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            byte[] result = sha.digest(randomNum.getBytes());
-            nonce = byteArrayToHex(result);
-            WalletLogger.getInstance().d(nonce);
-        } catch (Exception e) {
-        }
-
-        return nonce;
-    }
-
-    public static String createNonce2() {
-        String nonce = "";
-
-        try {
-            SecureRandom prng = SecureRandom.getInstance("SHA1PRNG");
-            String randomNum = String.valueOf(prng.nextInt());
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            byte[] result = sha.digest(randomNum.getBytes());
-            nonce = hexEncode(result);
-            WalletLogger.getInstance().d(nonce);
-
-        } catch (Exception e) {
-        }
-
-        return nonce;
-    }
-
     public static String byteArrayToHex(byte[] a) {
         StringBuilder sb = new StringBuilder();
         for(final byte b: a) {
@@ -76,25 +42,15 @@ public class BigIntegerUtil {
 
     public static String hexEncode(byte[] aInput) {
         StringBuilder result = new StringBuilder();
-
         char[] digits = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-
         for (int idx = 0; idx < aInput.length; ++idx) {
             byte b = aInput[idx];
             result.append(digits[(b & 0xf0) >> 4]);
             result.append(digits[b & 0x0f]);
         }
-
         return result.toString();
     }
 
-    public static void main(String args[]) {
-        for (int i = 0 ; i < 10 ; i++) {
-            createNonce1();
-        }
-    }
-
-    //TODO: random 생명주기 고려 필요
     private final SecureRandom random;
 
     //TODO: 왜 1000인지 의해 불능
@@ -181,27 +137,15 @@ public class BigIntegerUtil {
         return rv;
     }
 
-    public static BigInteger fromBytes(byte[] bytes) throws WalletCoreException {
-        try {
-            return new BigInteger(1, bytes);
-        } catch (Exception e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_BIG_NUMBER_FROM_BYTE_FAIL);
-        }
-    }
+    public static byte[] asUnsignedByteArray(BigInteger value) {
+        byte[] bytes = value.toByteArray();
 
-    public static byte[] asUnsignedByteArray(BigInteger value) throws WalletCoreException {
-        try {
-            byte[] bytes = value.toByteArray();
-
-            if (bytes[0] == 0) {
-                byte[] tmp = new byte[bytes.length - 1];
-                System.arraycopy(bytes, 1, tmp, 0, tmp.length);
-                return tmp;
-            }
-            return bytes;
-        } catch (Exception e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_BIG_NUMBER_TO_BYTE_FAIL);
+        if (bytes[0] == 0) {
+            byte[] tmp = new byte[bytes.length - 1];
+            System.arraycopy(bytes, 1, tmp, 0, tmp.length);
+            return tmp;
         }
+        return bytes;
     }
 
     public static BigInteger getHash(byte[] src) throws UtilityException {
@@ -497,11 +441,7 @@ public class BigIntegerUtil {
     public BigInteger generateNonce() {
         return createRandomBigInteger(ZkpConstants.LARGE_NONCE, this.random);
     }
-    public BigInteger generateMasterSecret() throws WalletCoreException {
-        try {
-            return createRandomBigInteger(ZkpConstants.LARGE_MASTER_SECRET, this.random);
-        } catch (Exception e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_GENERATE_MASTER_SECRET_FAIL);
-        }
+    public BigInteger generateMasterSecret() {
+        return createRandomBigInteger(ZkpConstants.LARGE_MASTER_SECRET, this.random);
     }
 }

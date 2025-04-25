@@ -193,7 +193,7 @@ class ZKPManager<E extends BaseObject> {
         List<UsableInnerWalletItem<ZKPMeta, ZKPInfo>> walletItems = storageManager.getItems(identifiers);
 
         if (identifiers.size() != walletItems.size()) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_CREDENTIAL_BY_IDENTIFIERS, "check credential key correctness proof fail");
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_CREDENTIAL_BY_IDENTIFIERS);
         }
 
 
@@ -445,9 +445,11 @@ class ZKPManager<E extends BaseObject> {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "validRequest fail [credentialPublicKey has null parameter]");
         if (credOffer == null)
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "validRequest fail [credOffer has null parameter]");
+
+        // Credential 발급자(issuer)의 공개키와 CredentialOffer의 정당성 증명 값(KeyCorrectnessProof)이 일치하지 않을 경우
         if (!KeyPairVerifier.verify(credentialPublicKey, credOffer.getKeyCorrectnessProof())) {
             WalletLogger.getInstance().d("check credential key correctness proof fail");
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_BIG_NUMBER_COMPARE_FAIL, "check credential key correctness proof fail");
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_VERIFY_CREDENTIAL_KEY_CORRECTNESS_FAIL);
         }
 
         MasterSecret masterSecret = this.getMasterSecret();
@@ -458,7 +460,7 @@ class ZKPManager<E extends BaseObject> {
         WalletLogger.getInstance().d("createCredentialRequest prover nonce: "+proverNonce);
 
         if (masterSecret == null) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_SELECT_MASTER_SECRET_FROM_WALLET_FAIL, "select master secret from wallet fail");
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_SELECT_MASTER_SECRET_FROM_WALLET_FAIL);
         }
 
         CredentialRequest credentialRequest = CredentialRequestHelper.generateCredentialRequest(credentialPublicKey, proverDid, masterSecret, credOffer, proverNonce, v_prime);
@@ -504,7 +506,7 @@ class ZKPManager<E extends BaseObject> {
         MasterSecret masterSecret = getMasterSecret();
 
         if (masterSecret == null) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_SELECT_MASTER_SECRET_FROM_WALLET_FAIL, "select master secret from wallet fail");
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_SELECT_MASTER_SECRET_FROM_WALLET_FAIL);
         }
 
         WalletLogger.getInstance().d("masterSecrets: "+GsonWrapper.getGson().toJson(masterSecret));
@@ -516,7 +518,7 @@ class ZKPManager<E extends BaseObject> {
                 credentialPrimaryPublicKey, credentialRequestMeta.getMasterSecretBlindingData().getVPrime(),
                 credentialRequestMeta.getNonce())) {
 
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_BIG_NUMBER_COMPARE_FAIL, "verify primary credential fail in verify and store credential");
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_VERIFY_CREDENTIAL_SIGNATURE_CORRECTNESS_FAIL);
         }
 
         // Store c1, c2, m2
@@ -562,7 +564,6 @@ class ZKPManager<E extends BaseObject> {
         for (String key : availableSelfAttribute.keySet()) {
             proofRequestAttribute.remove(key);
         }
-
 
         // VC안에 속성을 못찾은 경우
         availableAttribute = AvailableReferent.addAttrReferent(proofRequestAttribute, credentialList);
@@ -732,7 +733,7 @@ class ZKPManager<E extends BaseObject> {
         }
 
         if (proveCredentialList.size() == 0)
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_BUILD_CREDENTIAL_FOR_PROVING_FAIL, "Failed to build credential for proving");
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_BUILD_CREDENTIAL_FOR_PROVING_FAIL);
 
         WalletLogger.getInstance().d("credential for proving: " + GsonWrapper.getGsonPrettyPrinting().toJson(proveCredentialList));
         WalletLogger.getInstance().d("=============================================================== proving end");
@@ -850,7 +851,10 @@ class ZKPManager<E extends BaseObject> {
                     WalletLogger.getInstance().d("requestedProof: "+GsonWrapper.getGsonPrettyPrinting().toJson(requestedProof));
 
                     if (proveCredential.getSchema() == null)
-                        throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_SCHEMA_FROM_LIST, "not found schema from list");
+                        throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_SCHEMA_FROM_LIST);
+
+                    if (proveCredential.getCredentialDefinition() == null)
+                        throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_DEFINITION_FROM_LIST);
 
                     identifierList.add(new Identifiers(proveCredential.getSchema().getId(),
                             proveCredential.getCredentialDefinition().getId()));

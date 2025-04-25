@@ -39,7 +39,7 @@ public class WalletCoreException extends Exception {
         this.errMsg = WalletCoreErrorCode.getMsg();
     }
     public WalletCoreException(WalletCoreErrorCode WalletCoreErrorCode, String paramName){
-        super("["+ WalletCoreErrorCode.getWalletCoreCode() + WalletCoreErrorCode.getFeature() + String.format("%03d", WalletCoreErrorCode.getCode()) +"] " + WalletCoreErrorCode.getMsg() + paramName);
+        super("["+ WalletCoreErrorCode.getWalletCoreCode() + WalletCoreErrorCode.getFeature() + String.format("%03d", WalletCoreErrorCode.getCode()) +"] " + WalletCoreErrorCode.getMsg() +" "+ paramName);
         this.errorCode = WalletCoreErrorCode.getCode();
         this.errMsg = WalletCoreErrorCode.getMsg() + paramName;
     }

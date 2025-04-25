@@ -40,7 +40,6 @@ public class ChallengeBuilder {
         return add(BigIntegerUtil.asUnsignedByteArray(value));
     }
 
-    //TODO: byte[]가 unsignedByte 인지 확인 필요
     public ChallengeBuilder add(byte[] value) throws WalletCoreException {
         try {
             this.values.write(value);
@@ -73,12 +72,10 @@ public class ChallengeBuilder {
         if (element instanceof BigInteger) {
             for (T value : vector) {
                 this.add((BigInteger)value);
-//                WalletLogger.getInstance().d(str + " add >>>> t :" + value.toString());
             }
         } else if (element instanceof byte[]) {
             for (T value : vector) {
                 this.add((byte[])value);
-//                WalletLogger.getInstance().d(str+" add >>>> t :"+ AMCLUtils.byteArrayToHex((byte[])value));
             }
         } else {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NOT_SUPPORTED_TYPE, "[Challenge Building] not supported Type " + element.getClass().getName());

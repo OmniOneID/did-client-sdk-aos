@@ -101,66 +101,59 @@ public class AvailableReferent {
 
     public static Map<String, AttrReferent> addSelfAttrReferent(Map<String, AttributeInfo> attrInfoMap) throws WalletCoreException {
 
-        try {
-            Map<String, AttrReferent> attrMap = new HashMap<String, AttrReferent>();
-            // LOOP: attribute referent
-            for (String attrReferentKey : attrInfoMap.keySet()) {
-                AttributeInfo attrReferentValue = attrInfoMap.get(attrReferentKey);
-                if (attrReferentValue.getRestrictions().size() == 0) {
-                    List<SubReferent> subList = new LinkedList<SubReferent>();
-                    attrMap.put(attrReferentKey, new AttrReferent.Builder()
-                            .setName(attrReferentValue.getName())
-                            .setCheckRevealed(true)
-                            .setAttrSubReferent(subList)
-                            .build());
-                }
+        Map<String, AttrReferent> attrMap = new HashMap<String, AttrReferent>();
+        // LOOP: attribute referent
+        for (String attrReferentKey : attrInfoMap.keySet()) {
+            AttributeInfo attrReferentValue = attrInfoMap.get(attrReferentKey);
+            if (attrReferentValue.getRestrictions().size() == 0) {
+                List<SubReferent> subList = new LinkedList<SubReferent>();
+                attrMap.put(attrReferentKey, new AttrReferent.Builder()
+                        .setName(attrReferentValue.getName())
+                        .setCheckRevealed(true)
+                        .setAttrSubReferent(subList)
+                        .build());
             }
-            return attrMap;
-        } catch (Exception e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
         }
+        return attrMap;
     }
 
-    public static Map<String, AttrReferent> addAttrReferent(Map<String, AttributeInfo> attrInfoMap, ArrayList<Credential> credentialList) throws WalletCoreException {
+    public static Map<String, AttrReferent> addAttrReferent(Map<String, AttributeInfo> attrInfoMap, ArrayList<Credential> credentialList) {
 
         WalletLogger.getInstance().d("attrInfoMap: " + GsonWrapper.getGsonPrettyPrinting().toJson(attrInfoMap));
         Map<String, AttrReferent> attrMap = new HashMap<String, AttrReferent>();
-        try {
-            // LOOP: attribute referent
-            for (String attrReferentKey : attrInfoMap.keySet()) {
-                AttributeInfo attrReferentValue = attrInfoMap.get(attrReferentKey);
-                WalletLogger.getInstance().d("attrReferentValue: " + GsonWrapper.getGsonPrettyPrinting().toJson(attrReferentValue));
-                List<SubReferent> subList = new LinkedList<SubReferent>();
 
-                for (Credential credential : credentialList) {
-                    if (attrReferentValue.getRestrictions().size() > 0) {
-                        for (Map<String, String> restrictionMap : attrReferentValue.getRestrictions()) {
+        // LOOP: attribute referent
+        for (String attrReferentKey : attrInfoMap.keySet()) {
+            AttributeInfo attrReferentValue = attrInfoMap.get(attrReferentKey);
+            WalletLogger.getInstance().d("attrReferentValue: " + GsonWrapper.getGsonPrettyPrinting().toJson(attrReferentValue));
+            List<SubReferent> subList = new LinkedList<SubReferent>();
 
-                            if (restrictionMap.get("credDefId").equals(credential.getCredDefId())) {
-                                LinkedHashMap<String, AttributeValue> values = credential.getValues();
+            for (Credential credential : credentialList) {
+                if (attrReferentValue.getRestrictions().size() > 0) {
+                    for (Map<String, String> restrictionMap : attrReferentValue.getRestrictions()) {
 
-                                for (String attrKey : values.keySet()) {
-                                    AttributeValue attrValue = values.get(attrKey);
-                                    WalletLogger.getInstance().d("attrKey: " + GsonWrapper.getGsonPrettyPrinting().toJson(attrKey));
-                                    WalletLogger.getInstance().d("attrValue: " + GsonWrapper.getGsonPrettyPrinting().toJson(attrValue));
+                        if (restrictionMap.get("credDefId").equals(credential.getCredDefId())) {
+                            LinkedHashMap<String, AttributeValue> values = credential.getValues();
 
-                                    if (attrKey.equals(attrReferentValue.getName())) {
-                                        // attrReferent 생성
-                                        subList.add(new SubReferent(attrValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
-                                        attrMap.put(attrReferentKey, new AttrReferent.Builder()
-                                                .setName(attrKey)
-                                                .setCheckRevealed(true)
-                                                .setAttrSubReferent(subList)
-                                                .build());
-                                    }
+                            for (String attrKey : values.keySet()) {
+                                AttributeValue attrValue = values.get(attrKey);
+                                WalletLogger.getInstance().d("attrKey: " + GsonWrapper.getGsonPrettyPrinting().toJson(attrKey));
+                                WalletLogger.getInstance().d("attrValue: " + GsonWrapper.getGsonPrettyPrinting().toJson(attrValue));
+
+                                if (attrKey.equals(attrReferentValue.getName())) {
+                                    // attrReferent 생성
+                                    subList.add(new SubReferent(attrValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
+                                    attrMap.put(attrReferentKey, new AttrReferent.Builder()
+                                            .setName(attrKey)
+                                            .setCheckRevealed(true)
+                                            .setAttrSubReferent(subList)
+                                            .build());
                                 }
                             }
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
         }
 
         return attrMap;
@@ -170,78 +163,70 @@ public class AvailableReferent {
 
         WalletLogger.getInstance().d(predInfoMap + GsonWrapper.getGsonPrettyPrinting().toJson(predInfoMap));
         Map<String, PredicateReferent> predicateMap = new HashMap<String, PredicateReferent>();
-        try {
-            for (String predicateReferentKey : predInfoMap.keySet()) {
-                PredicateInfo predicateReferentValue = predInfoMap.get(predicateReferentKey);
-                WalletLogger.getInstance().d("predicateReferentValue: " + GsonWrapper.getGsonPrettyPrinting().toJson(predicateReferentValue));
 
-                List<SubReferent> predicateSubList = new LinkedList<SubReferent>();
+        for (String predicateReferentKey : predInfoMap.keySet()) {
+            PredicateInfo predicateReferentValue = predInfoMap.get(predicateReferentKey);
+            WalletLogger.getInstance().d("predicateReferentValue: " + GsonWrapper.getGsonPrettyPrinting().toJson(predicateReferentValue));
 
-                for (Credential credential : credentialList) {
+            List<SubReferent> predicateSubList = new LinkedList<SubReferent>();
 
-//                    WalletLogger.getInstance().d("key: " + ZkpGsonWrapper.getGsonPrettyPrinting().toJson(credInfo.getCredentialId()));
-//                    WalletLogger.getInstance().d("value: " + ZkpGsonWrapper.getGsonPrettyPrinting().toJson(credInfo.getCredential()));
+            for (Credential credential : credentialList) {
+                if (predicateReferentValue.getRestrictions().size() > 0) {
 
-                    if (predicateReferentValue.getRestrictions().size() > 0) {
+                    for (Map<String, String> restrictionMap : predicateReferentValue.getRestrictions()) {
+                        if (restrictionMap.get("credDefId").equals(credential.getCredDefId())) {
+                            LinkedHashMap<String, AttributeValue> values = credential.getValues();
 
-                        for (Map<String, String> restrictionMap : predicateReferentValue.getRestrictions()) {
-                            if (restrictionMap.get("credDefId").equals(credential.getCredDefId())) {
-                                LinkedHashMap<String, AttributeValue> values = credential.getValues();
+                            for (String predicateKey : values.keySet()) {
+                                AttributeValue predValue = values.get(predicateKey);
+                                WalletLogger.getInstance().d("predicateKey: " + GsonWrapper.getGsonPrettyPrinting().toJson(predicateKey));
+                                WalletLogger.getInstance().d("predValue: " + GsonWrapper.getGsonPrettyPrinting().toJson(predValue));
 
-                                for (String predicateKey : values.keySet()) {
-                                    AttributeValue predValue = values.get(predicateKey);
-                                    WalletLogger.getInstance().d("predicateKey: " + GsonWrapper.getGsonPrettyPrinting().toJson(predicateKey));
-                                    WalletLogger.getInstance().d("predValue: " + GsonWrapper.getGsonPrettyPrinting().toJson(predValue));
+                                if (predicateKey.equals(predicateReferentValue.getName())) {
 
-                                    if (predicateKey.equals(predicateReferentValue.getName())) {
+                                    /**
+                                     *     GE(" >= "),
+                                     *     LE(" <= "),
+                                     *     GT(" > "),
+                                     *     LT(" < "),
+                                     **/
+                                    int pValue = predicateReferentValue.getPValue();
+//                                    try {
+//                                        WalletLogger.getInstance().d("GET VALUE: " + predicateReferentValue.getPType().getValue());
+//                                        WalletLogger.getInstance().d("pValue: " + pValue);
+//                                        WalletLogger.getInstance().d("raw: " + Integer.parseInt(predValue.getRaw()));
+//                                    } catch (Exception e) {
+//                                        WalletLogger.getInstance().d("OMNI_ERROR_ZKP_NOT_SUPPORTED_PREDICATE_TYPE, " + "number format exception for input string {" + predValue.getRaw() + "}");
+//                                        continue;
+////                                            throw new ZkpException(ZkpErrorCode.OMNI_ERROR_ZKP_NOT_SUPPORTED_PREDICATE_TYPE, "number format exception for input string {" + predValue.getRaw() + "}");
+//                                    }
 
-                                        /**
-                                         *     GE(" >= "),
-                                         *     LE(" <= "),
-                                         *     GT(" > "),
-                                         *     LT(" < "),
-                                         **/
-                                        int pValue = predicateReferentValue.getPValue();
-                                        try {
-                                            WalletLogger.getInstance().d("GET VALUE: " + predicateReferentValue.getPType().getValue());
-                                            WalletLogger.getInstance().d("pValue: " + pValue);
-                                            WalletLogger.getInstance().d("raw: " + Integer.parseInt(predValue.getRaw()));
-                                        } catch (Exception e) {
-                                            WalletLogger.getInstance().d("OMNI_ERROR_ZKP_NOT_SUPPORTED_PREDICATE_TYPE, " + "number format exception for input string {" + predValue.getRaw() + "}");
-                                            continue;
-//                                            throw new ZkpException(ZkpErrorCode.OMNI_ERROR_ZKP_NOT_SUPPORTED_PREDICATE_TYPE, "number format exception for input string {" + predValue.getRaw() + "}");
-                                        }
+                                    if (predicateReferentValue.getPType() == PredicateType.GE && Integer.parseInt(predValue.getRaw()) >= pValue) {
+                                        predicateSubList.add(new SubReferent(predValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
+                                        predicateMap.put(predicateReferentKey, new PredicateReferent.Builder().setName(predicateKey).setCheckRevealed(false).setPredicateReferent(predicateSubList).build());
 
-                                        if (predicateReferentValue.getPType() == PredicateType.GE && Integer.parseInt(predValue.getRaw()) >= pValue) {
-                                            predicateSubList.add(new SubReferent(predValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
-                                            predicateMap.put(predicateReferentKey, new PredicateReferent.Builder().setName(predicateKey).setCheckRevealed(false).setPredicateReferent(predicateSubList).build());
+                                    } else if (predicateReferentValue.getPType() == PredicateType.LE && Integer.parseInt(predValue.getRaw()) <= pValue) {
+                                        predicateSubList.add(new SubReferent(predValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
+                                        predicateMap.put(predicateReferentKey, new PredicateReferent.Builder().setName(predicateKey).setCheckRevealed(false).setPredicateReferent(predicateSubList).build());
 
-                                        } else if (predicateReferentValue.getPType() == PredicateType.LE && Integer.parseInt(predValue.getRaw()) <= pValue) {
-                                            predicateSubList.add(new SubReferent(predValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
-                                            predicateMap.put(predicateReferentKey, new PredicateReferent.Builder().setName(predicateKey).setCheckRevealed(false).setPredicateReferent(predicateSubList).build());
+                                    } else if (predicateReferentValue.getPType() == PredicateType.GT && Integer.parseInt(predValue.getRaw()) > pValue) {
+                                        predicateSubList.add(new SubReferent(predValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
+                                        predicateMap.put(predicateReferentKey, new PredicateReferent.Builder().setName(predicateKey).setCheckRevealed(false).setPredicateReferent(predicateSubList).build());
 
-                                        } else if (predicateReferentValue.getPType() == PredicateType.GT && Integer.parseInt(predValue.getRaw()) > pValue) {
-                                            predicateSubList.add(new SubReferent(predValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
-                                            predicateMap.put(predicateReferentKey, new PredicateReferent.Builder().setName(predicateKey).setCheckRevealed(false).setPredicateReferent(predicateSubList).build());
-
-                                        } else if (predicateReferentValue.getPType() == PredicateType.LT && Integer.parseInt(predValue.getRaw()) < pValue) {
-                                            predicateSubList.add(new SubReferent(predValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
-                                            predicateMap.put(predicateReferentKey, new PredicateReferent.Builder().setName(predicateKey).setCheckRevealed(false).setPredicateReferent(predicateSubList).build());
-                                        }
+                                    } else if (predicateReferentValue.getPType() == PredicateType.LT && Integer.parseInt(predValue.getRaw()) < pValue) {
+                                        predicateSubList.add(new SubReferent(predValue.getRaw(), credential.getCredentialId(), credential.getCredDefId()));
+                                        predicateMap.put(predicateReferentKey, new PredicateReferent.Builder().setName(predicateKey).setCheckRevealed(false).setPredicateReferent(predicateSubList).build());
                                     }
                                 }
-                            } else {
-
                             }
+                        } else {
+
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_PREDICATE_ATTRIBUTE);
         }
 
         return predicateMap;
-
     }
 }

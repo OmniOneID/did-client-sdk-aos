@@ -84,42 +84,36 @@ public enum WalletCoreErrorCode {
     // common
     ERR_CODE_ZKP_NULL                                                    (ZKP_MANAGER_BASE,100,"Data is null"),
     ERR_CODE_ZKP_NEGATIVE_DELTA                                          (ZKP_MANAGER_BASE,101,"Delta value must be positive"),
-    ERR_CODE_ZKP_BIG_NUMBER_COMPARE_FAIL                                 (ZKP_MANAGER_BASE,102,"Failed to compare big numbers"),
-    ERR_CODE_ZKP_BIG_NUMBER_FROM_BYTE_FAIL                               (ZKP_MANAGER_BASE,104,"Failed to convert byte to big number"),
-    ERR_CODE_ZKP_BIG_NUMBER_TO_BYTE_FAIL                                 (ZKP_MANAGER_BASE,105,"Failed to convert big number to byte"),
 
-    ERR_CODE_ZKP_IO                                                      (ZKP_MANAGER_BASE,106,"Error IO"),
-    ERR_CODE_ZKP_NOT_SUPPORTED_TYPE                                      (ZKP_MANAGER_BASE,107,"Not supported type"),
+    ERR_CODE_ZKP_IO                                                      (ZKP_MANAGER_BASE,102,"Error IO"),
+    ERR_CODE_ZKP_NOT_SUPPORTED_TYPE                                      (ZKP_MANAGER_BASE,103,"Not supported type"),
 
     // master secret
     ERR_CODE_ZKP_PROVER_SELECT_MASTER_SECRET_FROM_WALLET_FAIL            (ZKP_MANAGER_BASE,200,"Master secret not found"),
     ERR_CODE_ZKP_PROVER_GENERATE_MASTER_SECRET_FAIL                      (ZKP_MANAGER_BASE,201,"Failed to generate master secret"),
 
     // issue credential
-    ERR_CODE_ZKP_PROVER_CHECK_SIGNATURE_CORRECTNESS_PROOF_FAIL           (ZKP_MANAGER_BASE,300,"Failed to verify signature correctness proof"),
+    ERR_CODE_ZKP_PROVER_INVALID_SIGNATURE_CALCULATION                    (ZKP_MANAGER_BASE,300,"Calculated signature value is invalid. Possibly due to incorrect public key or credential values"),
+    ERR_CODE_ZKP_PROVER_VERIFY_CREDENTIAL_KEY_CORRECTNESS_FAIL           (ZKP_MANAGER_BASE,301,"Failed to verify credential key correctness proof"),
+    ERR_CODE_ZKP_PROVER_VERIFY_CREDENTIAL_SIGNATURE_CORRECTNESS_FAIL     (ZKP_MANAGER_BASE,302,"Failed to verify credential signature correctness proof"),
 
     // get credential
     ERR_CODE_ZKP_PROVER_NOT_FOUND_CREDENTIAL_STORED                      (ZKP_MANAGER_BASE,400,"Credential not found in storage"),
     ERR_CODE_ZKP_PROVER_NOT_FOUND_CREDENTIAL_BY_IDENTIFIERS              (ZKP_MANAGER_BASE,401,"Credential not found by identifiers in storage"),
 
     // search credential
-    ERR_CODE_ZKP_PROVER_PREDICATE_MUST_HAVE_RESTRICTIONS                 (ZKP_MANAGER_BASE,500,"Proof request's predicate must have restrictions"),
-    ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE            (ZKP_MANAGER_BASE,501,"Not found available request attribute"),
-    ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_PREDICATE_ATTRIBUTE          (ZKP_MANAGER_BASE,502,"Not found available predicate attribute"),
+    ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE            (ZKP_MANAGER_BASE,500,"Not found available request attribute"),
+    ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_PREDICATE_ATTRIBUTE          (ZKP_MANAGER_BASE,501,"Not found available predicate attribute"),
 
     // proof
-    ERR_CODE_ZKP_PROVER_BUILD_CREDENTIAL_FOR_PROVING_FAIL                (ZKP_MANAGER_BASE,602,"Failed to build credential for proving"),
-    ERR_CODE_ZKP_PROVER_NOT_FOUND_SCHEMA_FROM_LIST                       (ZKP_MANAGER_BASE,603,"Not found schema from list"),
-    ERR_CODE_ZKP_PROVER_INSUFFICIENT_PROOF_REQUEST_REFERENTS             (ZKP_MANAGER_BASE,604,"Insufficient referents for proof request"),
-    ERR_CODE_ZKP_DUPLICATED                                              (ZKP_MANAGER_BASE,605,"Duplicated key"),
+    ERR_CODE_ZKP_PROVER_BUILD_CREDENTIAL_FOR_PROVING_FAIL                (ZKP_MANAGER_BASE,600,"Failed to build credential for proving"),
+    ERR_CODE_ZKP_PROVER_NOT_FOUND_SCHEMA_FROM_LIST                       (ZKP_MANAGER_BASE,601,"Not found schema from list"),
+    ERR_CODE_ZKP_PROVER_NOT_FOUND_DEFINITION_FROM_LIST                   (ZKP_MANAGER_BASE,602,"Not found credential definition from list"),
+    ERR_CODE_ZKP_DUPLICATED                                              (ZKP_MANAGER_BASE,603,"Duplicated key"),
 
     // integrated
     ERR_CODE_ZKP_CALCULATE_TEQ_FAIL                                      (ZKP_MANAGER_BASE,900, "Failed to calculate TEQ proof"),
     ERR_CODE_ZKP_CALCULATE_TNE_FAIL                                      (ZKP_MANAGER_BASE,901, "Failed to calculate TNE proof"),
-    ERR_CODE_ZKP_PROVER_INITIALIZE_PRIMARY_EQ_PROOF_FAIL                 (ZKP_MANAGER_BASE,902,"Failed to initialize primary equal proof"),
-    ERR_CODE_ZKP_PROVER_INITIALIZE_PRIMARY_NE_PROOF_FAIL                 (ZKP_MANAGER_BASE,903,"Failed to initialize primary non-equal proof"),
-    ERR_CODE_ZKP_PROVER_FINALIZE_PRIMARY_EQ_PROOF_FAIL                   (ZKP_MANAGER_BASE,904,"Failed to finalize primary equal proof"),
-    ERR_CODE_ZKP_PROVER_FINALIZE_PRIMARY_NE_PROOF_FAIL                   (ZKP_MANAGER_BASE,905,"Failed to finalize primary non-equal proof"),
 
 
     /*  [10] StorageManager  */

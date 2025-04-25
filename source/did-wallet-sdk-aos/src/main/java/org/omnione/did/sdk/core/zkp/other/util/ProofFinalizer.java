@@ -115,7 +115,6 @@ public class ProofFinalizer {
     private static PrimaryPredicateInequalityProof finalizeNeProof(BigInteger challenge,
                                                                    PrimaryPredicateInequalityInitProof neInitProof,
                                                                    PrimaryEqualProof eqProof) throws WalletCoreException {
-
         if (challenge == null) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "finalizeNeProof challenge is null in finalizeNeProof");
         } else if (neInitProof == null) {
@@ -124,48 +123,43 @@ public class ProofFinalizer {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "finalizeNeProof eqProof is null in finalizeNeProof");
         }
 
-        try {
-            Map<String, BigInteger> u = new HashMap<String, BigInteger>();
-            Map<String, BigInteger> r = new HashMap<String, BigInteger>();
-            BigInteger ur = BigInteger.ZERO;
+        Map<String, BigInteger> u = new HashMap<String, BigInteger>();
+        Map<String, BigInteger> r = new HashMap<String, BigInteger>();
+        BigInteger ur = BigInteger.ZERO;
 
-            final Map<String, BigInteger> u_tilde = neInitProof.getUTilde();
-            final Map<String, BigInteger> r_tilde = neInitProof.getRTilde();
-            final Map<String, BigInteger> uInit = neInitProof.getU();
-            final Map<String, BigInteger> rInit = neInitProof.getR();
-            final Map<String, BigInteger> tInit = neInitProof.getT();
-            final BigInteger alpha_tilde = neInitProof.getAlphaTilde();
-            final Predicate predicate = neInitProof.getPredicate();
+        final Map<String, BigInteger> u_tilde = neInitProof.getUTilde();
+        final Map<String, BigInteger> r_tilde = neInitProof.getRTilde();
+        final Map<String, BigInteger> uInit = neInitProof.getU();
+        final Map<String, BigInteger> rInit = neInitProof.getR();
+        final Map<String, BigInteger> tInit = neInitProof.getT();
+        final BigInteger alpha_tilde = neInitProof.getAlphaTilde();
+        final Predicate predicate = neInitProof.getPredicate();
 
-            //TODO: for 조건문 ZkpConstants.ITERATION으로 변경 고려
-            for (String key : neInitProof.getUTilde().keySet()) {
-                BigInteger cur_u = uInit.get(key);
-                BigInteger cur_r = rInit.get(key);
-                // For 1 ≤ i ≤ 4 compute ui ← ui + cu.
-                u.put(key, challenge.multiply(cur_u).add(u_tilde.get(key)));
-                // For1 ≤ i ≤ 4 computer ri ← ri + cr.
-                r.put(key, challenge.multiply(cur_r).add(r_tilde.get(key)));
+        //TODO: for 조건문 ZkpConstants.ITERATION으로 변경 고려
+        for (String key : neInitProof.getUTilde().keySet()) {
+            BigInteger cur_u = uInit.get(key);
+            BigInteger cur_r = rInit.get(key);
+            // For 1 ≤ i ≤ 4 compute ui ← ui + cu.
+            u.put(key, challenge.multiply(cur_u).add(u_tilde.get(key)));
+            // For1 ≤ i ≤ 4 computer ri ← ri + cr.
+            r.put(key, challenge.multiply(cur_r).add(r_tilde.get(key)));
 
-                ur = cur_u.multiply(cur_r).add(ur);
-            }
-
-            //TODO: indy에서의 구현이 이상해서 일단 변경해둠
-            BigInteger r_delta = rInit.get(ZkpConstants.DELTA);
-            BigInteger r_delta_tilde = r_tilde.get(ZkpConstants.DELTA);
-
-            r.put(ZkpConstants.DELTA, challenge.multiply(r_delta).add(r_delta_tilde));
-
-            // Compute r∆ ← r∆ + c * r∆.
-            // Compute α ← α + c(r∆ − u1*r1 − u2*r2 − u3*r3 − u4*r4).
-            BigInteger alpha = r_delta.subtract(ur).multiply(challenge).add(alpha_tilde);
-
-            //The values Prp = ({ui},{ri},r∆,α,mj) are the sub-proof for predicate p
-            PrimaryPredicateInequalityProof neProof = new PrimaryPredicateInequalityProof(u, r, tInit, eqProof.getM().get(predicate.getAttrName()), alpha, predicate);
-            return neProof;
-
-        } catch (Exception e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_FINALIZE_PRIMARY_NE_PROOF_FAIL);
+            ur = cur_u.multiply(cur_r).add(ur);
         }
+
+        //TODO: indy에서의 구현이 이상해서 일단 변경해둠
+        BigInteger r_delta = rInit.get(ZkpConstants.DELTA);
+        BigInteger r_delta_tilde = r_tilde.get(ZkpConstants.DELTA);
+
+        r.put(ZkpConstants.DELTA, challenge.multiply(r_delta).add(r_delta_tilde));
+
+        // Compute r∆ ← r∆ + c * r∆.
+        // Compute α ← α + c(r∆ − u1*r1 − u2*r2 − u3*r3 − u4*r4).
+        BigInteger alpha = r_delta.subtract(ur).multiply(challenge).add(alpha_tilde);
+
+        //The values Prp = ({ui},{ri},r∆,α,mj) are the sub-proof for predicate p
+        PrimaryPredicateInequalityProof neProof = new PrimaryPredicateInequalityProof(u, r, tInit, eqProof.getM().get(predicate.getAttrName()), alpha, predicate);
+        return neProof;
     }
 
     private static PrimaryEqualProof finalizeEqProof(PrimaryEqualInitProof eqInitProof,
@@ -176,71 +170,64 @@ public class ProofFinalizer {
                                                      SubProofRequest subProofReq) throws WalletCoreException {
 
         // For each credential C = (I = {mj }, A, e, v) and Issuer’s public key pkI compute
-        try {
-            final BigInteger a_prime = eqInitProof.getAPrime();
-            final BigInteger e_tilde = eqInitProof.getETilde();
-            final BigInteger v_tilde = eqInitProof.getVTilde();
-            final Map<String, BigInteger> m_tilde = eqInitProof.getM_tilde();
+        final BigInteger a_prime = eqInitProof.getAPrime();
+        final BigInteger e_tilde = eqInitProof.getETilde();
+        final BigInteger v_tilde = eqInitProof.getVTilde();
+        final Map<String, BigInteger> m_tilde = eqInitProof.getM_tilde();
 
-            BigInteger e = challenge.multiply(eqInitProof.getEPrime());
-            BigInteger e_hat = e_tilde.add(e);
+        BigInteger e = challenge.multiply(eqInitProof.getEPrime());
+        BigInteger e_hat = e_tilde.add(e);
 
-            BigInteger v = challenge.multiply(eqInitProof.getVPrime());
-            BigInteger v_hat = v_tilde.add(v);
+        BigInteger v = challenge.multiply(eqInitProof.getVPrime());
+        BigInteger v_hat = v_tilde.add(v);
 
-            Set<String> unrevealedAttrs = new HashSet<String>();
-            // for 연산식 문제로 set 합집합, 차집합 연산 처리
-            Set<String> nonCredSchemaList = nonCredSchema.getNonCredSchema();
-            List<String> credSchemaList = credSchema.getAttrNames();
-            Set<String> subProofReqAttrsList = subProofReq.getRevealedAttrs();
+        Set<String> unrevealedAttrs = new HashSet<String>();
+        // for 연산식 문제로 set 합집합, 차집합 연산 처리
+        Set<String> nonCredSchemaList = nonCredSchema.getNonCredSchema();
+        List<String> credSchemaList = credSchema.getAttrNames();
+        Set<String> subProofReqAttrsList = subProofReq.getRevealedAttrs();
 
-            unrevealedAttrs.addAll(nonCredSchemaList);
-            unrevealedAttrs.addAll(credSchemaList);
-            unrevealedAttrs.removeAll(subProofReqAttrsList);
+        unrevealedAttrs.addAll(nonCredSchemaList);
+        unrevealedAttrs.addAll(credSchemaList);
+        unrevealedAttrs.removeAll(subProofReqAttrsList);
 
-            Map<String, BigInteger> m_hat = new HashMap<String, BigInteger>();
-            // For all j ∈ Ar compute
-            for (String key : unrevealedAttrs) {
+        Map<String, BigInteger> m_hat = new HashMap<String, BigInteger>();
+        // For all j ∈ Ar compute
+        for (String key : unrevealedAttrs) {
 
-                BigInteger cur_m_tilde = m_tilde.get(key);
-                if (cur_m_tilde == null) {
-                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "Value by key '{}' not found in init_proof.mtilde in finalizeEqProof");
-                }
-                CredentialValue cur_value = credValues.get(key);
-                if (cur_value == null) {
-                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "Value by key '{}' not found in attributes_values in finalizeEqProof");
-                }
-
-                m_hat.put(key, cur_value.getValue().multiply(challenge).add(cur_m_tilde));
+            BigInteger cur_m_tilde = m_tilde.get(key);
+            if (cur_m_tilde == null) {
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "Value by key '{}' not found in init_proof.mtilde in finalizeEqProof");
             }
+            CredentialValue cur_value = credValues.get(key);
+            if (cur_value == null) {
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "Value by key '{}' not found in attributes_values in finalizeEqProof");
+            }
+
+            m_hat.put(key, cur_value.getValue().multiply(challenge).add(cur_m_tilde));
+        }
 
 //        BigInteger m2_tilde = eqInitProof.getM2Tilde();
+        BigInteger m2 = eqInitProof.getM2().multiply(challenge).add(eqInitProof.getM2Tilde());
 
-            // djpark0402 20210521
-            BigInteger m2 = eqInitProof.getM2().multiply(challenge).add(eqInitProof.getM2Tilde());
+        Map<String, BigInteger> revealedAttrsWithValue = new TreeMap<String, BigInteger>();
 
-            Map<String, BigInteger> revealedAttrsWithValue = new TreeMap<String, BigInteger>();
+        for (String key : subProofReq.getRevealedAttrs()) {
+            CredentialValue credValue = credValues.get(key);
 
-            for (String key : subProofReq.getRevealedAttrs()) {
-                CredentialValue credValue = credValues.get(key);
-
-                if (credValue == null) {
-                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "InvalidStructure: Encoded value not found in finalizeEqProof");
-                }
-                revealedAttrsWithValue.put(key, credValue.getValue());
+            if (credValue == null) {
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "InvalidStructure: Encoded value not found in finalizeEqProof");
             }
-            // The values PrC = (e_hat, v_hat, m_hat, A′ ) are the sub-proof for credential C
-            PrimaryEqualProof primaryEqualProof = new PrimaryEqualProof(revealedAttrsWithValue,
-                    a_prime,
-                    e_hat,
-                    v_hat,
-                    m_hat,
-                    m2);
-
-            return primaryEqualProof;
-
-        } catch (Exception e) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_FINALIZE_PRIMARY_EQ_PROOF_FAIL);
+            revealedAttrsWithValue.put(key, credValue.getValue());
         }
+        // The values PrC = (e_hat, v_hat, m_hat, A′ ) are the sub-proof for credential C
+        PrimaryEqualProof primaryEqualProof = new PrimaryEqualProof(revealedAttrsWithValue,
+                a_prime,
+                e_hat,
+                v_hat,
+                m_hat,
+                m2);
+
+        return primaryEqualProof;
     }
 }

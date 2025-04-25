@@ -56,18 +56,13 @@ public class CredentialVerifier {
         BigInteger rctxt = publicKey.getRctxt();
         BigInteger sv = CommitmentHelper.commitment(s, v, rctxt, m2, n);
 
-        try {
-            for (String key : credValues.getAttrValues().keySet()) {
-                WalletLogger.getInstance().d("key: " + key);
-                sv = sv.multiply(r.get(key).modPow(credValues.get(key).getValue(), n)).mod(n);
-            }
-        } catch(Exception ex) {
-            WalletLogger.getInstance().d("exception: " + ex);
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_CHECK_SIGNATURE_CORRECTNESS_PROOF_FAIL, "publicKey r is null");
+        for (String key : credValues.getAttrValues().keySet()) {
+            WalletLogger.getInstance().d("key: " + key);
+            sv = sv.multiply(r.get(key).modPow(credValues.get(key).getValue(), n)).mod(n);
         }
 
         if (sv.bitLength() == 0) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_CHECK_SIGNATURE_CORRECTNESS_PROOF_FAIL, "publicKey not match");
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_INVALID_SIGNATURE_CALCULATION);
         }
         // e와 v가 주어진 범위내 있는지, e가 소수인지 확인
         // Ae ≡ Z Sv ⋅ ∏i R mi i (mod n)
@@ -79,8 +74,6 @@ public class CredentialVerifier {
             BigInteger exp = credSignProof.getC().add(credSignProof.getSe().multiply(e));
             BigInteger a_cap = a.modPow(exp, n);
 
-            //TODO: challenge 연산 실패시
-            // exception throw를 할 것인가, log만 남길 것인가 판단 필요
             BigInteger c_cap = new ChallengeBuilder()
                     .add(q)
                     .add(a)
