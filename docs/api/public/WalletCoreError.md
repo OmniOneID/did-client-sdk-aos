@@ -20,13 +20,14 @@ Android WalletCoreError
 
 - Topic: WalletCoreError
 - Author: Dongjun Park
-- Date: 2024-04-30
+- Date: 2024-05-30
 - Version: v2.0.0
 
 | Version | Date       | Changes         |
 | ------- | ---------- | --------------- |
+| v2.0.0  | 2025-05-30 | Add ZKP error   |
 | v1.0.0  | 2024-08-12 | Initial version |
-| v2.0.0  | 2025-04-30 | Add ZKP error   |
+
 
 <div style="page-break-after: always;"></div>
 
