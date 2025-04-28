@@ -79,7 +79,7 @@ did-client-sdk-aos
 
 ## 라이브러리
 
-라이브러리는 [release 폴더](source/did-wallet-sdk-aos/release)에서 찾을 수 있습니다.
+라이브러리는 [release 폴더](source/release)에서 찾을 수 있습니다.
 
 ### Wallet SDK
 
