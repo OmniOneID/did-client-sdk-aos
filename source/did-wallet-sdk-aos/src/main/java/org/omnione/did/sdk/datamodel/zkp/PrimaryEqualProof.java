@@ -50,7 +50,7 @@ public class PrimaryEqualProof {
 
     public PrimaryEqualProof(Map<String, BigInteger> revealedAttrs, BigInteger aPrime, BigInteger e,
                              BigInteger v, Map<String, BigInteger> m, BigInteger m2) {
-        //TODO: TreeMap 제거 가능?
+
         this.revealedAttrs = new TreeMap<String, BigInteger>(revealedAttrs);
         this.aPrime = aPrime;
         this.e = e;

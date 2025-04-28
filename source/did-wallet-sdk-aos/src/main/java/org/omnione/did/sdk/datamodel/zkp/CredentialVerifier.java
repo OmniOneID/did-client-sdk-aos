@@ -69,7 +69,7 @@ public class CredentialVerifier {
         BigInteger q = z.multiply(sv.modInverse(n)).mod(n);
         BigInteger q_cap = a.modPow(e, n);
 
-        // 서명 검증
+        // Signature verification
         if (q.equals(q_cap)) {
             BigInteger exp = credSignProof.getC().add(credSignProof.getSe().multiply(e));
             BigInteger a_cap = a.modPow(exp, n);

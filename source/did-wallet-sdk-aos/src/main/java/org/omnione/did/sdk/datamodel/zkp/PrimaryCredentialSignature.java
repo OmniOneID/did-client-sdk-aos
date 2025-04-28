@@ -33,11 +33,9 @@ public class PrimaryCredentialSignature {
     @JsonAdapter(BigIntegerSerializer.class)
     private BigInteger v;
 
-    //TODO: 사용여부 확인 필요
     @JsonAdapter(BigIntegerSerializer.class)
     private BigInteger q;
 
-    //TODO: did 검증용
     @JsonAdapter(BigIntegerSerializer.class)
     private BigInteger m2;
 

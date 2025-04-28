@@ -68,7 +68,7 @@ public class CredentialRequestHelper {
 
         return generateCredentialSecretProof(credentialKeyPair.getPublicKey(), credSecret, credOffer.getNonce(), masterSecret, v_prime);
     }
-    //    //Wrapper Method
+
     private static BlindedCredentialSecretsCorrectnessProof generateCredentialSecretProof(
             CredentialPrimaryPublicKey publicKey,
             BlindedCredentialSecrets credSecret,

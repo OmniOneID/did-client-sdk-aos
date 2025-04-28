@@ -579,7 +579,7 @@ class ZKPManager<E extends BaseObject> {
         WalletLogger.getInstance().d("availablePredicate: "+ GsonWrapper.getGson().toJson(availablePredicate));
 
 
-        // proofRequest 조건에 부합하지 않으면 실패 리턴
+        // If the proofRequest condition is not met, return failure.
         if (proofRequestAttribute.size() != availableAttribute.size()) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
         }
@@ -795,7 +795,7 @@ class ZKPManager<E extends BaseObject> {
         WalletLogger.getInstance().d("combinedReferentKeys: "+combinedReferentKeys);
         // Check if all items in proofRequestRestrictionAttrs exist in combinedReferentKeys
         boolean allMatch = proofRequestRestrictionAttrs.equals(combinedReferentKeys);
-        // 결과 출력
+
         if (!allMatch) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
         }

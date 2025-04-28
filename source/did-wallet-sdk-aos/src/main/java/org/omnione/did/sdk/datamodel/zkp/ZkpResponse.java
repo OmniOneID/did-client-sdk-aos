@@ -30,23 +30,14 @@ public class ZkpResponse {
         this.isSuccess = this.errorCode == "00000" ? true: false;
     }
 
-    /**
-     * 성공 시 true, 실패 시 false 반환
-     */
     public boolean isSuccess() {
         return isSuccess;
     }
 
-    /**
-     * 에러 코드 반환 (ErrorCode.java 참고)
-     */
     public String getErrorCode() {
         return errorCode;
     }
 
-    /**
-     * 에러 메시지 반환 (ErrorCode.java 참고)
-     */
     public String getErrorMessage() {
         return errorMessage;
     }

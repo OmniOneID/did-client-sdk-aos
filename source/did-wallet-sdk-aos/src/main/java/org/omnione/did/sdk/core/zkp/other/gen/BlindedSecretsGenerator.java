@@ -45,7 +45,7 @@ public class BlindedSecretsGenerator {
 
 
         /**
-         issuer의 공개키(pk)와 masterSecret(m1)을 이용하여 nym을 생성
+         Generate nym using issuer's public key (pk) and masterSecret (m1)
          generates r < p, nym = g^m1 * h^r (mod T)
          u : nym
          u = r1^m1 * s^vPrime (mod n)
@@ -57,13 +57,10 @@ public class BlindedSecretsGenerator {
         List<String> hiddenAttrs = new LinkedList<String>();
         hiddenAttrs.add(ZkpConstants.MASTER_SECRET_KEY);
 
-        // TODO: committedAttrs 고려 필요
-        BlindedCredentialSecrets blindedCredSecret =
-                new BlindedCredentialSecrets(u,
-                        v_prime,
-                        hiddenAttrs, null);
-
-        return blindedCredSecret;
+        // TODO: Consider committedAttrs
+        return new BlindedCredentialSecrets(u,
+                v_prime,
+                hiddenAttrs, null);
 
     }
 }
