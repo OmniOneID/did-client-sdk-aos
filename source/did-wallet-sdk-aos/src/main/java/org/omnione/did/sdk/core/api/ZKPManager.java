@@ -446,7 +446,7 @@ class ZKPManager<E extends BaseObject> {
         if (credOffer == null)
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "validRequest fail [credOffer has null parameter]");
 
-        // Credential 발급자(issuer)의 공개키와 CredentialOffer의 정당성 증명 값(KeyCorrectnessProof)이 일치하지 않을 경우
+        // If the public key of the Credential issuer and the KeyCorrectnessProof of the CredentialOffer do not match
         if (!KeyPairVerifier.verify(credentialPublicKey, credOffer.getKeyCorrectnessProof())) {
             WalletLogger.getInstance().d("check credential key correctness proof fail");
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_VERIFY_CREDENTIAL_KEY_CORRECTNESS_FAIL);
@@ -550,7 +550,7 @@ class ZKPManager<E extends BaseObject> {
         ArrayList<Credential> credentialList = this.getAllCredentials();
         WalletLogger.getInstance().d("credentialList: "+GsonWrapper.getGson().toJson(credentialList));
 
-        // User 에게 반환할 데이터 생성
+        // Create data to return to the User
         Map<String, AttrReferent> availableSelfAttribute = new HashMap<String, AttrReferent>();
         Map<String, AttrReferent> availableAttribute = new HashMap<String, AttrReferent>();
         Map<String, PredicateReferent> availablePredicate = new HashMap<String, PredicateReferent>();
@@ -560,12 +560,12 @@ class ZKPManager<E extends BaseObject> {
 
         availableSelfAttribute = AvailableReferent.addSelfAttrReferent(proofRequestAttribute);
 
-        // 공통 key 삭제
+        // Delete common key
         for (String key : availableSelfAttribute.keySet()) {
             proofRequestAttribute.remove(key);
         }
 
-        // VC안에 속성을 못찾은 경우
+        // If the proofRequest condition is not met, return failure.
         availableAttribute = AvailableReferent.addAttrReferent(proofRequestAttribute, credentialList);
         // attrMap -> 0개
         availablePredicate = AvailableReferent.addPredicateReferent(proofRequestPredicate, credentialList);
@@ -793,14 +793,14 @@ class ZKPManager<E extends BaseObject> {
         }
 
         WalletLogger.getInstance().d("combinedReferentKeys: "+combinedReferentKeys);
-        // proofRequestRestrictionAttrs의 모든 항목이 combinedReferentKeys에 존재하는지 확인
+        // Check if all items in proofRequestRestrictionAttrs exist in combinedReferentKeys
         boolean allMatch = proofRequestRestrictionAttrs.equals(combinedReferentKeys);
         // 결과 출력
         if (!allMatch) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
         }
 
-        // proof 생성
+        // create Proof
         ProofBuilder builder = new ProofBuilder(ZkpConstants.MASTER_SECRET_KEY);
         List<Identifiers> identifierList = new LinkedList<Identifiers>();
         RequestedProof requestedProof = new RequestedProof();

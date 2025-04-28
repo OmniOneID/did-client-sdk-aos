@@ -41,7 +41,6 @@ public class CredentialRequest {
     @SerializedName("blindedMsCorrectnessProof")
     private BlindedCredentialSecretsCorrectnessProof blindedMsProof;
 
-
     public String getProverDid() {
         return proverDid;
     }

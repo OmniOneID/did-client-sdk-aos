@@ -30,7 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class CredentialValueHelper {
-    // Credential Value 생성
+    // Create Credential Value
     public static CredentialValues generateCredentialValues(LinkedHashMap<String, AttributeValue> credValues, MasterSecret masterSecret) throws WalletCoreException, UtilityException {
 
         CredentialValues credentialValues = new CredentialValues();

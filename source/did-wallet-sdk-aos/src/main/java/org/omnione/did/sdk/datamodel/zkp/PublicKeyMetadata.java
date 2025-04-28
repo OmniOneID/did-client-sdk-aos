@@ -32,7 +32,6 @@ public class PublicKeyMetadata {
     @JsonAdapter(BigIntegerMapSerializer.class)
     private final LinkedHashMap<String, BigInteger> xr;
 
-    //TODO: Map의 구현체 타입을 강제하는 것 고려 (TreeMap)
     public PublicKeyMetadata(BigInteger xz, LinkedHashMap<String, BigInteger> xr) {
         this.xz = xz;
         this.xr = xr;

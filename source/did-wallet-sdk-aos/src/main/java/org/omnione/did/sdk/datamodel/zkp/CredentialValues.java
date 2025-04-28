@@ -28,7 +28,6 @@ public class CredentialValues {
 
     private Map<String, CredentialValue> attrValues;
 
-    //TODO: TreeMap의 교체 가능 여부 검
     public CredentialValues() {
         this.attrValues = new TreeMap<String, CredentialValue>();
     }

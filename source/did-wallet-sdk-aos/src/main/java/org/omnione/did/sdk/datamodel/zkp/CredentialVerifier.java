@@ -64,7 +64,7 @@ public class CredentialVerifier {
         if (sv.bitLength() == 0) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_INVALID_SIGNATURE_CALCULATION);
         }
-        // e와 v가 주어진 범위내 있는지, e가 소수인지 확인
+        // Check if e and v are within the given range and if e is prime
         // Ae ≡ Z Sv ⋅ ∏i R mi i (mod n)
         BigInteger q = z.multiply(sv.modInverse(n)).mod(n);
         BigInteger q_cap = a.modPow(e, n);

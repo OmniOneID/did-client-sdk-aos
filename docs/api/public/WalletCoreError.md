@@ -19,14 +19,14 @@ Android WalletCoreError
 ==
 
 - Topic: WalletCoreError
-- Author: Sangjun Kim
-- Date: 2024-08-12
-- Version: v1.0.0
+- Author: Dongjun Park
+- Date: 2024-04-30
+- Version: v2.0.0
 
 | Version | Date       | Changes         |
 | ------- | ---------- | --------------- |
 | v1.0.0  | 2024-08-12 | Initial version |
-| v2.0.0  | 2025-04-30 | add ZKP error   |
+| v2.0.0  | 2025-04-30 | Add ZKP error   |
 
 <div style="page-break-after: always;"></div>
 

@@ -23,7 +23,6 @@ public class CredentialSignature {
     @SerializedName("pCredential")
     private PrimaryCredentialSignature primaryCredential;
 
-
     public PrimaryCredentialSignature getPrimaryCredential() {
         return primaryCredential;
     }

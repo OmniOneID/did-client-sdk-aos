@@ -32,15 +32,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class BlindedSecretsProofGenerator {
-
-//    //Wrapper Method
-//    public static BlindedCredentialSecretsCorrectnessProof generateBlindedSecretsProof(CredentialPrimaryPublicKey publicKey, BlindedCredentialSecrets blindedSecret,
-//                                                                                       MasterSecret masterSecret, BigInteger nonce) throws ZkpException {
-//        //TODO: wallet을 masterSecretId로 조회하여 획득
-////        BigInteger masterSecret = TestConstants.MASTER_SECRET;
-//        return generateBlindedSecretsProof(publicKey, blindedSecret, masterSecret, nonce);
-//    }
-
     public static BlindedCredentialSecretsCorrectnessProof generateBlindedSecretsProof(CredentialPrimaryPublicKey publicKey,
                                                                                        BlindedCredentialSecrets blindedSecret,
                                                                                        MasterSecret masterSecret,
@@ -51,7 +42,6 @@ public class BlindedSecretsProofGenerator {
         final BigInteger n = publicKey.getN();
         final Map<String, BigInteger> r = publicKey.getR();
 
-        //TODO: 상수값 검증 필요
         BigInteger v_dash_tilde = generator.createRandomBigInteger(ZkpConstants.LARGE_VPRIME_TILDE);
         BigInteger m_tilde = generator.createRandomBigInteger(ZkpConstants.LARGE_MTILDE);
         //1 + Fiat-Shamir Heuristic + security parameter + attribute size
@@ -61,7 +51,7 @@ public class BlindedSecretsProofGenerator {
 
         u_tilde = u_tilde.mod(n);
 
-        //add 항목들의 순서는 고정되어야 한다.
+        //The order of the add items must be fixed.
         BigInteger c = new ChallengeBuilder()
                 .add(blindedSecret.getU())
                 .add(u_tilde)
@@ -71,11 +61,7 @@ public class BlindedSecretsProofGenerator {
         BigInteger v_dash_cap = c.multiply(v_prime).add(v_dash_tilde);
 
         LinkedHashMap<String, BigInteger> mCaps = new LinkedHashMap<String, BigInteger>();
-        //TODO: commitment 타입때 사용
 
-
-
-        //TODO: hidden Value들에 대한 재고려 필요 (현재 1개만 존재)
         BigInteger mCap = c.multiply(masterSecret.getMasterSecret()).add(m_tilde);
 
         mCaps.put(ZkpConstants.MASTER_SECRET_KEY, mCap);

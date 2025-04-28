@@ -39,7 +39,6 @@ public class CredentialOffer {
     @SerializedName("keyCorrectnessProof")
     private KeyCorrectnessProof keyCorrectnessProof;
 
-    //TODO: 필요성을 고려 해봐야 한다.
 //    @SerializedName("method_name")
     @Expose
     private String methodName;
