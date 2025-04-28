@@ -86,15 +86,15 @@ List<CredentialInfo> getCredentials(List<String> identifiers)
 
 ### Parameters
 
-| Parameter   | Type | Description              |
-|-------------|------|--------------------------|
-| identifiers | List | List of credential IDs   |
+| Parameter   | Type | Description              | **M/O** | Note |
+|-------------|------|--------------------------| -- | -- |
+| identifiers | List | List of credential IDs   | M | |
 
 ### Returns
 
-| Type | Description              |
-|------|--------------------------|
-| List | List of stored credentials |
+| Type | Description              | **M/O** | Note |
+|------|--------------------------| -- | -- |
+| List | List of stored credentials | M | |
 
 
 ## 3. getAllCredentials
@@ -111,9 +111,9 @@ ArrayList<CredentialInfo> getAllCredentials()
 
 ### Returns
 
-| Type      | Description              |
-|-----------|--------------------------|
-| ArrayList | All stored credentials   |
+| Type      | Description              | **M/O** | Note |
+|-----------|--------------------------| -- | -- |
+| ArrayList | All stored credentials   | M | |
 
 
 ## 4. deleteCredentials
@@ -130,9 +130,9 @@ void deleteCredentials(List<String> identifiers)
 
 ### Parameters
 
-| Parameter   | Type | Description              |
-|-------------|------|--------------------------|
-| identifiers | List | List of credential IDs   |
+| Parameter   | Type | Description              | **M/O** | Note |
+|-------------|------|--------------------------| -- | -- |
+| identifiers | List | List of credential IDs   | M | |
 
 ### Returns
 
@@ -189,17 +189,17 @@ ZkpRequestCredentialBuilder createCredentialRequest(String proverDid,
 
 ### Parameters
 
-| Parameter           | Type                       | Description            |
-|---------------------|----------------------------|------------------------|
-| proverDid           | String                     | Prover DID             |
-| credentialPublicKey | CredentialPrimaryPublicKey | Credential Public Key  |
-| credOffer           | CredentialOffer            | Credential Offer       |
+| Parameter           | Type                       | Description            | **M/O** | Note |
+|---------------------|----------------------------|------------------------| -- | -- |
+| proverDid           | String                     | Prover DID             | M | |
+| credentialPublicKey | CredentialPrimaryPublicKey | Credential Public Key  | M | |
+| credOffer           | CredentialOffer            | Credential Offer       | M | |
 
 ### Returns
 
-| Type                       | Description                    |
-|----------------------------|--------------------------------|
-| CredentialRequestContainer | Credential Request Container   |
+| Type                       | Description                    | **M/O** | Note |
+|----------------------------|--------------------------------| -- | -- |
+| CredentialRequestContainer | Credential Request Container   | M | |
 
 
 ## 8. verifyAndStoreCredential
@@ -218,17 +218,17 @@ boolean verifyAndStoreCredential(CredentialRequestMeta credentialRequestMeta,
 
 ### Parameters
 
-| Parameter                  | Type                       | Description                            |
-|----------------------------|----------------------------|----------------------------------------|
-| credentialRequestMeta      | CredentialRequestMeta      | Blinded Master Secret Data, nonce      |
-| credentialPrimaryPublicKey | CredentialPrimaryPublicKey | Credential Public Key                  |
-| credential                 | Credential                 | Credential Object                      |
+| Parameter                  | Type                       | Description                            | **M/O** | Note |
+|----------------------------|----------------------------|----------------------------------------| -- | -- |
+| credentialRequestMeta      | CredentialRequestMeta      | Blinded Master Secret Data, nonce      | M | |
+| credentialPrimaryPublicKey | CredentialPrimaryPublicKey | Credential Public Key                  | M | |
+| credential                 | Credential                 | Credential Object                      | M | |
 
 ### Returns
 
-| Type    | Description         |
-|---------|---------------------|
-| boolean | Verification result |
+| Type    | Description         | **M/O** | Note |
+|---------|---------------------| -- | -- |
+| boolean | Verification result | M | |
 
 
 ## 9. searchCredentials
@@ -245,15 +245,15 @@ ZkpSearchCredentialBuilder searchCredentials(ProofRequest proofRequest)
 
 ### Parameters
 
-| Parameter    | Type         | Description         |
-|--------------|--------------|---------------------|
-| proofRequest | ProofRequest | ZKP Proof Request   |
+| Parameter    | Type         | Description         | **M/O** | Note |
+|--------------|--------------|---------------------| -- | -- |
+| proofRequest | ProofRequest | ZKP Proof Request   | M | |
 
 ### Returns
 
-| Type                       | Description                |
-|----------------------------|----------------------------|
-| ZkpSearchCredentialBuilder | Credential Search Builder  |
+| Type                       | Description                | **M/O** | Note |
+|----------------------------|----------------------------| -- | -- |
+| ZkpSearchCredentialBuilder | Credential Search Builder  | M | |
 
 
 ## 10. createReferent
@@ -270,15 +270,15 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 
 ### Parameters
 
-| Parameter       | Type | Description               |
-|------------------|------|---------------------------|
-| customReferents | List | User Selected Referents   |
+| Parameter       | Type | Description               | **M/O** | Note |
+|------------------|------|---------------------------| -- | -- |
+| customReferents | List | User Selected Referents   | M | |
 
 ### Returns
 
-| Type                     | Description         |
-|--------------------------|---------------------|
-| ZkpCreateReferentBuilder | Referent Builder    |
+| Type                     | Description         | **M/O** | Note |
+|--------------------------|---------------------| -- | -- |
+| ZkpCreateReferentBuilder | Referent Builder    | M | |
 
 
 ## 11. createProof
@@ -295,14 +295,14 @@ Proof createProof(ProofRequest proofRequest, List<ProofParam> proofParams, Map<S
 
 ### Parameters
 
-| Parameter      | Type                 | Description                  |
-|----------------|----------------------|------------------------------|
-| proofRequest   | ProofRequest         | ZKP Proof Request            |
-| proofParams    | List                 | Referent Mapping Parameters  |
-| selfAttributes | Map<String, String> | Self-Attested Attributes     |
+| Parameter      | Type                 | Description                  | **M/O** | Note |
+|----------------|----------------------|------------------------------| -- | -- |
+| proofRequest   | ProofRequest         | ZKP Proof Request            | M | |
+| proofParams    | List                 | Referent Mapping Parameters  | M | |
+| selfAttributes | Map<String, String> | Self-Attested Attributes     | O | |
 
 ### Returns
 
-| Type  | Description |
-|--------|-------------|
-| Proof | Proof        |
+| Type  | Description | **M/O** | Note |
+|--------|-------------| -- | -- |
+| Proof | Proof        | M | |
