@@ -76,7 +76,7 @@ public class CredentialRequest {
 | credDefId                 | String                                   | Credential Definition ID               | M       |          |
 | nonce                     | BigInteger                               | Nonce used for authentication          | M       |          |
 | blindedMs                 | BlindedCredentialSecrets                 | Blinded Master Secret                  | M       |          |
-| blindedMsCorrectnessProof| BlindedCredentialSecretsCorrectnessProof | Proof of correctness of blinding       | M       |          |
+| blindedMsCorrectnessProof| BlindedCredentialSecretsCorrectnessProof | Proof of correctness of blinding        | M       |          |
 <br>
 
 ### 1.1. BlindedCredentialSecrets
@@ -178,7 +178,7 @@ public class CredentialSignature {
 
 | Name        | Type                       | Description                  | **M/O** | **Note** |
 | ----------- | -------------------------- | ---------------------------- | ------- | -------- |
-| pCredential | PrimaryCredentialSignature | Each primary signature value and its associated data. | O       |          |
+| pCredential | PrimaryCredentialSignature | Each primary signature value and its associated data. | M       |          |
 
 <br>
 
@@ -201,8 +201,8 @@ public class SignatureCorrectnessProof {
 
 | Name | Type       | Description                                | **M/O** | **Note** |
 | ---- | ---------- | ------------------------------------------ | ------- | -------- |
-| se   | BigInteger | The hash value that proves the signature has not been tampered with.          | O       |          |
-| c    | BigInteger | An auxiliary hash value used to verify consistency.              | O       |          |
+| se   | BigInteger | The hash value that proves the signature has not been tampered with.          | M       |          |
+| c    | BigInteger | An auxiliary hash value used to verify consistency.              | M       |          |
 
 <br>
 
@@ -247,9 +247,9 @@ public class AvailableReferent {
 
 | Name              | Type                            | Description                  | **M/O** | **Note** |
 |-------------------|----------------------------------|------------------------------|---------|----------|
-| selfAttrReferent  | Map<String, AttrReferent>       | Self-attested attributes     | O       |          |
-| attrReferent      | Map<String, AttrReferent>       | General attributes to submit | O       |          |
-| predicateReferent | Map<String, PredicateReferent>  | Predicate-based attributes   | O       |          |
+| selfAttrReferent  | Map<String, AttrReferent>       | Self-attested attributes     | M       |          |
+| attrReferent      | Map<String, AttrReferent>       | General attributes to submit | M       |          |
+| predicateReferent | Map<String, PredicateReferent>  | Predicate-based attributes   | M       |          |
 
 
 
@@ -273,9 +273,9 @@ public class AttrReferent {
 
 | Name              | Type                    | Description              | **M/O** | **Note** |
 |-------------------|-------------------------|--------------------------|---------|----------|
-| name              | String                  | Attribute name           | O       |          |
-| checkRevealed     | boolean                 | Whether it is revealed   | O       |          |
-| attrSubReferent   | List<SubReferent>       | SubReferent              | O       |          |
+| name              | String                  | Attribute name           | M       |          |
+| checkRevealed     | boolean                 | Whether it is revealed   | M       |          |
+| attrSubReferent   | List<SubReferent>       | SubReferent              | M       |          |
 
 
 ### 4.2. PredicateReferent
@@ -298,9 +298,9 @@ public class PredicateReferent {
 
 | Name              | Type                    | Description              | **M/O** | **Note** |
 |-------------------|-------------------------|--------------------------|---------|----------|
-| name              | String                  | Attribute name           | O       |          |
-| checkRevealed     | boolean                 | Whether it is revealed   | O       |          |
-| attrSubReferent   | List<SubReferent>       | SubReferent              | O       |          |
+| name              | String                  | Attribute name           | M       |          |
+| checkRevealed     | boolean                 | Whether it is revealed   | M       |          |
+| attrSubReferent   | List<SubReferent>       | SubReferent              | M       |          |
 
 
 ### 4.3. SubReferent
@@ -323,9 +323,9 @@ public class SubReferent {
 
 | Name            | Type     | Description                                         | **M/O** | **Note** |
 |------------------|----------|-----------------------------------------------------|---------|----------|
-| raw              | String   | Raw value of the attribute                          | O       |          |
-| credentialId     | String   | Credential ID that contains the attribute           | O       |          |
-| credentialDefId  | String   | Definition of credential schema by the issuer      | O       |          |
+| raw              | String   | Raw value of the attribute                          | M       |          |
+| credentialId     | String   | Credential ID that contains the attribute           | M       |          |
+| credentialDefId  | String   | Definition of credential schema by the issuer       | M       |          |
 
 
 ## 5. Proof
@@ -374,7 +374,7 @@ public class SubProof {
 
 | Name         | Type          | Description     | **M/O** | **Note** |
 |--------------|---------------|-----------------|---------|----------|
-| primaryProof | PrimaryProof  | Primary proof   | O       |          |
+| primaryProof | PrimaryProof  | Primary proof   | M       |          |
 
 <br>
 
@@ -423,10 +423,10 @@ public class RequestedProof {
 
 | Name              | Type                             | Description                     | **M/O** | **Note** |
 |-------------------|----------------------------------|---------------------------------|---------|----------|
-| selfAttestedAttrs | Map<String, String>              | Self-attested attributes        | O       |          |
-| revealedAttrs     | Map<String, Map<String,String>>  | Revealed attributes             | O       |          |
-| unrevealedAttrs   | Map<String, Map<String,String>>  | Hidden attributes               | O       |          |
-| predicates        | Map<String, Map<String,String>>  | Predicate-based attribute proof | O       |          |
+| selfAttestedAttrs | Map<String, String>              | Self-attested attributes        | M       |          |
+| revealedAttrs     | Map<String, Map<String,String>>  | Revealed attributes             | M       |          |
+| unrevealedAttrs   | Map<String, Map<String,String>>  | Hidden attributes               | M       |          |
+| predicates        | Map<String, Map<String,String>>  | Predicate-based attribute proof | M       |          |
 
 <br>
 

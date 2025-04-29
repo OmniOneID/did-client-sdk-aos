@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.omnione.did.sdk.core.api;
 
 import android.content.Context;
@@ -247,7 +263,7 @@ public class ZKPManagerTest {
 //                    .setRevealed(true)
 //                    .build());
 //
-//            selfAttr.put(key, "사용자가 입력하는 값!!");
+//            selfAttr.put(key, "test text");
 //        }
 //
 //        // attr_referent
@@ -326,15 +342,14 @@ public class ZKPManagerTest {
 //            WalletLogger.getInstance().d("referentMap key: "+key);    // credential Id
 //            Referent referent = referentInfo.getReferents().get(key);
 //            proofParams.add(new ProofParam.Builder()
-//                    // id로 조회
+//                    // query from id
 //                    .setSchema(credentialSchema)
-//                    // id로 조회
+//                    // query from id
 //                    .setCredDef(credentiaDefinition)
 //                    .setReferentInfo(new ReferentInfo(key, referent))
 //                    .build());
 //        }
 //
-//        WalletLogger.getInstance().d("zkp verify 사용자가 입력한 proofParams: "+ GsonWrapper.getGson().toJson(proofParams));
 //        Proof proof = zkpManager.createProof(proofRequest, proofParams, selfAttr);
         proof = GsonWrapper.getGson().fromJson(proofDummyStr, Proof.class);
         WalletLogger.getInstance().d("proof: "+ GsonWrapper.getGson().toJson(proof));

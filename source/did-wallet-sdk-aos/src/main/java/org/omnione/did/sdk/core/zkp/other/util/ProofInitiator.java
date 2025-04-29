@@ -88,13 +88,11 @@ public class ProofInitiator {
 
         int delta = predicate.getDelta(credValue);
 
-        //TODO: 0은 왜 정상인지 재고려
         if (delta < 0) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NEGATIVE_DELTA, "Delta value must be positive");
         }
 
-        // ∆ ← mj − zj 라고 하고 ∆ = (u1)^2 + (u2)^2 + (u3)^2 + (u4)^2가 되도록 u1, u2, u3, u4를 찾는다.
-
+        // Let ∆ ← mj − zj and find u1, u2, u3, u4 such that ∆ = (u1)^2 + (u2)^2 + (u3)^2 + (u4)^2.
         int[] uList = BigIntegerUtil.four_squares(delta);
 
         Map<String, BigInteger> u = new HashMap<String, BigInteger>();
@@ -196,7 +194,7 @@ public class ProofInitiator {
         Map<String, BigInteger> m_tilde = new HashMap<String, BigInteger>();
         m_tilde.putAll(commonAttributes);
 
-        // 공개되지 않은 각 속성에 대해 i ∈ A는 임의의 592비트 숫자 m1을 생성.
+        // For each unpublished attribute i ∈ A, generate a random 592-bit number m1.
         // generate m_tilde <- by unrevealedAttrs
         for (String key : unrevealedAttrs) {
 //            WalletLogger.getInstance().d("unrevealedAttrs ..... "+key);
@@ -213,7 +211,7 @@ public class ProofInitiator {
         BigInteger e = credSign.getE();
         BigInteger v = credSign.getV();
 
-        // a' = A*S^r (mod n) 인데, 성능 향상을 위한 {(S^r mod n)*(A mod n)} mod n 작업 처리
+        // a' = A*S^r (mod n), but {(S^r mod n)*(A mod n)} mod n operation is processed to improve performance.
         // A′ ← A * S^r (mod n)
         BigInteger a_prime = s.modPow(r, n).multiply(a.mod(n)).mod(n);
 

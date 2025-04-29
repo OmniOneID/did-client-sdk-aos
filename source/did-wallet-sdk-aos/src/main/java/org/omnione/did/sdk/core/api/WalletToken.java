@@ -82,11 +82,11 @@ class WalletToken {
         walletLogger.d("db: " + validUntil_db + " / " + purpose_db);
 
         if(!hWalletToken.equals(hWalletToken_db)){
-            walletLogger.e("walletToken 검증 실패");
+            walletLogger.e("walletToken verification fail");
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_TOKEN_FAIL);
         }
         if(!WalletUtil.checkDate(validUntil_db)){
-            walletLogger.e("valid until 검증 실패");
+            walletLogger.e("valid until verification fail");
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_TOKEN_FAIL);
         }
         boolean isPurpose = false;
@@ -97,9 +97,9 @@ class WalletToken {
         }
         if(!isPurpose)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_TOKEN_FAIL);
-        walletLogger.d("walletToken 검증 성공");
-        walletLogger.d("valid until 검증 성공");
-        walletLogger.d("purpose 검증 성공");
+        walletLogger.d("walletToken verification success");
+        walletLogger.d("valid until verification success");
+        walletLogger.d("purpose verification success");
 
     }
 

@@ -217,7 +217,7 @@ public class KeystoreManager {
             keyGenParameterSpec = new KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
                     .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                     .setDigests(KeyProperties.DIGEST_NONE)
-                    // 생체 인증을 통해서만 keystore 접근 가능하게 옵션을 준다.
+                    // Provides an option to allow keystore access only via biometric authentication.
                     //.setUserAuthenticationRequired(true)
                     //.setUserAuthenticationValidityDurationSeconds(KEYSTORE_KEY_VALID_SECONDS)
                     .setIsStrongBoxBacked(true)
@@ -226,7 +226,7 @@ public class KeystoreManager {
             keyGenParameterSpec = new KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
                     .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                     .setDigests(KeyProperties.DIGEST_NONE)
-                    // keyOption 이 R1_KEYSTORE_ACCESS 인 경우 생체 인증을 통해서만 keystore 접근 가능하게 옵션을 준다.
+                    // If keyOption is R1_KEYSTORE_ACCESS, it provides an option to allow access to the keystore only through biometric authentication.
                     //.setUserAuthenticationRequired((true))
                     //.setUserAuthenticationValidityDurationSeconds(KEYSTORE_KEY_VALID_SECONDS)
                     .build();

@@ -40,10 +40,10 @@ public class KeyPairVerifier {
         final BigInteger xz_cap = keyProof.getXzCap();
         final LinkedHashMap<String, BigInteger> xr_cap = keyProof.getXrCap();
 
-        //z_cap 연산
+        //z_cap operation
         BigInteger z_cap = CommitmentHelper.commitment(z.modInverse(n), proof_c, s, xz_cap, n);
 
-        //r_cap 연산
+        //r_cap operation
         Vector<BigInteger> r_cap = new Vector<BigInteger>();
 
         for (String attrName : publicKey.getR().keySet()) {

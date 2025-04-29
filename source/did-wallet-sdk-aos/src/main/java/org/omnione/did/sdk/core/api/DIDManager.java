@@ -174,7 +174,7 @@ class DIDManager<E extends BaseObject> {
 
         String controller = keyInfo.getController();
         String id = keyInfo.getKeyInfo().getId();
-        // Verification 객체 세팅
+        // set verification object
         VerificationMethod verificationMethod = new VerificationMethod();
         verificationMethod.setId(keyInfo.getKeyInfo().getId());
         verificationMethod.setType(DIDKeyType.DID_KEY_TYPE.secp256r1VerificationKey2018);

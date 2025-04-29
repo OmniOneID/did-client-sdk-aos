@@ -95,7 +95,6 @@ public class HttpUrlConnectionTask {
                     error.append(inputLine);
                 }
                 in.close();
-                // todo : message??
                 throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_INCORRECT_URL_CONNECTION , urlString);
             }
         } catch (IOException e) {

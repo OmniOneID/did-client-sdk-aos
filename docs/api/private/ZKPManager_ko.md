@@ -21,12 +21,12 @@ Android ZKPManager API
 ==
 - 주제: ZKPManager
 - 작성: Dongjun Park
-- 일자: 2025-04-07
+- 일자: 2025-04-30
 - 버전: v1.0.0
 
 | 버전     | 일자         | 변경 내용 |
 | ------ | ---------- | ----- |
-| v1.0.0 | 2025-04-07 | 최초 작성 |
+| v1.0.0 | 2025-04-30 | 최초 작성 |
 
 # 목차
 
@@ -185,17 +185,18 @@ ZkpRequestCredentialBuilder createCredentialRequest(String proverDid,
 
 ### Parameters
 
-| Parameter           | Type                           | Description           | **M/O** | **비고**  |
-| ------------------- | ------------------------------ | --------------------- | -- | -- |
-| proverDid           | String                         | Prover DID            | M| |
-| credentialPublicKey | CredentialPrimaryPublicKey     | Credential Public Key | M | |
-| credOffer           | CredentialOffer                | Credential Offer      | M | |
+| Parameter           | Type                       | Description           | **M/O** | **비고** |
+| ------------------- | -------------------------- | --------------------- | ------- | -------- |
+| proverDid           | String                     | Prover DID            | M       |          |
+| credentialPublicKey | CredentialPrimaryPublicKey | Credential Public Key | M       |          |
+| credOffer           | CredentialOffer            | Credential Offer      | M       |          |
 
 ### Returns
 
-| Type                        | Description                | **M/O** | **비고**  |
-| --------------------------- | -------------------------- | -- | -- |
-| CredentialRequestContainer | Credential Request Container | M | |
+| Type                       | Description                  | **M/O** | **비고** |
+| -------------------------- | ---------------------------- | ------- | -------- |
+| CredentialRequestContainer | Credential Request Container | M       |          |
+|                            |                              |         |          |
 
 ## 8. verifyAndStoreCredential
 
@@ -213,18 +214,20 @@ boolean verifyAndStoreCredential(CredentialRequestMeta credentialRequestMeta,
 
 ### Parameters
 
-| Parameter                  | Type                       | Description                       | **M/O** | **비고**  |
-| -------------------------- | -------------------------- | ----------------------------------| -- | -- |
-| CredentialRequestMeta      | CredentialRequestMeta      | Blinded Master Secret Data, nonce | M| |
-| credentialPrimaryPublicKey | CredentialPrimaryPublicKey | Credential Public Key             | M| |
-| credential                 | Credential                 | Credential Object                 | M| |
+| Parameter                  | Type                       | Description                       | **M/O** | **비고** |
+| -------------------------- | -------------------------- | --------------------------------- | ------- | -------- |
+| CredentialRequestMeta      | CredentialRequestMeta      | Blinded Master Secret Data, nonce | M       |          |
+| credentialPrimaryPublicKey | CredentialPrimaryPublicKey | Credential Public Key             | M       |          |
+| credential                 | Credential                 | Credential Object                 | M       |          |
+|                            |                            |                                   |         |          |
 
 
 ### Returns
 
-| Type    | Description         | **M/O** | **비고**  |
-| ------- | ------------------- | -- | -- |
-| boolean | Verification result | M | |
+| Type    | Description         | **M/O** | **비고** |
+| ------- | ------------------- | ------- | -------- |
+| boolean | Verification result | M       |          |
+|         |                     |         |          |
 
 ## 9. searchCredentials
 
@@ -240,15 +243,17 @@ ZkpSearchCredentialBuilder searchCredentials(ProofRequest proofRequest)
 
 ### Parameters
 
-| Parameter    | Type         | Description       | **M/O** | **비고**  |
-| ------------ | ------------ | ----------------- | -- | -- |
-| proofRequest | ProofRequest | ZKP Proof Request | M | |
+| Parameter    | Type         | Description       | **M/O** | **비고** |
+| ------------ | ------------ | ----------------- | ------- | -------- |
+| proofRequest | ProofRequest | ZKP Proof Request | M       |          |
+|              |              |                   |         |          |
 
 ### Returns
 
-| Type                       | Description               | **M/O** | **비고**  |
-| -------------------------- | ------------------------- | -- | -- |
-| ZkpSearchCredentialBuilder | Credential Search Builder | M | |
+| Type                       | Description               | **M/O** | **비고** |
+| -------------------------- | ------------------------- | ------- | -------- |
+| ZkpSearchCredentialBuilder | Credential Search Builder | M       |          |
+|                            |                           |         |          |
 
 ## 10. createReferent
 
@@ -264,15 +269,17 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 
 ### Parameters
 
-| Parameter       | Type | Description             | **M/O** | **비고**  |
-| --------------- | ---- | ----------------------- | -- | -- |
-| customReferents | List | User Selected Referents | M | |
+| Parameter       | Type | Description             | **M/O** | **비고** |
+| --------------- | ---- | ----------------------- | ------- | -------- |
+| customReferents | List | User Selected Referents | M       |          |
+|                 |      |                         |         |          |
 
 ### Returns
 
-| Type                     | Description      | **M/O** | **비고**  |
-| ------------------------ | ---------------- | -- | -- |
-| ZkpCreateReferentBuilder | Referent Builder | M | | 
+| Type                     | Description      | **M/O** | **비고** |
+| ------------------------ | ---------------- | ------- | -------- |
+| ZkpCreateReferentBuilder | Referent Builder | M       |          |
+|                          |                  |         |          |
 
 ## 11. createProof
 
@@ -281,21 +288,21 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 사용자의 credential과 referent을 기반으로 ZKP proof 생성
 
 ### Declaration
-
+ㄴ
 ```java
 Proof createProof(ProofRequest proofRequest, List<ProofParam> proofParams, Map<String, String> selfAttributes)
 ```
 
 ### Parameters
 
-| Parameter      | Type                 | Description                 | **M/O** | **비고**  |
-| -------------- | -------------------- | --------------------------- | -- | -- |
-| proofRequest   | ProofRequest         | ZKP Proof Request           | M | |
-| proofParams    | List                 | Referent Mapping Parameters | M | |
-| selfAttributes | Map<String, String> | Self-Attested Attributes    | O | |
+| Parameter      | Type                | Description                 | **M/O** | **비고** |
+| -------------- | ------------------- | --------------------------- | ------- | -------- |
+| proofRequest   | ProofRequest        | ZKP Proof Request           | M       |          |
+| proofParams    | List                | Referent Mapping Parameters | M       |          |
+| selfAttributes | Map<String, String> | Self-Attested Attributes    | M       |          |
 
 ### Returns
 
-| Type                  | Description   | **M/O** | **비고**  |
-| --------------------- | ------------- | -- | -- |
-| Proof                 | Proof         | M | |
+| Type  | Description | **M/O** | **비고** |
+| ----- | ----------- | ------- | -------- |
+| Proof | Proof       | M       |          |

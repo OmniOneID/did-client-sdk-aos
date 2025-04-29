@@ -303,8 +303,6 @@ public class WalletService implements WalletServiceInterface {
     public CompletableFuture<String> requestIssueVc(String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
         verifyCertVc(RoleType.ROLE_TYPE.ISSUER, profile.getProfile().issuer.getDID(), profile.getProfile().issuer.getCertVcRef(), apiGateWayUrl);
 
-        // todo: profile 서명 검증
-
         String serverPublicKey = profile.getProfile().process.reqE2e.getPublicKey();
         EcKeyPair e2eKeyPair = CryptoUtils.generateECKeyPair(EcType.EC_TYPE.SECP256_R1);
         byte[] iv = CryptoUtils.generateNonce(16);

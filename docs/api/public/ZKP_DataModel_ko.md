@@ -77,9 +77,9 @@ public class CredentialRequest {
 | ------------------------- | ---------------------------------------- | ------------------------ | ------- | -------- |
 | proverDid                 | String                                   | Prover의 DID              | M       |          |
 | credDefId                 | String                                   | Credential Definition ID | M       |          |
-| nonce                     | BigInteger                               | 인증용 nonce                | M       |          |
+| nonce                     | BigInteger                               | 인증용 nonce               | M       |          |
 | blindedMs                 | BlindedCredentialSecrets                 | Blind된 Master Secret     | M       |          |
-| blindedMsCorrectnessProof | BlindedCredentialSecretsCorrectnessProof | 블라인딩 정당성 증명 객체           | M       |          |
+| blindedMsCorrectnessProof | BlindedCredentialSecretsCorrectnessProof | 블라인딩 정당성 증명 객체       | M       |          |
 <br>
 
 
@@ -185,7 +185,7 @@ public class CredentialSignature {
 
 | Name        | Type                       | Description                  | **M/O** | **Note** |
 | ----------- | -------------------------- | ---------------------------- | ------- | -------- |
-| pCredential | PrimaryCredentialSignature | "Primary 각 서명 값과 데이터 | O       |          |
+| pCredential | PrimaryCredentialSignature | "Primary 각 서명 값과 데이터 | M       |          |
 
 <br>
 
@@ -208,8 +208,8 @@ public class SignatureCorrectnessProof {
 
 | Name | Type       | Description                                | **M/O** | **Note** |
 | ---- | ---------- | ------------------------------------------ | ------- | -------- |
-| se   | BigInteger | 서명이 변조되지 않았음을 증명하는 해시 값.           | O       |          |
-| c    | BigInteger | 정합성을 검증하기 위한 보조 해시 값.               | O       |          |
+| se   | BigInteger | 서명이 변조되지 않았음을 증명하는 해시 값.           | M       |          |
+| c    | BigInteger | 정합성을 검증하기 위한 보조 해시 값.               | M       |          |
 
 <br>
 
@@ -256,9 +256,9 @@ public class AvailableReferent {
 
 | Name              | Type                            | Description  | **M/O** | **Note** |
 | ----------------- | ------------------------------- | ------------ | ------- | -------- |
-| selfAttrReferent  | Map<String, AttrReferent>      | 자가 증명 속성     | O       |          |
-| attrReferent      | Map<String, AttrReferent>      | 제출 가능한 일반 속성 | O       |          |
-| predicateReferent | Map<String, PredicateReferent> | 조건 기반 속성     | O       |          |
+| selfAttrReferent  | Map<String, AttrReferent>      | 자가 증명 속성     | M       |          |
+| attrReferent      | Map<String, AttrReferent>      | 제출 가능한 일반 속성 | M       |          |
+| predicateReferent | Map<String, PredicateReferent> | 조건 기반 속성     | M       |          |
 
 <br>
 
@@ -282,9 +282,9 @@ public class AttrReferent {
 
 | Name              | Type                            | Description  | **M/O** | **Note** |
 | ----------------- | ------------------------------- | ------------ | ------- | -------- |
-| name              | String                          | 어트리뷰트 이름  | O       |          |
-| checkRevealed     | boolean                         | 공개/비공개 유무 | O       |          |
-| attrSubReferent   | List<SubReferent>               | SubReferent  | O       |          |
+| name              | String                          | 어트리뷰트 이름  | M       |          |
+| checkRevealed     | boolean                         | 공개/비공개 유무 | M       |          |
+| attrSubReferent   | List<SubReferent>               | SubReferent  | M       |          |
 
 
 ### 4.2. PredicateReferent
@@ -307,9 +307,9 @@ public class PredicateReferent {
 
 | Name              | Type                            | Description  | **M/O** | **Note** |
 | ----------------- | ------------------------------- | ------------ | ------- | -------- |
-| name              | String                          | 어트리뷰트 이름  | O       |          |
-| checkRevealed     | boolean                         | 공개/비공개 유무 | O       |          |
-| attrSubReferent   | List<SubReferent>               | SubReferent  | O       |          |
+| name              | String                          | 어트리뷰트 이름  | M       |          |
+| checkRevealed     | boolean                         | 공개/비공개 유무 | M       |          |
+| attrSubReferent   | List<SubReferent>               | SubReferent  | M       |          |
 
 
 
@@ -333,9 +333,9 @@ public class SubReferent {
 
 | Name              | Type                    | Description  | **M/O** | **Note** |
 | ----------------- | ----------------------- | ------------ | ------- | -------- |
-| raw               | String                  |  속성의 원본 값  | O       |          |
-| credentialId      | String                  | 속성이 포함된 credential ID | O       |          |
-| credentialDefId   | String                  | 발급자가 특정 스키마에 대한 증명서 정의            | O       |          |
+| raw               | String                  |  속성의 원본 값  | M       |          |
+| credentialId      | String                  | 속성이 포함된 credential ID | M       |          |
+| credentialDefId   | String                  | 발급자가 특정 스키마에 대한 증명서 정의            | M       |          |
 
 
 
@@ -385,7 +385,7 @@ public class SubProof {
 
 | Name              | Type                              | Description | **M/O** | **Note** |
 | ----------------- | --------------------------------- | ----------- | ------- | -------- |
-| primaryProof      | PrimaryProof                      | 기본 증명     | O       |          |
+| primaryProof      | PrimaryProof                      | 기본 증명     | M       |          |
 
 <br>
 
@@ -434,10 +434,10 @@ public class RequestedProof {
 
 | Name              | Type                             | Description | **M/O** | **Note** |
 | ----------------- | ---------------------------------| ----------- | ------- | -------- |
-| selfAttestedAttrs | Map<String, String>              | 자가 증명 속성    | O       |          |
-| revealedAttrs     | Map<String, Map<String,String>> | 공개된 속성      | O       |          |
-| unrevealedAttrs   | Map<String, Map<String,String>> | 비공개 속성      | O       |          |
-| predicates        | Map<String, Map<String,String>> | 조건 기반 속성 증명 | O       |          |
+| selfAttestedAttrs | Map<String, String>              | 자가 증명 속성    | M       |          |
+| revealedAttrs     | Map<String, Map<String,String>> | 공개된 속성      | M       |          |
+| unrevealedAttrs   | Map<String, Map<String,String>> | 비공개 속성      | M       |          |
+| predicates        | Map<String, Map<String,String>> | 조건 기반 속성 증명 | M       |          |
 
 <br>
 

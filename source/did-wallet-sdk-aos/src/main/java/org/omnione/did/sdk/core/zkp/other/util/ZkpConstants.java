@@ -35,8 +35,7 @@ public class ZkpConstants {
     public static final int LARGE_VPRIME = (LARGE_PRIME * 2) + LARGE_NONCE;
     public static final int LARGE_VPRIME_VPRIME = 2724;
 
-    //TODO: 표준과 같이 다름 (재검토 필요)
-    public static final int LARGE_VPRIME_TILDE = 673; //2465가 표준
+    public static final int LARGE_VPRIME_TILDE = 673;
 
     public final static int LARGE_E_START = 596;
     public final static int LARGE_E_END_RANGE = 119;
@@ -44,8 +43,6 @@ public class ZkpConstants {
 
     public final static BigInteger LARGE_E_START_VALUE = BigInteger.ONE.shiftLeft(LARGE_E_START);
 
-    //TODO: 이 아래부분은 표준과 같이 다름을 검증하지 못한 코드
-    //TODO: 표준과 값이 다름 재고려 필요
     public final static int LARGE_MTILDE = 593;
     public final static int LARGE_ETILDE = 456;
     public final static int LARGE_VTILDE = 3060;

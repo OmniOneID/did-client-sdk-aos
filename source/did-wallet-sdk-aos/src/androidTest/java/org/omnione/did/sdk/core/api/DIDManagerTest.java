@@ -66,7 +66,7 @@ public class DIDManagerTest {
         if(!keyManager.isKeySaved("FREE"))
             keyManager.generateKey(keyGenInfo);
 
-        // pin Key 생성
+        // pin Key generation
         keyGenInfo = new WalletKeyGenRequest(
                 "PIN",
                 AlgorithmType.ALGORITHM_TYPE.SECP256R1,
@@ -93,13 +93,13 @@ public class DIDManagerTest {
         }
 
         didManager.createDocument(did, didKeyInfos, did, null);
-        //6. saveDocument
+        // 4. saveDocument
         didManager.saveDocument();
-        //4.getDocument
+        // 5.getDocument
         DIDDocument didDocument = didManager.getDocument();
         Log.d("DIDManagerTest","2. getDocument : " + didDocument.toJson());
 
-        //5.replaceDocument
+        // 6.replaceDocument
         List<Proof> proofs = new ArrayList<>();
         Proof proof = new Proof(
                 "2024-08-15T12:20:36Z",
@@ -115,7 +115,7 @@ public class DIDManagerTest {
         didManager.saveDocument();
         Log.d("DIDManagerTest","5. replaceDocument save getDocument : " + didDocument.toJson());
 
-        //8.addVerificationMethod
+        // 7.addVerificationMethod
         keyGenInfo = new WalletKeyGenRequest(
                 "PIN2",
                 AlgorithmType.ALGORITHM_TYPE.SECP256R1,
@@ -133,12 +133,12 @@ public class DIDManagerTest {
         didManager.saveDocument();
         Log.d("DIDManagerTest","addVerificationMethod getDocument2 : " + didManager.getDocument().toJson());
 
-        //9.addVerificationMethod
+        // 8.addVerificationMethod
         didManager.removeVerificationMethod("PIN");
         didManager.saveDocument();
         Log.d("DIDManagerTest","removeVerificationMethod getDocument : " + didManager.getDocument().toJson());
 
-        //10.addService
+        // 9.addService
         Service service = new Service("id1", DIDServiceType.DID_SERVICE_TYPE.credentialRegistry, List.of("end1"));
         didManager.addService(service);
         service = new Service("id2", DIDServiceType.DID_SERVICE_TYPE.credentialRegistry, List.of("end2"));
@@ -146,7 +146,7 @@ public class DIDManagerTest {
         didManager.saveDocument();
         Log.d("DIDManagerTest","addService getDocument : " + didManager.getDocument().toJson());
 
-        //11.removeService
+        // 10.removeService
         didManager.removeService("id1");
         Log.d("DIDManagerTest","removeService id1 getDocument : " + didManager.getDocument().toJson());
         didManager.removeService("id2");
@@ -154,7 +154,7 @@ public class DIDManagerTest {
         didManager.saveDocument();
         Log.d("DIDManagerTest","removeService getDocument : " + didManager.getDocument().toJson());
 
-        //7. deleteDocument
+        // 11. deleteDocument
         didManager.deleteDocument();
         Log.d("DIDManagerTest","isSaved : " + didManager.isSaved());
 

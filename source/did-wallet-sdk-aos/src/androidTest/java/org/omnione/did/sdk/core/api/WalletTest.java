@@ -67,7 +67,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-
 /**
  * Instrumented test, which will execute on an Android device.
  *
@@ -118,7 +117,7 @@ public class WalletTest {
                 Log.d("WalletTest","bindUser pii : " + pii);
                 user.pii = pii;
                 Log.d("WalletTest","bindUser pii : " + user.pii);
-                Log.d("WalletTest", "bind user 성공");
+                Log.d("WalletTest", "bind user success");
 
                 return true;
             }
@@ -174,11 +173,11 @@ public class WalletTest {
                 Log.d("WalletTest","db: validUntil_db - " + validUntil_db + " / " + WalletTokenPurpose.WALLET_TOKEN_PURPOSE.fromValue(Integer.valueOf(purpose_db)).toString());
 
                 if(!hWalletToken.equals(hWalletToken_db)){
-                    Log.d("WalletTest","walletToken 검증 실패");
+                    Log.d("WalletTest","walletToken verification fail");
                     throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_TOKEN_FAIL);
                 }
                 if(!WalletUtil.checkDate(validUntil_db)){
-                    Log.d("WalletTest","valid until 검증 실패");
+                    Log.d("WalletTest","valid until verification fail");
                     throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_TOKEN_FAIL);
                 }
                 boolean isPurpose = false;
@@ -188,12 +187,12 @@ public class WalletTest {
                         break;
                     }
                 }
-                // purpose 검증
+                // purpose verification
                 if(!isPurpose)
                     throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_TOKEN_FAIL);
-                Log.d("WalletTest","walletToken 검증 성공");
-                Log.d("WalletTest","valid until 검증 성공");
-                Log.d("WalletTest","purpose 검증 성공");
+                Log.d("WalletTest","walletToken verification success");
+                Log.d("WalletTest","valid until verification success");
+                Log.d("WalletTest","purpose verification success");
 
             }
 
@@ -212,7 +211,6 @@ public class WalletTest {
                 String resultNonce = "F9909CA2B700D1EC658098ECE03A97343";
                 String hWalletToken = WalletTestData.hWalletToken[walletTokenData.getSeed().getPurpose().getValue() - 1];
 
-                // DB 대신 객체 할당
                 token.hWalletToken = hWalletToken;
                 token.validUntil = walletTokenData.getSeed().getValidUntil();
                 token.purpose = String.valueOf(walletTokenData.getSeed().getPurpose().getValue());
@@ -251,7 +249,7 @@ public class WalletTest {
                             iv);
                     Log.d("WalletTest","encCek : " + Base16.toHex(encCek) + " / " + encCek.length);
 
-                    byte[] finalEncCek = SecureEncryptor.encrypt(encCek, appContext); //"finalEncCek" AES 암호화
+                    byte[] finalEncCek = SecureEncryptor.encrypt(encCek, appContext); //"finalEncCek" AES encrypt
                     Log.d("WalletTest","finalEncCek : " + Base16.toHex(finalEncCek) + " / " + finalEncCek.length);
                     user.fek = Base16.toHex(finalEncCek);
 
@@ -276,7 +274,7 @@ public class WalletTest {
                 int dk_keySize = 48;
                 int iterator = 2048;
                 byte[] salt = CryptoUtils.generateNonce(20);
-                // salt 하드코딩
+                // salt
                 salt = Base16.toBytes("ef81d6d71d43fc53a18fddb9600f03e1532a8dd0");
                 Log.d("WalletTest", "salt : " + Base16.toHex(salt) + " / " + salt.length);
 
@@ -292,7 +290,7 @@ public class WalletTest {
                         iv);
                 Log.d("WalletTest", "dec cek : " + Base16.toHex(cek) + " / " + cek.length);
 
-                // unlock 상태 관리
+                // unlock status
                 WalletApi.isLock = false;
 
             }
@@ -338,30 +336,29 @@ public class WalletTest {
         Assert.assertFalse(WalletApi.isLock);
         Log.i("WalletTest", "===========================================================");
 
-
-        Log.i("WalletTest", "===========================사용자 등록 =========================");
+        Log.i("WalletTest", "===========================user reg =========================");
         WalletTokenData walletTokenData_CreateDID = MessageUtil.deserialize(WalletTestData.WALLET_TOKEN_DATA_CREATE_DID, WalletTokenData.class);
         resultNonce = testWalletApi.createNonceForWalletToken("apiGateWay", walletTokenData_CreateDID);
         walletToken = walletTokenData_CreateDID.toJson() + resultNonce;
         hWalletToken = Base16.toHex(DigestUtils.getDigest(walletToken.getBytes(), DigestEnum.DIGEST_ENUM.SHA_256));
-        // PIN 키 생성
+        // PIN key generation
         testWalletApi.generateKeyPair(hWalletToken, WalletTestData.TEST_PASSCODE);
 
-        // holder did doc 생성
+        // holder did doc generation
         DIDDocument holderDIDDoc = testWalletApi.createHolderDIDDoc(hWalletToken);
         Log.d("WalletTest", "holder did doc : " + holderDIDDoc.toJson());
         // type 1 : device key , 2 : holder key
         DIDDocument ownerDIDDoc = (DIDDocument) testWalletApi.addProofsToDocument(holderDIDDoc, List.of("pin"), holderDIDDoc.getId(), 2, WalletTestData.TEST_PASSCODE, false);
         Log.d("WalletTest", "ownerDIDDoc : " + ownerDIDDoc.toJson());
 
-        // signed DID Doc 생성
+        // signed DID Doc generation
         SignedDidDoc signedDidDoc = testWalletApi.createSignedDIDDoc(ownerDIDDoc);
         Log.d("WalletTest", "signedDidDoc : " + signedDidDoc.toJson());
         Log.d("WalletTest", "requestRegisterUser : " + testWalletApi.requestRegisterUser(hWalletToken, "tas", WalletTestData.TEST_TX_ID, WalletTestData.TEST_SERVER_TOKEN, signedDidDoc).get());
         Log.i("WalletTest", "===========================================================");
 
 
-        Log.i("WalletTest", "===========================VC 발급 =========================");
+        Log.i("WalletTest", "===========================VC issue =========================");
         WalletTokenData walletTokenData_IssueVC = MessageUtil.deserialize(WalletTestData.WALLET_TOKEN_DATA_ISSUE_VC, WalletTokenData.class);
         resultNonce = testWalletApi.createNonceForWalletToken("apiGateWay", walletTokenData_IssueVC);
         walletToken = walletTokenData_IssueVC.toJson() + resultNonce;
@@ -381,8 +378,7 @@ public class WalletTest {
                 ).get();
         Log.d("WalletTest", "vc ID : " + vcId);
         Log.i("WalletTest", "===========================================================");
-
-        Log.i("WalletTest", "===========================VP 제출 =========================");
+        Log.i("WalletTest", "===========================VP submit =========================");
         WalletTokenData walletTokenData_PresentVP = MessageUtil.deserialize(WalletTestData.WALLET_TOKEN_DATA_PRESENT_VP, WalletTokenData.class);
         resultNonce = testWalletApi.createNonceForWalletToken("apiGateWay", walletTokenData_PresentVP);
         walletToken = walletTokenData_PresentVP.toJson() + resultNonce;

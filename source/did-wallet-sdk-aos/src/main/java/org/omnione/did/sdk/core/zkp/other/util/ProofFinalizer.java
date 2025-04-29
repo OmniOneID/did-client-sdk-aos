@@ -65,10 +65,10 @@ public class ProofFinalizer {
 
         Vector<SubProof> proofs = new Vector<SubProof>();
 
-        //PrimaryProof 생성
+        //Create PrimaryProof
         for (InitProof initProof : initProofs) {
             PrimaryProof primaryProof = finalizePrimaryProof(initProof, challenge);
-            //TODO: SubProof 구조의 개선필요
+
             proofs.add(new SubProof(primaryProof));
         }
         // Then (c, {PrC }, {Prp}, C) is the full proof sent to the Verifier.
@@ -135,7 +135,6 @@ public class ProofFinalizer {
         final BigInteger alpha_tilde = neInitProof.getAlphaTilde();
         final Predicate predicate = neInitProof.getPredicate();
 
-        //TODO: for 조건문 ZkpConstants.ITERATION으로 변경 고려
         for (String key : neInitProof.getUTilde().keySet()) {
             BigInteger cur_u = uInit.get(key);
             BigInteger cur_r = rInit.get(key);
@@ -147,7 +146,6 @@ public class ProofFinalizer {
             ur = cur_u.multiply(cur_r).add(ur);
         }
 
-        //TODO: indy에서의 구현이 이상해서 일단 변경해둠
         BigInteger r_delta = rInit.get(ZkpConstants.DELTA);
         BigInteger r_delta_tilde = r_tilde.get(ZkpConstants.DELTA);
 
@@ -182,7 +180,7 @@ public class ProofFinalizer {
         BigInteger v_hat = v_tilde.add(v);
 
         Set<String> unrevealedAttrs = new HashSet<String>();
-        // for 연산식 문제로 set 합집합, 차집합 연산 처리
+        // For operation problem, processing union and difference operations of sets
         Set<String> nonCredSchemaList = nonCredSchema.getNonCredSchema();
         List<String> credSchemaList = credSchema.getAttrNames();
         Set<String> subProofReqAttrsList = subProofReq.getRevealedAttrs();

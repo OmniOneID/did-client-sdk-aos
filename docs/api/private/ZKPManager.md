@@ -22,12 +22,12 @@ Android ZKPManager API
 ==
 - Subject: ZKPManager
 - Author: Dongjun Park
-- Date: 2025-04-07
+- Date: 2025-04-30
 - Version: v1.0.0
 
 | Version | Date       | Description    |
 |---------|------------|----------------|
-| v1.0.0  | 2025-04-07 | Initial Draft  |
+| v1.0.0  | 2025-04-30 | Initial Draft  |
 
 # Table of Contents
 
@@ -189,17 +189,19 @@ ZkpRequestCredentialBuilder createCredentialRequest(String proverDid,
 
 ### Parameters
 
-| Parameter           | Type                       | Description            | **M/O** | Note |
-|---------------------|----------------------------|------------------------| -- | -- |
-| proverDid           | String                     | Prover DID             | M | |
-| credentialPublicKey | CredentialPrimaryPublicKey | Credential Public Key  | M | |
-| credOffer           | CredentialOffer            | Credential Offer       | M | |
+| Parameter           | Type                       | Description           | **M/O** | Note |
+| ------------------- | -------------------------- | --------------------- | ------- | ---- |
+| proverDid           | String                     | Prover DID            | M       |      |
+| credentialPublicKey | CredentialPrimaryPublicKey | Credential Public Key | M       |      |
+| credOffer           | CredentialOffer            | Credential Offer      | M       |      |
+|                     |                            |                       |         |      |
 
 ### Returns
 
-| Type                       | Description                    | **M/O** | Note |
-|----------------------------|--------------------------------| -- | -- |
-| CredentialRequestContainer | Credential Request Container   | M | |
+| Type                       | Description                  | **M/O** | Note |
+| -------------------------- | ---------------------------- | ------- | ---- |
+| CredentialRequestContainer | Credential Request Container | M       |      |
+|                            |                              |         |      |
 
 
 ## 8. verifyAndStoreCredential
@@ -218,17 +220,19 @@ boolean verifyAndStoreCredential(CredentialRequestMeta credentialRequestMeta,
 
 ### Parameters
 
-| Parameter                  | Type                       | Description                            | **M/O** | Note |
-|----------------------------|----------------------------|----------------------------------------| -- | -- |
-| credentialRequestMeta      | CredentialRequestMeta      | Blinded Master Secret Data, nonce      | M | |
-| credentialPrimaryPublicKey | CredentialPrimaryPublicKey | Credential Public Key                  | M | |
-| credential                 | Credential                 | Credential Object                      | M | |
+| Parameter                  | Type                       | Description                       | **M/O** | Note |
+| -------------------------- | -------------------------- | --------------------------------- | ------- | ---- |
+| credentialRequestMeta      | CredentialRequestMeta      | Blinded Master Secret Data, nonce | M       |      |
+| credentialPrimaryPublicKey | CredentialPrimaryPublicKey | Credential Public Key             | M       |      |
+| credential                 | Credential                 | Credential Object                 | M       |      |
+|                            |                            |                                   |         |      |
 
 ### Returns
 
 | Type    | Description         | **M/O** | Note |
-|---------|---------------------| -- | -- |
-| boolean | Verification result | M | |
+| ------- | ------------------- | ------- | ---- |
+| boolean | Verification result | M       |      |
+|         |                     |         |      |
 
 
 ## 9. searchCredentials
@@ -245,15 +249,17 @@ ZkpSearchCredentialBuilder searchCredentials(ProofRequest proofRequest)
 
 ### Parameters
 
-| Parameter    | Type         | Description         | **M/O** | Note |
-|--------------|--------------|---------------------| -- | -- |
-| proofRequest | ProofRequest | ZKP Proof Request   | M | |
+| Parameter    | Type         | Description       | **M/O** | Note |
+| ------------ | ------------ | ----------------- | ------- | ---- |
+| proofRequest | ProofRequest | ZKP Proof Request | M       |      |
+|              |              |                   |         |      |
 
 ### Returns
 
-| Type                       | Description                | **M/O** | Note |
-|----------------------------|----------------------------| -- | -- |
-| ZkpSearchCredentialBuilder | Credential Search Builder  | M | |
+| Type                       | Description               | **M/O** | Note |
+| -------------------------- | ------------------------- | ------- | ---- |
+| ZkpSearchCredentialBuilder | Credential Search Builder | M       |      |
+|                            |                           |         |      |
 
 
 ## 10. createReferent
@@ -270,15 +276,17 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 
 ### Parameters
 
-| Parameter       | Type | Description               | **M/O** | Note |
-|------------------|------|---------------------------| -- | -- |
-| customReferents | List | User Selected Referents   | M | |
+| Parameter       | Type | Description             | **M/O** | Note |
+| --------------- | ---- | ----------------------- | ------- | ---- |
+| customReferents | List | User Selected Referents | M       |      |
+|                 |      |                         |         |      |
 
 ### Returns
 
-| Type                     | Description         | **M/O** | Note |
-|--------------------------|---------------------| -- | -- |
-| ZkpCreateReferentBuilder | Referent Builder    | M | |
+| Type                     | Description      | **M/O** | Note |
+| ------------------------ | ---------------- | ------- | ---- |
+| ZkpCreateReferentBuilder | Referent Builder | M       |      |
+|                          |                  |         |      |
 
 
 ## 11. createProof
@@ -295,14 +303,15 @@ Proof createProof(ProofRequest proofRequest, List<ProofParam> proofParams, Map<S
 
 ### Parameters
 
-| Parameter      | Type                 | Description                  | **M/O** | Note |
-|----------------|----------------------|------------------------------| -- | -- |
-| proofRequest   | ProofRequest         | ZKP Proof Request            | M | |
-| proofParams    | List                 | Referent Mapping Parameters  | M | |
-| selfAttributes | Map<String, String> | Self-Attested Attributes     | O | |
+| Parameter      | Type                | Description                 | **M/O** | Note |
+| -------------- | ------------------- | --------------------------- | ------- | ---- |
+| proofRequest   | ProofRequest        | ZKP Proof Request           | M       |      |
+| proofParams    | List                | Referent Mapping Parameters | M       |      |
+| selfAttributes | Map<String, String> | Self-Attested Attributes    | M       |      |
 
 ### Returns
 
 | Type  | Description | **M/O** | Note |
-|--------|-------------| -- | -- |
-| Proof | Proof        | M | |
+| ----- | ----------- | ------- | ---- |
+| Proof | Proof       | M       |      |
+|       |             |         |      |

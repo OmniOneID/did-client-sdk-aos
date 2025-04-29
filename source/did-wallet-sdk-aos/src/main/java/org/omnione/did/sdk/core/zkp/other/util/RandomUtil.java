@@ -31,9 +31,9 @@ public class RandomUtil {
             }
         }
 
-        // 랜덤 생성
+
         SecureRandom tmp = new SecureRandom();
-        // seed 고정
+
 //        SecureRandom tmp = null;
 //        try {
 //            tmp = SecureRandom.getInstance("SHA1PRNG", "SUN");

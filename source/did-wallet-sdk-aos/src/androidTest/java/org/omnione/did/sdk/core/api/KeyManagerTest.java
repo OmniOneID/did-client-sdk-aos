@@ -66,11 +66,12 @@ public class KeyManagerTest {
         for(String alias : KeystoreManager.getKeystoreAliasList()){
             Log.d("KeyManagerTest","Bio key 생성 전 alias : " + alias);
         }
-        // KeyManager 생성자
+
         KeyManager<DetailKeyInfo> keyManager = new KeyManager<>("walletTest", appContext);
         if(keyManager.isAnyKeySaved())
             keyManager.deleteAllKeys();
-        // NONE KEY 생성
+
+        // NONE KEY generation
         WalletKeyGenRequest keyGenInfo = new WalletKeyGenRequest();
         keyGenInfo.setId("FREE");
         keyGenInfo.setAlgorithmType(AlgorithmType.ALGORITHM_TYPE.SECP256R1);
@@ -79,7 +80,7 @@ public class KeyManagerTest {
         keyGenInfo.setWalletMethodType(keyGenWalletMethodType);
         Log.d("KeyManagerTest", "KeyGenInfo (FREE) : " + keyGenInfo.toJson());
         keyManager.generateKey(keyGenInfo);
-        // pin Key 생성
+        // pin Key generation
         keyGenInfo = new WalletKeyGenRequest();
         keyGenInfo.setId("PIN");
         keyGenInfo.setAlgorithmType(AlgorithmType.ALGORITHM_TYPE.SECP256R1);
@@ -105,14 +106,13 @@ public class KeyManagerTest {
         Log.d("KeyManagerTest", "checkKeyPairMatch priv2 / pub2");
         secp256R1Manager.checkKeyPairMatch(privateKey2, publicKey2);
 
-        //지문키 등록
+        // fingerprint registration
 //        try {
 //            walletApi.setBioPromptListener(new BioPromptHelper.BioPromptInterface() {
 //                @Override
 //                public void onSuccess(String result) {
 //                    Log.d("KeyManagerTest", "MAIN registerBioKey onSuccess");
 //                    Log.d("KeyManagerTest","result : " + result);
-//                    // 지문키 생성 후 처리
 //                }
 //
 //                @Override
@@ -185,8 +185,7 @@ public class KeyManagerTest {
 
 
 
-        /////////////// 서명, 검증/////////////////
-        // passcode 맞는것
+        /////////////// signature, verification/////////////////
 
         byte[] plainData = "KeyManagerTest".getBytes();
         byte[] digest = DigestUtils.getDigest(plainData, DigestEnum.DIGEST_ENUM.SHA_256);
