@@ -13,7 +13,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: source/did-client-sdk-aos
+        working-directory: source/did-wallet-sdk-aos
 
     steps:
     - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
         api-level: 33
         arch: x86_64
         profile: pixel_6
-        working-directory: source/did-client-sdk-aos
+        working-directory: source/did-wallet-sdk-aos
         script: |
           adb devices
           adb -s emulator-5554 emu finger touch 1
