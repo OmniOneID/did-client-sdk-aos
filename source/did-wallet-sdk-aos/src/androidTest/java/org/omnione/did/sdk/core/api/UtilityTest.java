@@ -56,7 +56,7 @@ public class UtilityTest {
 
         byte[] nonce = CryptoUtils.generateNonce(20);
         assertNotNull(nonce);
-        Log.d("utilityTest","generateNonce - nonce : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, nonce)
+        Log.d("utilityTest","generateNonce - nonce : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, nonce)
                 + " / length : " + nonce.length);
         EcKeyPair ecKeyPair = CryptoUtils.generateECKeyPair(EcType.EC_TYPE.SECP256_R1);
         assertNotNull(ecKeyPair);
@@ -64,9 +64,9 @@ public class UtilityTest {
         byte[] clientPrivateKey = MultibaseUtils.decode(ecKeyPair.getPrivateKey());
         byte[] clientPublicKey = MultibaseUtils.decode(ecKeyPair.getPublicKey());
 
-        Log.d("utilityTest","generateECKeyPair - PrivateKey : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, clientPrivateKey)
+        Log.d("utilityTest","generateECKeyPair - PrivateKey : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, clientPrivateKey)
             + " / length : " + clientPrivateKey.length);
-        Log.d("utilityTest","generateECKeyPair - PublicKey : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, clientPublicKey)
+        Log.d("utilityTest","generateECKeyPair - PublicKey : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, clientPublicKey)
             + " / length : " + clientPublicKey.length);
 
         byte[] yourPrivateKey = MultibaseUtils.decode("f262a051ac304ae86007e5f954860098b3cad236b2a715ced572344fb1d1b6739");
@@ -74,7 +74,7 @@ public class UtilityTest {
 
         byte[] secretKey = CryptoUtils.generateSharedSecret(EcType.EC_TYPE.SECP256_R1, clientPrivateKey, yourPubKey);
         assertNotNull(secretKey);
-        Log.d("utilityTest","generateSharedSecret - secretKey : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, secretKey)
+        Log.d("utilityTest","generateSharedSecret - secretKey : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, secretKey)
              + " / length : " + secretKey.length);
 
         byte[] salt = MultibaseUtils.decode("mFVFPNa8pzyuccULBUeTmyorygTU=");
@@ -84,7 +84,7 @@ public class UtilityTest {
         assertArrayEquals(pbkdf1, pbkdf2);
         assertNotEquals(pbkdf2, pbkdf3);
 
-        Log.d("utilityTest","pbkdf2 - pbkdf : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, pbkdf1)
+        Log.d("utilityTest","pbkdf2 - pbkdf : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, pbkdf1)
                 + " / length : " + pbkdf1.length);
 
         byte[] plainData = "Plain".getBytes();

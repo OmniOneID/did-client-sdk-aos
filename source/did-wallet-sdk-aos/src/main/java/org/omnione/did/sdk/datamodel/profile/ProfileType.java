@@ -21,7 +21,8 @@ import org.omnione.did.sdk.datamodel.util.StringEnum;
 public class ProfileType {
     public enum PROFILE_TYPE implements StringEnum {
         issueProfile("IssueProfile"),
-        verifyProfile("VerifyProfile");
+        verifyProfile("VerifyProfile"),
+        proofRequestProfile("ProofRequestProfile");
 
         final private String value;
         PROFILE_TYPE(String value) {
@@ -47,6 +48,8 @@ public class ProfileType {
                     return "IssueProfile";
                 case verifyProfile:
                     return "VerifyProfile";
+                case proofRequestProfile:
+                    return "ProofRequestProfile";
                 default:
                     return "Unknown";
             }

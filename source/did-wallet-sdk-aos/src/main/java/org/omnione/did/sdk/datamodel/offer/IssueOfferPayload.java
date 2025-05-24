@@ -41,7 +41,10 @@ public class IssueOfferPayload extends SortData {
 
     public enum OFFER_TYPE {
         IssueOffer("IssueOffer"),
-        VerifyOffer("VerifyOffer");
+        VerifyOffer("VerifyOffer"),
+        RestoreDidOffer("RestoreDidOffer"),
+        ZkpIssueOffer("ZkpIssueOffer"),
+        VerifyProofOffer("VerifyProofOffer");
 
         final private String value;
         OFFER_TYPE(String value) {

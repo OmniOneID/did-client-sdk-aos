@@ -17,9 +17,7 @@
 package org.omnione.did.sdk.datamodel.zkp;
 
 import com.google.gson.annotations.SerializedName;
-
 import org.omnione.did.sdk.core.zkp.other.type.PredicateType;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

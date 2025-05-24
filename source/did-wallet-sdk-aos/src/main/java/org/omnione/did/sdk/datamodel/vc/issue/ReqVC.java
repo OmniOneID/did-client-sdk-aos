@@ -20,6 +20,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.omnione.did.sdk.datamodel.common.SortData;
+import org.omnione.did.sdk.datamodel.zkp.CredentialRequest;
 
 public class ReqVC extends SortData {
 
@@ -30,6 +31,10 @@ public class ReqVC extends SortData {
     @SerializedName("profile")
     @Expose
     private Profile profile;
+
+    @SerializedName("credentialRequest")
+    @Expose
+    private CredentialRequest credentialRequest;
 
     public String getRefId() {
         return refId;
@@ -45,6 +50,14 @@ public class ReqVC extends SortData {
 
     public void setProfile(Profile profile) {
         this.profile = profile;
+    }
+
+    public CredentialRequest getCredentialRequest() {
+        return credentialRequest;
+    }
+
+    public void setCredentialRequest(CredentialRequest credentialRequest) {
+        this.credentialRequest = credentialRequest;
     }
 
     public static class Profile{

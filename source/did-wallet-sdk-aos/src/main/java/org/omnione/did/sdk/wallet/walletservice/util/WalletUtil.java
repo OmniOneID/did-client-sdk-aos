@@ -16,16 +16,34 @@
 
 package org.omnione.did.sdk.wallet.walletservice.util;
 
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.omnione.did.sdk.communication.exception.CommunicationException;
 import org.omnione.did.sdk.datamodel.common.enums.SymmetricCipherType;
+import org.omnione.did.sdk.datamodel.did.DIDDocument;
+import org.omnione.did.sdk.datamodel.did.DidDocVo;
+import org.omnione.did.sdk.datamodel.util.GsonWrapper;
+import org.omnione.did.sdk.datamodel.util.MessageUtil;
+import org.omnione.did.sdk.datamodel.zkp.CredentialDefinition;
+import org.omnione.did.sdk.datamodel.zkp.CredentialDefinitionVo;
+import org.omnione.did.sdk.datamodel.zkp.ladger.ZkpCredentionDefRows;
+import org.omnione.did.sdk.datamodel.zkp.ladger.ZkpLadgerRequestData;
+import org.omnione.did.sdk.datamodel.zkp.ladger.ZkpLadgerResponseData;
 import org.omnione.did.sdk.utility.CryptoUtils;
 import org.omnione.did.sdk.utility.DataModels.DigestEnum;
+import org.omnione.did.sdk.utility.DataModels.MultibaseType;
 import org.omnione.did.sdk.utility.DigestUtils;
 import org.omnione.did.sdk.utility.Encodings.Base16;
 import org.omnione.did.sdk.utility.Errors.UtilityException;
+import org.omnione.did.sdk.utility.MultibaseUtils;
 import org.omnione.did.sdk.wallet.walletservice.config.Config;
+import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 import org.omnione.did.sdk.wallet.walletservice.network.HttpUrlConnection;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -124,6 +142,30 @@ public class WalletUtil {
                 .exceptionally(ex -> {
                     throw new CompletionException(ex);
                 });
+    }
+
+    public static CompletableFuture<CredentialDefinition> getCredentialDefinition(String gatewayAPI, String credDefId){
+        HttpUrlConnection httpUrlConnection = new HttpUrlConnection();
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                WalletLogger.getInstance().d("credDefUrl: "+gatewayAPI);
+                String credDef = httpUrlConnection.send(gatewayAPI+"/api-gateway/api/v1/zkp-cred-def?id="+credDefId, "GET", "");
+
+                CredentialDefinitionVo credentialDefinitionVo = MessageUtil.deserialize(credDef, CredentialDefinitionVo.class);
+                CredentialDefinition credentialDefinition = MessageUtil.deserialize(new String(MultibaseUtils.decode(credentialDefinitionVo.getCredDef())), CredentialDefinition.class);
+                WalletLogger.getInstance().d("credentialDefinition: "+GsonWrapper.getGson().toJson(credentialDefinition));
+                return credentialDefinition;
+
+                } catch (CommunicationException e) {
+                    throw new CompletionException(e);
+                } catch (UtilityException e) {
+                throw new RuntimeException(e);
+            }
+                })
+            .thenCompose(CompletableFuture::completedFuture)
+            .exceptionally(ex -> {
+                throw new CompletionException(ex);
+            });
     }
 
     public static CompletableFuture<String> getVcSchema(String schemaId){

@@ -122,7 +122,7 @@ public class KeystoreManager {
 //                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEYSTORE_MANAGER_NO_REGISTERED_BIO_AUTH_INFO);
 //            }
             byte[] ecPubKeyX = generateECKeyWithKeyStore(prefix + alias, context);
-            keyGenerationInfo.setPublicKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, ecPubKeyX));
+            keyGenerationInfo.setPublicKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, ecPubKeyX));
 
             return keyGenerationInfo;
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeySpecException | NoSuchProviderException e) {

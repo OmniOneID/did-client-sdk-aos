@@ -26,6 +26,7 @@ import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.CredentialSchemaType;
 import org.omnione.did.sdk.datamodel.util.IntEnumAdapterFactory;
 import org.omnione.did.sdk.datamodel.util.StringEnumAdapterFactory;
+import org.omnione.did.sdk.datamodel.zkp.CredentialOffer;
 
 import java.util.List;
 
@@ -73,6 +74,8 @@ public class IssueProfile implements ProofContainer {
     public static class Profile {
         public ProviderDetail issuer;
         public CredentialSchema credentialSchema;
+        public CredentialOffer credentialOffer;
+
         public Process process;
 
         public static class CredentialSchema {
