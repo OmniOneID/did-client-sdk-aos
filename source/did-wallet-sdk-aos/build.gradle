@@ -19,8 +19,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 }
 
@@ -35,6 +35,7 @@ task deleteObjectJar(type: Delete){
 task exportJar(type: Copy){
     from('build/intermediates/aar_main_jar/release/')
     into('../release/')
+//    into('../../../did-ca-aos/source/did-ca-aos/app/libs')
     include('classes.jar')
     rename('classes.jar', "${project.name}-${customVersionMajorMinorBuild}.jar")
 }
@@ -51,6 +52,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     implementation 'org.bitcoinj:bitcoinj-core:0.15.7'
+
     api "androidx.room:room-runtime:2.6.1"
     annotationProcessor "androidx.room:room-compiler:2.6.1"
 
