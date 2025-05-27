@@ -136,7 +136,7 @@ public class WalletTest {
                     String clientPrivKey = "mMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgNdy+e2T694f0QbSd/gdLvmdgUjti+RR6wQY4F+kMYfCgCgYIKoZIzj0DAQehRANCAAT7qjXANGpEQoAuWp7+n00BbLUMp6tlmYGIP/RIdEJAMt3uDVWWb54UkVN5RsN4PZ7mnM5ZL9fgEgZTf2nXNpaK";
                     byte[] privateKey = MultibaseUtils.decode(clientPrivKey);
                     byte[] clientPrivateKey = EcUtils.convertCompressedPrivateKey(privateKey);
-                    Log.d("WalletTest", "compressedPrivateKey : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, clientPrivateKey));
+                    Log.d("WalletTest", "compressedPrivateKey : " + MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, clientPrivateKey));
                     byte[] clientPublicKey = MultibaseUtils.decode("mAvuqNcA0akRCgC5anv6fTQFstQynq2WZgYg/9Eh0QkAy");
 
                     byte[] serverPubKey = MultibaseUtils.decode("mA+1jfCC06BtbLwUkkAAsiU46i4GWz17SWnaME4yx7g2c");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,36 +16,23 @@
 
 package org.omnione.did.sdk.datamodel.protocol;
 
+import com.google.gson.annotations.SerializedName;
+
+import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
 import org.omnione.did.sdk.datamodel.util.JsonSortUtil;
 
-public abstract class BaseResponseVo {
-    private String txId;
-    private Integer code;
-    private String message;
+public class P310ZkpResponseVo extends BaseResponseVo {
 
-    public String getTxId() {
-        return txId;
+    @SerializedName("proofRequestProfile")
+    private ProofRequestProfile profile;
+
+    public ProofRequestProfile getProofRequestProfile() {
+        return profile;
     }
 
-    public void setTxId(String txId) {
-        this.txId = txId;
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+    public void setProofRequestProfile(ProofRequestProfile profile) {
+        this.profile = profile;
     }
 
     public String toJson() {
@@ -53,4 +40,5 @@ public abstract class BaseResponseVo {
         String json = gson.toJson(this);
         return JsonSortUtil.sortJsonString(gson, json);
     }
+
 }

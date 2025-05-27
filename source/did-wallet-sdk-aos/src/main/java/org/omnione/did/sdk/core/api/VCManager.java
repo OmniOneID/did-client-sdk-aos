@@ -26,12 +26,14 @@ import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
 import org.omnione.did.sdk.core.vcmanager.datamodel.PresentationInfo;
 import org.omnione.did.sdk.core.vcmanager.datamodel.VcMeta;
 import org.omnione.did.sdk.datamodel.common.BaseObject;
+import org.omnione.did.sdk.datamodel.util.GsonWrapper;
 import org.omnione.did.sdk.datamodel.vc.Claim;
 import org.omnione.did.sdk.datamodel.vc.CredentialSubject;
 import org.omnione.did.sdk.datamodel.vc.VCProof;
 import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.utility.Errors.UtilityException;
+import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -181,7 +183,15 @@ class VCManager<E extends BaseObject> {
             List<Claim> tempClaims = new ArrayList<>();
             VerifiableCredential tempVc = vcByIds;
             List<String> tempProofValueList = new ArrayList<>();
+
+            WalletLogger.getInstance().d("LOG_1: "+ GsonWrapper.getGson().toJson(vcByIds.getCredentialSubject().getClaims()));
+
             for(Claim claim : vcByIds.getCredentialSubject().getClaims()){
+                WalletLogger.getInstance().d("claim: "+ GsonWrapper.getGson().toJson(claim));
+                WalletLogger.getInstance().d("claimInfoMap: "+ GsonWrapper.getGson().toJson(claimInfoMap));
+                WalletLogger.getInstance().d("vcByIds.getId(): "+ vcByIds.getId());
+                WalletLogger.getInstance().d("tempVc: "+ GsonWrapper.getGson().toJson(tempVc));
+
                 for(int i = 0; i < claimInfoMap.get(vcByIds.getId()).size(); i++){
                     if(claimInfoMap.get(vcByIds.getId()).get(i).equals(claim.getCode())) {
                         tempClaims.add(claim);

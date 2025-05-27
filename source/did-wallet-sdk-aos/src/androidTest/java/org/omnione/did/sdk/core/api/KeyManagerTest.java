@@ -85,7 +85,7 @@ public class KeyManagerTest {
         keyGenInfo.setId("PIN");
         keyGenInfo.setAlgorithmType(AlgorithmType.ALGORITHM_TYPE.SECP256R1);
         keyGenInfo.setStorage(StorageOption.STORAGE_OPTION.WALLET);
-        keyGenWalletMethodType = new KeyGenWalletMethodType(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, "111111".getBytes()));
+        keyGenWalletMethodType = new KeyGenWalletMethodType(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, "111111".getBytes()));
         keyGenInfo.setWalletMethodType(keyGenWalletMethodType);
         Log.d("KeyManagerTest", "KeyGenInfo (PIN) : " + keyGenInfo.toJson());
         keyManager.generateKey(keyGenInfo);

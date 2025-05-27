@@ -21,6 +21,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.omnione.did.sdk.datamodel.profile.LogoImage;
 import org.omnione.did.sdk.datamodel.vc.CredentialSchema;
+import org.omnione.did.sdk.datamodel.zkp.CredentialDefinition;
 
 import java.util.List;
 
@@ -54,6 +55,10 @@ public class VCPlan {
     private String validUntil;
     // private tags
 
+    @SerializedName("credentialDefinition")
+    @Expose
+    private CredentialDefinition credentialDefinition;
+
     @SerializedName("credentialSchema")
     @Expose
     private CredentialSchema credentialSchema;
@@ -69,6 +74,14 @@ public class VCPlan {
     @SerializedName("manager")
     @Expose
     private String manager;
+
+    public CredentialDefinition getCredentialDefinition() {
+        return credentialDefinition;
+    }
+
+    public void setCredentialDefinition(CredentialDefinition credentialDefinition) {
+        this.credentialDefinition = credentialDefinition;
+    }
 
     public static class Option {
         public boolean allowUserInit;

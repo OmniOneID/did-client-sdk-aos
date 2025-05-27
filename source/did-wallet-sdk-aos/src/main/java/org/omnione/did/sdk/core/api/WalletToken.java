@@ -100,7 +100,6 @@ class WalletToken {
         walletLogger.d("walletToken verification success");
         walletLogger.d("valid until verification success");
         walletLogger.d("purpose verification success");
-
     }
 
     public WalletTokenSeed createWalletTokenSeed(WalletTokenPurpose.WALLET_TOKEN_PURPOSE purpose, String pkgName, String userId) throws UtilityException, WalletException {

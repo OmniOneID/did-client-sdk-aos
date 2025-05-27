@@ -16,6 +16,8 @@
 
 package org.omnione.did.sdk.datamodel.zkp;
 
+import android.util.Log;
+
 import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
 import org.omnione.did.sdk.core.zkp.other.helper.CommitmentHelper;

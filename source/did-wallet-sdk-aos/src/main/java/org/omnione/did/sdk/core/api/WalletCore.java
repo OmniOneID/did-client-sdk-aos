@@ -21,6 +21,7 @@ import android.content.Context;
 import androidx.fragment.app.Fragment;
 
 import org.omnione.did.sdk.core.zkp.datamodel.ZKPInfo;
+import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
@@ -198,7 +199,7 @@ class WalletCore implements WalletCoreInterface {
         keyGenRequest.setId(Constants.KEY_ID_PIN);
         keyGenRequest.setAlgorithmType(AlgorithmType.ALGORITHM_TYPE.SECP256R1);
         keyGenRequest.setStorage(StorageOption.STORAGE_OPTION.WALLET);
-        KeyGenWalletMethodType keyGenWalletMethodType = new KeyGenWalletMethodType(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, passcode.getBytes()));
+        KeyGenWalletMethodType keyGenWalletMethodType = new KeyGenWalletMethodType(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, passcode.getBytes()));
         keyGenRequest.setWalletMethodType(keyGenWalletMethodType);
         keyManager.generateKey(keyGenRequest);
     }
@@ -283,11 +284,23 @@ class WalletCore implements WalletCoreInterface {
         return vcManager.getAllCredentials();
     }
     @Override
-    public void deleteCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException {
+    public void deleteCredentials(List<String> identifiers, boolean hasZkp) throws WalletCoreException, UtilityException, WalletException {
         if(WalletApi.isLock)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
 
         vcManager.deleteCredentials(identifiers);
+        WalletLogger.getInstance().d("delete vc success");
+
+        if (hasZkp) {
+            for (String identifier : identifiers) {
+                if (!zkpManager.isZkpCredentialsSaved(identifier)) {
+                    throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_REVOKE_CREDENTIAL_FAIL);
+                } else {
+                    zkpManager.deleteCredentials(identifiers);
+                    WalletLogger.getInstance().d("delete credential success");
+                }
+            }
+        }
     }
     @Override
     public VerifiablePresentation makePresentation(List<ClaimInfo> claimInfos, PresentationInfo presentationInfo) throws WalletCoreException, UtilityException, WalletException {
@@ -424,10 +437,9 @@ class WalletCore implements WalletCoreInterface {
     }
 
     @Override
-    public CredentialRequestContainer createZkpCredentialRequest(String proverDid,
-                                                                 CredentialPrimaryPublicKey credentialPublicKey,
-                                                                 CredentialOffer credOffer) throws WalletCoreException, UtilityException {
-        return zkpManager.createCredentialRequest(proverDid, credentialPublicKey, credOffer);
+    public CredentialRequestContainer createCredentialRequest(CredentialPrimaryPublicKey credentialPublicKey, CredentialOffer credOffer) throws WalletCoreException, UtilityException, WalletException {
+
+        return zkpManager.createCredentialRequest(this.getDocument(2).getId(), credentialPublicKey, credOffer);
     }
 
     @Override
@@ -451,5 +463,9 @@ class WalletCore implements WalletCoreInterface {
     public Proof createZkpProof(ProofRequest proofRequest,
                                 List<ProofParam> proofParams, Map<String, String> selfAttributes) throws WalletCoreException, UtilityException {
         return zkpManager.createProof(proofRequest, proofParams, selfAttributes);
+    }
+
+    public boolean isZkpCredentialsSaved(String identifier) throws WalletCoreException, UtilityException, WalletException {
+        return zkpManager.isZkpCredentialsSaved(identifier);
     }
 }
