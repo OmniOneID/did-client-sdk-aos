@@ -21,7 +21,6 @@ import android.content.Context;
 import androidx.fragment.app.Fragment;
 
 import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
-import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.protocol.P310ZkpRequestVo;
 import org.omnione.did.sdk.datamodel.protocol.P310ZkpResponseVo;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
@@ -31,12 +30,8 @@ import org.omnione.did.sdk.datamodel.did.DIDDocument;
 import org.omnione.did.sdk.datamodel.profile.ReqE2e;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
-import org.omnione.did.sdk.datamodel.zkp.CredentialDefinition;
 import org.omnione.did.sdk.datamodel.zkp.CredentialOffer;
 import org.omnione.did.sdk.datamodel.zkp.CredentialPrimaryPublicKey;
-import org.omnione.did.sdk.datamodel.zkp.CredentialRequestContainer;
-import org.omnione.did.sdk.datamodel.zkp.CredentialRequestMeta;
-import org.omnione.did.sdk.datamodel.zkp.Proof;
 import org.omnione.did.sdk.datamodel.zkp.ProofParam;
 import org.omnione.did.sdk.datamodel.zkp.ProofRequest;
 import org.omnione.did.sdk.datamodel.zkp.ReferentInfo;
@@ -350,7 +345,7 @@ public class WalletApi {
      * @return CompletableFuture<String> - A `CompletableFuture` representing the result of the VC issuance request.
      * @throws Exception - Any error that occurs during wallet token verification or VC issuance request.
      */
-    public CompletableFuture<String> requestIssueVc(String hWalletToken, String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId, CredentialPrimaryPublicKey credentialPrimaryPublicKey, CredentialOffer credentialOffer) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestIssueVc(String hWalletToken, String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.ISSUE_VC,
                 WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID_AND_ISSUE_VC));
         return walletService.requestIssueVc(tasUrl, apiGateWayUrl, serverToken, refId, profile, signedDIDAuth, txId);
@@ -408,7 +403,7 @@ public class WalletApi {
      */
     public void deleteCredentials(String hWalletToken, String vcId) throws WalletException, UtilityException, WalletCoreException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.REMOVE_VC));
-        walletCore.deleteCredentials(List.of(vcId));
+        walletCore.deleteCredentials(List.of(vcId), false);
     }
 
     /**
@@ -611,6 +606,10 @@ public class WalletApi {
 
     public boolean isAnyZkpCredentialsSaved() throws WalletCoreException, UtilityException, WalletException {
         return walletCore.isAnyZkpCredentialsSaved();
+    }
+
+    public boolean isZkpCredentialsSaved(String identifier) throws WalletException, WalletCoreException, UtilityException {
+        return walletCore.isZkpCredentialsSaved(identifier);
     }
 
     public List<Credential> getZkpCredentials(String hWalletToken, List<String> identifiers) throws WalletCoreException, UtilityException, WalletException {

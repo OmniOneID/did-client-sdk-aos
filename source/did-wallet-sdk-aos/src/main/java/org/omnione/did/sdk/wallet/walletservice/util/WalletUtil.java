@@ -61,8 +61,8 @@ public class WalletUtil {
         String messageId = "";
         try {
             messageId = dateFormat.format(today) + Base16.toHex(CryptoUtils.generateNonce(4));
-        } catch (Exception e){
-            e.printStackTrace();
+        } catch (UtilityException e) {
+            throw new RuntimeException(e);
         }
         return messageId;
     }

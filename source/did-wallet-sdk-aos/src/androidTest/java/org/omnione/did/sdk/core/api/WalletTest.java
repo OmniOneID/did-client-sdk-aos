@@ -374,7 +374,7 @@ public class WalletTest {
                 WalletTestData.TEST_REF_ID,
                 issueProfile,
                 signedDidAuth,
-                WalletTestData.TEST_TX_ID, null, null
+                WalletTestData.TEST_TX_ID
                 ).get();
         Log.d("WalletTest", "vc ID : " + vcId);
         Log.i("WalletTest", "===========================================================");

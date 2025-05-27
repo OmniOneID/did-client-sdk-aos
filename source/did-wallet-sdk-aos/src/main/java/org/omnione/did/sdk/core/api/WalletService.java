@@ -385,7 +385,6 @@ public class WalletService implements WalletServiceInterface {
 
         if (hasZkp) {
             CredentialDefinition credentialDefinition = WalletUtil.getCredentialDefinition(apiGateWayUrl, credOffer.getCredDefId()).get();
-
             WalletLogger.getInstance().d("credentialDefinition: "+GsonWrapper.getGson().toJson(credentialDefinition));
             credentialPrimaryPublicKey = credentialDefinition.getValue().getPrimary();
             CredentialRequestContainer credentialRequestContainer = walletCore.createCredentialRequest(credentialDefinition.getValue().getPrimary(), credOffer);
@@ -412,7 +411,7 @@ public class WalletService implements WalletServiceInterface {
 
         String credInfo = decryptVc(result, profile.getProfile().process.reqE2e, e2eKeyPair, apiGateWayUrl);
 
-        return CompletableFuture.completedFuture(saveVc(credInfo, apiGateWayUrl, credentialPrimaryPublicKey));
+        return CompletableFuture.completedFuture(saveVc(credInfo, apiGateWayUrl, hasZkp, credentialPrimaryPublicKey));
     }
 
     private String decryptVc(String e2e, ReqE2e reqE2e, EcKeyPair dhKeyPair, String apiGateWayUrl) throws UtilityException{
@@ -430,38 +429,44 @@ public class WalletService implements WalletServiceInterface {
         byte[] plain = CryptoUtils.decrypt(MultibaseUtils.decode(encVc), info, sessKey, MultibaseUtils.decode(iv));
         return new String(plain);
     }
-    private String saveVc(String credInfoStr, String apiGateWayUrl, CredentialPrimaryPublicKey primaryPublicKey) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
+    private String saveVc(String credInfoStr, String apiGateWayUrl, boolean hasZkp, CredentialPrimaryPublicKey primaryPublicKey) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
 
         List<String> removeIds = new ArrayList<>();
         CredInfo credInfo = MessageUtil.deserialize(credInfoStr, CredInfo.class);
 
         WalletLogger.getInstance().d("credInfo: "+GsonWrapper.getGson().toJson(credInfo));
-        WalletLogger.getInstance().d("isSavedZkp: "+walletCore.isAnyZkpCredentialsSaved());
-        // zkp 저장
-        if (primaryPublicKey != null && walletCore.isAnyZkpCredentialsSaved()) {
-            for (Credential credential : walletCore.getAllZkpCredentials()) {
-                if (credInfo.getCredential().getCredentialId().equals(credential.getCredentialId())) {
-                    removeIds.add(credential.getCredentialId());
+        if (hasZkp) {
+            WalletLogger.getInstance().d("isSavedZkp: " + walletCore.isAnyZkpCredentialsSaved());
+            // zkp 저장
+            if (primaryPublicKey != null && walletCore.isAnyZkpCredentialsSaved()) {
+                for (Credential credential : walletCore.getAllZkpCredentials()) {
+                    if (credInfo.getCredential().getCredentialId().equals(credential.getCredentialId())) {
+                        removeIds.add(credential.getCredentialId());
+                    }
+                    if (removeIds.size() > 0)
+                        walletCore.deleteZkpCredentials(removeIds);
                 }
-                if (removeIds.size() > 0)
-                    walletCore.deleteZkpCredentials(removeIds);
             }
+            walletCore.verifyAndStoreZkpCredential(credentialRequestMeta, primaryPublicKey, credInfo.getCredential());
+            removeIds.clear();
         }
-        walletCore.verifyAndStoreZkpCredential(credentialRequestMeta, primaryPublicKey, credInfo.getCredential());
-        removeIds.clear();
 
         VerifiableCredential vc = credInfo.getVc();
+
         if(walletCore.isAnyCredentialsSaved()) {
             for (VerifiableCredential verifiableCredential : walletCore.getAllCredentials()) {
                 if (vc.getCredentialSchema().getId().equals(verifiableCredential.getCredentialSchema().getId()))
                     removeIds.add(verifiableCredential.getId());
             }
             if(removeIds.size() > 0)
-                walletCore.deleteCredentials(removeIds);
+                walletCore.deleteCredentials(removeIds, hasZkp);
         }
-        boolean result = verifyProof(vc, false, apiGateWayUrl);
-        if (result)
+
+        boolean result = verifyProof(credInfo.getVc().toJson(), false, apiGateWayUrl);
+        if (result) {
+
             walletCore.addCredentials(vc);
+        }
         return vc.getId();
     }
 
@@ -550,6 +555,14 @@ public class WalletService implements WalletServiceInterface {
 
     @Override
     public ReturnEncVP createEncVp(String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException {
+
+        WalletLogger.getInstance().d("vcId: "+vcId);
+        WalletLogger.getInstance().d("passcode: "+passcode);
+        WalletLogger.getInstance().d("nonce: "+nonce);
+        WalletLogger.getInstance().d("authType: "+authType);
+
+        WalletLogger.getInstance().d("claimCode: "+GsonWrapper.getGson().toJson(claimCode));
+        WalletLogger.getInstance().d("reqE2e: "+GsonWrapper.getGson().toJson(reqE2e));
         String serverPublicKey = reqE2e.getPublicKey();
         EcKeyPair e2eKeyPair = CryptoUtils.generateECKeyPair(EcType.EC_TYPE.SECP256_R1);
         byte[] iv = CryptoUtils.generateNonce(16);
@@ -677,7 +690,9 @@ public class WalletService implements WalletServiceInterface {
         return clientMergedSharedSecret;
     }
 
-    private boolean verifyProof(VerifiableCredential vc, boolean isCertVc, String apiGateWayUrl) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
+    private boolean verifyProof(String strVc, boolean isCertVc, String apiGateWayUrl) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
+
+        VerifiableCredential vc = MessageUtil.deserialize(strVc, VerifiableCredential.class);
 
         String did = vc.getIssuer().getId();
         if(isCertVc)
@@ -730,7 +745,7 @@ public class WalletService implements WalletServiceInterface {
         if (!isExistRole)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_ROLE_MATCH_FAIL);
 
-        if (!verifyProof(certVc, false, apiGateWayUrl))
+        if (!verifyProof(certVcStr, false, apiGateWayUrl))
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_CERT_VC_FAIL);
     }
 

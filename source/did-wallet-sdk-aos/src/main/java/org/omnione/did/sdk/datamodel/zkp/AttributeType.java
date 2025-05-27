@@ -46,5 +46,4 @@ public class AttributeType {
     public void setItems(List<AttributeDef> items) {
         this.items = items;
     }
-
 }
