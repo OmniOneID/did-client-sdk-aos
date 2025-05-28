@@ -60,22 +60,34 @@ did-client-sdk-aos
         └── src
 ```
 
-|  이름 |         역할                    |
-| ------- | ------------------------------------ |
-| source  |  SDK 소스코드 프로젝트             |
-| docs  |   문서            |
-| ┖ api  |  API 가이드 문서          |
-| sample  |  샘플 및 데이터            |
-| README.md  |  프로젝트의 전체적인 개요 설명            |
-| CLA.md             | Contributor License Agreement                |
-| CHANGELOG.md| 프로젝트 버전별 변경사항           |
-| CODE_OF_CONDUCT.md| 기여자의 행동강령            |
-| CONTRIBUTING.md| 기여 절차 및 방법           |
-| LICENSE                 | Apache 2.0                                      |
-| dependencies-license.md| 프로젝트 의존성 라이브러리에 대한 라이선스            |
-| MAINTAINERS.md          | 유지관리 가이드              |
+| 이름                    | 역할                                       |
+| ----------------------- | ------------------------------------------ |
+| source                  | SDK 소스코드 프로젝트                      |
+| docs                    | 문서                                       |
+| ┖ api                   | API 가이드 문서                            |
+| sample                  | 샘플 및 데이터                             |
+| README.md               | 프로젝트의 전체적인 개요 설명              |
+| CLA.md                  | Contributor License Agreement              |
+| CHANGELOG.md            | 프로젝트 버전별 변경사항                   |
+| CODE_OF_CONDUCT.md      | 기여자의 행동강령                          |
+| CONTRIBUTING.md         | 기여 절차 및 방법                          |
+| LICENSE                 | Apache 2.0                                 |
+| dependencies-license.md | 프로젝트 의존성 라이브러리에 대한 라이선스 |
+| MAINTAINERS.md          | 유지관리 가이드                            |
 | RELEASE-PROCESS.md      | 릴리즈 절차                                |
-| SECURITY.md| 보안취약점 보고 및 보안정책            | 
+| SECURITY.md             | 보안취약점 보고 및 보안정책                |
+
+
+## S/W Specifications
+| Category         | Details                                                |
+| ---------------- | ------------------------------------------------------ |
+| OS               | Android 14                                             |
+| Language         | Java 21                                                |
+| IDE              | Android Studio 4                                       |
+| Build System     | Gradle 8.2                                             |
+| Compatibility    | Android API level 34 or higher                         |
+| Test Environment | Minimum Requirements: Android 8.0 (Oreo, API Level 26) |
+|                  | Recommended Requirements: Android 14 (API Level 34)    |
 
 ## 라이브러리
 
