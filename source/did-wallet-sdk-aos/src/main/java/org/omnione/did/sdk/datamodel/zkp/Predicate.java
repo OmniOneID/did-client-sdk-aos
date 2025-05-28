@@ -17,11 +17,9 @@
 package org.omnione.did.sdk.datamodel.zkp;
 
 import com.google.gson.annotations.SerializedName;
-
 import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
 import org.omnione.did.sdk.core.zkp.other.type.PredicateType;
-
 import java.math.BigInteger;
 
 public class Predicate {

@@ -16,31 +16,19 @@
 
 package org.omnione.did.sdk.datamodel.zkp;
 
-public class ZkpResponse {
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-    private String errorCode;
-    private String errorMessage;
-    private boolean isSuccess;
+public class CredentialSchemaVo {
+    @SerializedName("credSchema")
+    @Expose
+    private String credSchema;
 
-    public ZkpResponse(){}
-
-    public ZkpResponse(String errorCode, String errorMessage) {
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
-        this.isSuccess = this.errorCode == "00000" ? true: false;
+    public String getCredSchema() {
+        return credSchema;
     }
 
-    public boolean isSuccess() {
-        return isSuccess;
+    public void setCredSchema(String credSchema) {
+        this.credSchema = credSchema;
     }
-
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-
 }

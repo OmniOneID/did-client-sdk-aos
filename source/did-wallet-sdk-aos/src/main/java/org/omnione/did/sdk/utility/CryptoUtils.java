@@ -101,8 +101,8 @@ public class CryptoUtils {
         }
         EcKeyPair ecKeyPair = new EcKeyPair();
         BigInteger bNum = EcUtils.getOrCreatePrivKeyBigInteger(null);
-        ecKeyPair.setPrivateKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, bNum.toByteArray()));
-        ecKeyPair.setPublicKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, EcUtils.getPubKey(bNum)));
+        ecKeyPair.setPrivateKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, bNum.toByteArray()));
+        ecKeyPair.setPublicKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, EcUtils.getPubKey(bNum)));
 
         return ecKeyPair;
     }

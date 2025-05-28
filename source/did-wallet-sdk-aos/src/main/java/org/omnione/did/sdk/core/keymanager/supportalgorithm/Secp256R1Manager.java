@@ -74,8 +74,8 @@ public class Secp256R1Manager implements SignableInterface {
         KeyGenerationInfo keyGenerationInfo = new KeyGenerationInfo();
         keyGenerationInfo.setAlgoType(AlgorithmType.ALGORITHM_TYPE.SECP256R1);
         BigInteger bNum = getOrCreatePrivKeyBigInteger(null);
-        keyGenerationInfo.setPrivateKey((MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, bNum.toByteArray())));
-        keyGenerationInfo.setPublicKey((MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, getPubKey(bNum))));
+        keyGenerationInfo.setPrivateKey((MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, bNum.toByteArray())));
+        keyGenerationInfo.setPublicKey((MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, getPubKey(bNum))));
 
         return keyGenerationInfo;
     }

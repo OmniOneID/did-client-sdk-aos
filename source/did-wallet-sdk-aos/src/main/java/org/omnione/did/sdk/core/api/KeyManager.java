@@ -155,7 +155,7 @@ class KeyManager<E extends BaseObject>{
             );
 
             encodedPubKey = genKeyInfo.getPublicKey();
-            encodedPriKey = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, ePriKeyByte);
+            encodedPriKey = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, ePriKeyByte);
 
             keyInfo = new KeyInfo(
                     keyGenRequest.getId(),
@@ -167,7 +167,7 @@ class KeyManager<E extends BaseObject>{
             detailKeyInfo = new DetailKeyInfo(
                     keyGenRequest.getId(),
                     encodedPriKey,
-                    MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, salt)
+                    MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, salt)
             );
 
             Arrays.fill(symmetricKey, (byte) 0x00);
@@ -178,7 +178,7 @@ class KeyManager<E extends BaseObject>{
             storageManager.addItem(getUsableInnerWalletItem(keyInfo, detailKeyInfo), false);
         } else {
             encodedPubKey = genKeyInfo.getPublicKey();
-            encodedPriKey = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, priKey);
+            encodedPriKey = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, priKey);
 
             keyInfo = new KeyInfo(
                     keyGenRequest.getId(),
@@ -307,8 +307,8 @@ class KeyManager<E extends BaseObject>{
                 newIv
         );
 
-        String strEncodedPriKey = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, ePrivateKey);
-        DetailKeyInfo newKeyPairInfo = new DetailKeyInfo(id, strEncodedPriKey, MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, newSalt));
+        String strEncodedPriKey = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, ePrivateKey);
+        DetailKeyInfo newKeyPairInfo = new DetailKeyInfo(id, strEncodedPriKey, MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, newSalt));
 
         UsableInnerWalletItem<KeyInfo, DetailKeyInfo> newWalletItem = new UsableInnerWalletItem<>();
         newWalletItem.setItem(newKeyPairInfo);

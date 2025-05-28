@@ -29,6 +29,9 @@ public class CredentialSchema {
     private String version;
     @SerializedName("attrNames")
     private List<String> attrNames;
+
+    @SerializedName("attrTypes")
+    private List<AttributeType> attrTypes;
     private String tag;
 
     @Expose
@@ -64,6 +67,14 @@ public class CredentialSchema {
 
     public void setAttrNames(List<String> attrNames) {
         this.attrNames = attrNames;
+    }
+
+    public List<AttributeType> getAttrTypes() {
+        return attrTypes;
+    }
+
+    public void setAttrTypes(List<AttributeType> attrTypes) {
+        this.attrTypes = attrTypes;
     }
 
     public int getSeqNo() {

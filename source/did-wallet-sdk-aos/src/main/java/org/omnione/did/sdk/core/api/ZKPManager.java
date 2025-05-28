@@ -17,6 +17,7 @@
 package org.omnione.did.sdk.core.api;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
@@ -65,6 +66,7 @@ import org.omnione.did.sdk.core.zkp.other.util.DateUtil;
 import org.omnione.did.sdk.datamodel.common.BaseObject;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
 import org.omnione.did.sdk.utility.Errors.UtilityException;
+import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
 import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 
 import java.math.BigInteger;
@@ -149,6 +151,7 @@ class ZKPManager<E extends BaseObject> {
      * @throws UtilityException If a utility-level error occurs while handling the credential or storage operations.
      */
     private void addCredential(Credential credential) throws WalletCoreException, UtilityException {
+
         if(credential == null){
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "credential");
         }
@@ -165,7 +168,6 @@ class ZKPManager<E extends BaseObject> {
         zkpInfo.setValue(credential.toJson());
 
         item.setItem(zkpInfo);
-
         WalletLogger.getInstance().d("ZKPManager addCredentials() item: "+ GsonWrapper.getGson().toJson(item));
 
         storageManager.addItem(item, !isAnyCredentialsSaved());
@@ -500,6 +502,7 @@ class ZKPManager<E extends BaseObject> {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "validRequest fail [credentialPrimaryPublicKey has null parameter]");
         if (credential == null)
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "validRequest fail [credential has null parameter]");
+
         if (credentialRequestMeta.getNonce() == null)
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "validRequest fail [proverNonce has null parameter]");
 
@@ -905,5 +908,24 @@ class ZKPManager<E extends BaseObject> {
         WalletLogger.getInstance().d("proof.getRequestedProof: "+GsonWrapper.getGson().toJson(proof.getRequestedProof()));
 
         return proof;
+    }
+
+    public boolean isZkpCredentialsSaved(String identifier) throws WalletCoreException, UtilityException, WalletException {
+        if(identifier == null || identifier.isEmpty()){
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "identifiers");
+        }
+
+        List<ZKPMeta> zkpMetas = storageManager.getAllMetas();
+
+        if (zkpMetas.isEmpty()) return false;
+
+        for (ZKPMeta zkpMeta : zkpMetas) {
+            if (zkpMeta.getCategory() == Category.CREDENTIAL) {
+                if (identifier.equals(zkpMeta.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -71,7 +71,7 @@ public class DIDManagerTest {
                 "PIN",
                 AlgorithmType.ALGORITHM_TYPE.SECP256R1,
                 StorageOption.STORAGE_OPTION.WALLET,
-                new KeyGenWalletMethodType(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, "111111".getBytes()))
+                new KeyGenWalletMethodType(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, "111111".getBytes()))
         );
         Log.d("DIDManagerTest", "KeyGenInfo (PIN) : " + keyGenInfo.toJson());
         if(!keyManager.isKeySaved("PIN"))
@@ -120,7 +120,7 @@ public class DIDManagerTest {
                 "PIN2",
                 AlgorithmType.ALGORITHM_TYPE.SECP256R1,
                 StorageOption.STORAGE_OPTION.WALLET,
-                new KeyGenWalletMethodType(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, "password".getBytes()))
+                new KeyGenWalletMethodType(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, "password".getBytes()))
         );
         Log.d("DIDManagerTest","PIN2 keygenInfo : " + keyGenInfo.toJson());
         keyManager.generateKey(keyGenInfo);

@@ -20,11 +20,17 @@ import android.content.Context;
 
 import androidx.fragment.app.Fragment;
 
+import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.protocol.P210ResponseVo;
 import org.omnione.did.sdk.datamodel.protocol.P220ResponseVo;
 import org.omnione.did.sdk.datamodel.did.DidDocVo;
+import org.omnione.did.sdk.datamodel.protocol.P310RequestVo;
+import org.omnione.did.sdk.datamodel.protocol.P310ZkpRequestVo;
+import org.omnione.did.sdk.datamodel.protocol.P310ZkpResponseVo;
 import org.omnione.did.sdk.datamodel.security.AccE2e;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
+import org.omnione.did.sdk.datamodel.util.GsonWrapper;
+import org.omnione.did.sdk.datamodel.vc.issue.CredInfo;
 import org.omnione.did.sdk.datamodel.vc.issue.ReqRevokeVC;
 import org.omnione.did.sdk.datamodel.vc.issue.ReqVC;
 import org.omnione.did.sdk.datamodel.token.SignedWalletInfo;
@@ -42,6 +48,7 @@ import org.omnione.did.sdk.datamodel.did.AttestedDidDoc;
 import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
 import org.omnione.did.sdk.datamodel.token.Wallet;
 import org.omnione.did.sdk.datamodel.common.Proof;
+
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.ProofPurpose;
 import org.omnione.did.sdk.datamodel.common.enums.ProofType;
@@ -52,6 +59,15 @@ import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vcschema.VCSchema;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.wallet.AllowedCAList;
+import org.omnione.did.sdk.datamodel.zkp.Credential;
+import org.omnione.did.sdk.datamodel.zkp.CredentialDefinition;
+import org.omnione.did.sdk.datamodel.zkp.CredentialOffer;
+import org.omnione.did.sdk.datamodel.zkp.CredentialPrimaryPublicKey;
+import org.omnione.did.sdk.datamodel.zkp.CredentialRequest;
+import org.omnione.did.sdk.datamodel.zkp.CredentialRequestContainer;
+import org.omnione.did.sdk.datamodel.zkp.CredentialRequestMeta;
+import org.omnione.did.sdk.datamodel.zkp.ProofParam;
+import org.omnione.did.sdk.datamodel.zkp.ProofRequest;
 import org.omnione.did.sdk.utility.CryptoUtils;
 import org.omnione.did.sdk.utility.DataModels.CipherInfo;
 import org.omnione.did.sdk.utility.DataModels.DigestEnum;
@@ -88,6 +104,7 @@ import org.omnione.did.sdk.core.vcmanager.datamodel.PresentationInfo;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
@@ -97,10 +114,51 @@ public class WalletService implements WalletServiceInterface {
     BioPromptHelper bioPromptHelper;
     WalletCore walletCore;
     WalletLogger walletLogger;
-
+    CredentialRequestMeta credentialRequestMeta;
     public void setBioPromptListener(BioPromptHelper.BioPromptInterface bioPromptInterface){
         this.bioPromptInterface = bioPromptInterface;
     }
+
+    public P310ZkpRequestVo createZkpProof(P310ZkpResponseVo proofRequestProfileVo, List<ProofParam> proofParams, Map<String, String> selfAttributes) throws WalletCoreException, UtilityException, WalletException {
+
+        String serverPublicKey = proofRequestProfileVo.getProofRequestProfile().getProfile().getReqE2e().getPublicKey();
+        EcKeyPair e2eKeyPair = CryptoUtils.generateECKeyPair(EcType.EC_TYPE.SECP256_R1);
+        byte[] iv = CryptoUtils.generateNonce(16);
+        byte[] clientPublicKey = MultibaseUtils.decode(e2eKeyPair.getPublicKey());
+        AccE2e accE2e = new AccE2e();
+        accE2e.setIv(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, iv));
+        accE2e.setPublicKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, clientPublicKey));
+        accE2e = (AccE2e) addProofsToDocument(accE2e, List.of(Constants.KEY_ID_KEY_AGREE), walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER).getId(), Constants.DID_DOC_TYPE_HOLDER, "", false);
+        byte[] secretKey = CryptoUtils.generateSharedSecret(EcType.EC_TYPE.SECP256_R1, MultibaseUtils.decode(e2eKeyPair.getPrivateKey()), MultibaseUtils.decode(serverPublicKey));
+        byte[] serverNonce = MultibaseUtils.decode(proofRequestProfileVo.getProofRequestProfile().getProfile().getReqE2e().getNonce());
+        byte[] e2eKey = mergeSharedSecretAndNonce(secretKey, serverNonce, SymmetricCipherType.SYMMETRIC_CIPHER_TYPE.AES256CBC);
+
+        String[] cipher = proofRequestProfileVo.getProofRequestProfile().getProfile().getReqE2e().getCipher().getValue().split("-");
+        CipherInfo info = new CipherInfo
+                (CipherInfo.ENCRYPTION_TYPE.fromValue(cipher[0]),
+                        CipherInfo.ENCRYPTION_MODE.fromValue(cipher[2]),
+                        CipherInfo.SYMMETRIC_KEY_SIZE.fromValue(cipher[1]),
+                        CipherInfo.SYMMETRIC_PADDING_TYPE.fromKey(proofRequestProfileVo.getProofRequestProfile().getProfile().getReqE2e().getPadding().getValue()));
+
+        org.omnione.did.sdk.datamodel.zkp.Proof proof = walletCore.createZkpProof(proofRequestProfileVo.getProofRequestProfile().getProfile().getProofRequest(), proofParams, selfAttributes);
+
+        WalletLogger.getInstance().d("proof: "+proof.toJson());
+
+        byte[] encVp = CryptoUtils.encrypt(
+                proof.toJson().getBytes(),
+                info,
+                e2eKey,
+                iv
+        );
+        String encVpStr = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, encVp);
+        P310ZkpRequestVo returnEncVP = new P310ZkpRequestVo(proofRequestProfileVo.getProofRequestProfile().getId());
+        returnEncVP.setEncProof(encVpStr);
+        returnEncVP.setAccE2e(accE2e);
+        returnEncVP.setTxId(proofRequestProfileVo.getTxId());
+        returnEncVP.setNonce(proofRequestProfileVo.getProofRequestProfile().getProfile().proofRequest.getNonce());
+        return returnEncVP;
+    }
+
     public interface BioPromptInterface{
         void onSuccess(String result);
         void onFail(String result);
@@ -237,12 +295,12 @@ public class WalletService implements WalletServiceInterface {
         if(ownerDIDDoc == null)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL, "ownerDIDDoc");
         SignedDidDoc signedDIDDoc = new SignedDidDoc();
-        signedDIDDoc.setOwnerDidDoc(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, ownerDIDDoc.toJson().getBytes()));
+        signedDIDDoc.setOwnerDidDoc(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, ownerDIDDoc.toJson().getBytes()));
         Wallet wallet = new Wallet();
         wallet.setDID(walletCore.getDocument(Constants.DID_DOC_TYPE_DEVICE).getId());
         wallet.setId(Preference.loadWalletId(context));
         signedDIDDoc.setWallet(wallet);
-        signedDIDDoc.setNonce(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, CryptoUtils.generateNonce(16)));
+        signedDIDDoc.setNonce(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, CryptoUtils.generateNonce(16)));
         List<String> keyIds = List.of(Constants.KEY_ID_ASSERT);
         signedDIDDoc = (SignedDidDoc) addProofsToDocument(signedDIDDoc, keyIds, walletCore.getDocument(Constants.DID_DOC_TYPE_DEVICE).getId(), Constants.DID_DOC_TYPE_DEVICE, "", false);
         return signedDIDDoc;
@@ -291,7 +349,7 @@ public class WalletService implements WalletServiceInterface {
         didAuth.setAuthNonce(authNonce);
         DIDAuth signedDIDAuth = new DIDAuth();
 
-        String pinStr = pin != null ? pin.toString() : null;
+        String pinStr = pin != null ? pin : null;
 
         if(pinStr != null)
             signedDIDAuth = (DIDAuth) addProofsToDocument(didAuth, List.of(Constants.KEY_ID_PIN), holderDIDDoc.getId(), Constants.DID_DOC_TYPE_HOLDER, pin, true);
@@ -301,6 +359,7 @@ public class WalletService implements WalletServiceInterface {
     }
     @Override
     public CompletableFuture<String> requestIssueVc(String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
+
         verifyCertVc(RoleType.ROLE_TYPE.ISSUER, profile.getProfile().issuer.getDID(), profile.getProfile().issuer.getCertVcRef(), apiGateWayUrl);
 
         String serverPublicKey = profile.getProfile().process.reqE2e.getPublicKey();
@@ -317,6 +376,22 @@ public class WalletService implements WalletServiceInterface {
         byte[] e2eKey = mergeSharedSecretAndNonce(secretKey, serverNonce, SymmetricCipherType.SYMMETRIC_CIPHER_TYPE.AES256CBC);
 
         ReqVC reqVc = new ReqVC();
+        CredentialOffer credOffer = profile.getProfile().credentialOffer;
+        WalletLogger.getInstance().d("credOffer: "+ GsonWrapper.getGson().toJson(credOffer));
+
+        boolean hasZkp = credOffer != null;
+        WalletLogger.getInstance().d("hasZkp: "+hasZkp);
+        CredentialPrimaryPublicKey credentialPrimaryPublicKey = null;
+
+        if (hasZkp) {
+            CredentialDefinition credentialDefinition = WalletUtil.getCredentialDefinition(apiGateWayUrl, credOffer.getCredDefId()).get();
+            WalletLogger.getInstance().d("credentialDefinition: "+GsonWrapper.getGson().toJson(credentialDefinition));
+            credentialPrimaryPublicKey = credentialDefinition.getValue().getPrimary();
+            CredentialRequestContainer credentialRequestContainer = walletCore.createCredentialRequest(credentialDefinition.getValue().getPrimary(), credOffer);
+            credentialRequestMeta = credentialRequestContainer.getCredentialRequestMeta();
+            reqVc.setCredentialRequest(credentialRequestContainer.getCredentialRequest());
+        }
+
         reqVc.setRefId(refId);
         reqVc.setProfile(new ReqVC.Profile(profile.getId(), profile.getProfile().process.issuerNonce));
 
@@ -326,21 +401,17 @@ public class WalletService implements WalletServiceInterface {
                         CipherInfo.ENCRYPTION_MODE.fromValue(cipher[2]),
                         CipherInfo.SYMMETRIC_KEY_SIZE.fromValue(cipher[1]),
                         CipherInfo.SYMMETRIC_PADDING_TYPE.fromKey(profile.getProfile().process.reqE2e.getPadding().getValue()));
-        byte[] encReqVc = CryptoUtils.encrypt(
-                reqVc.toJson().getBytes(),
-                info,
-                e2eKey,
-                iv
-        );
+        byte[] encReqVc = CryptoUtils.encrypt(reqVc.toJson().getBytes(), info, e2eKey, iv);
         String encReqVcStr = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, encReqVc);
 
         IssueVc issueVc = new IssueVc(context);
         String result = issueVc.issueVc(tasUrl, txId, serverToken, signedDIDAuth, accE2e, encReqVcStr).get();
         if (result == null)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_ISSUE_CREDENTIAL_FAIL);
-        String vc = decryptVc(result, profile.getProfile().process.reqE2e, e2eKeyPair, apiGateWayUrl);
-        return CompletableFuture.completedFuture(saveVc(vc, apiGateWayUrl));
 
+        String credInfo = decryptVc(result, profile.getProfile().process.reqE2e, e2eKeyPair, apiGateWayUrl);
+
+        return CompletableFuture.completedFuture(saveVc(credInfo, apiGateWayUrl, hasZkp, credentialPrimaryPublicKey));
     }
 
     private String decryptVc(String e2e, ReqE2e reqE2e, EcKeyPair dhKeyPair, String apiGateWayUrl) throws UtilityException{
@@ -358,22 +429,47 @@ public class WalletService implements WalletServiceInterface {
         byte[] plain = CryptoUtils.decrypt(MultibaseUtils.decode(encVc), info, sessKey, MultibaseUtils.decode(iv));
         return new String(plain);
     }
-    private String saveVc(String vcStr, String apiGateWayUrl) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
+    private String saveVc(String credInfoStr, String apiGateWayUrl, boolean hasZkp, CredentialPrimaryPublicKey primaryPublicKey) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
+
         List<String> removeIds = new ArrayList<>();
-        VerifiableCredential vc = MessageUtil.deserialize(vcStr, VerifiableCredential.class);
+        CredInfo credInfo = MessageUtil.deserialize(credInfoStr, CredInfo.class);
+
+        WalletLogger.getInstance().d("credInfo: "+GsonWrapper.getGson().toJson(credInfo));
+        if (hasZkp) {
+            WalletLogger.getInstance().d("isSavedZkp: " + walletCore.isAnyZkpCredentialsSaved());
+            // zkp 저장
+            if (primaryPublicKey != null && walletCore.isAnyZkpCredentialsSaved()) {
+                for (Credential credential : walletCore.getAllZkpCredentials()) {
+                    if (credInfo.getCredential().getCredentialId().equals(credential.getCredentialId())) {
+                        removeIds.add(credential.getCredentialId());
+                    }
+                    if (removeIds.size() > 0)
+                        walletCore.deleteZkpCredentials(removeIds);
+                }
+            }
+            walletCore.verifyAndStoreZkpCredential(credentialRequestMeta, primaryPublicKey, credInfo.getCredential());
+            removeIds.clear();
+        }
+
+        VerifiableCredential vc = credInfo.getVc();
+
         if(walletCore.isAnyCredentialsSaved()) {
             for (VerifiableCredential verifiableCredential : walletCore.getAllCredentials()) {
                 if (vc.getCredentialSchema().getId().equals(verifiableCredential.getCredentialSchema().getId()))
                     removeIds.add(verifiableCredential.getId());
             }
             if(removeIds.size() > 0)
-                walletCore.deleteCredentials(removeIds);
+                walletCore.deleteCredentials(removeIds, hasZkp);
         }
-        boolean result = verifyProof(vcStr, false, apiGateWayUrl);
-        if(result)
+
+        boolean result = verifyProof(credInfo.getVc().toJson(), false, apiGateWayUrl);
+        if (result) {
+
             walletCore.addCredentials(vc);
+        }
         return vc.getId();
     }
+
     @Override
     public CompletableFuture<String> requestRevokeVc(String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException {
         ReqRevokeVC reqRevokeVc = new ReqRevokeVC();
@@ -459,6 +555,14 @@ public class WalletService implements WalletServiceInterface {
 
     @Override
     public ReturnEncVP createEncVp(String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException {
+
+        WalletLogger.getInstance().d("vcId: "+vcId);
+        WalletLogger.getInstance().d("passcode: "+passcode);
+        WalletLogger.getInstance().d("nonce: "+nonce);
+        WalletLogger.getInstance().d("authType: "+authType);
+
+        WalletLogger.getInstance().d("claimCode: "+GsonWrapper.getGson().toJson(claimCode));
+        WalletLogger.getInstance().d("reqE2e: "+GsonWrapper.getGson().toJson(reqE2e));
         String serverPublicKey = reqE2e.getPublicKey();
         EcKeyPair e2eKeyPair = CryptoUtils.generateECKeyPair(EcType.EC_TYPE.SECP256_R1);
         byte[] iv = CryptoUtils.generateNonce(16);
@@ -493,6 +597,9 @@ public class WalletService implements WalletServiceInterface {
         presentationInfo.setValidUntil(WalletUtil.createValidUntil(600));
         presentationInfo.setVerifierNonce(nonce);
         VerifiablePresentation vp = walletCore.makePresentation(claimInfos, presentationInfo);
+
+        WalletLogger.getInstance().d("vp: "+vp.toJson());
+
         VerifiablePresentation signedVp = new VerifiablePresentation();
         if(authType == VerifyAuthType.VERIFY_AUTH_TYPE.PIN
                 || authType == VerifyAuthType.VERIFY_AUTH_TYPE.BIO
@@ -583,8 +690,10 @@ public class WalletService implements WalletServiceInterface {
         return clientMergedSharedSecret;
     }
 
-    private boolean verifyProof(String vcStr, boolean isCertVc, String apiGateWayUrl) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
-        VerifiableCredential vc = MessageUtil.deserialize(vcStr, VerifiableCredential.class);
+    private boolean verifyProof(String strVc, boolean isCertVc, String apiGateWayUrl) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
+
+        VerifiableCredential vc = MessageUtil.deserialize(strVc, VerifiableCredential.class);
+
         String did = vc.getIssuer().getId();
         if(isCertVc)
             did = vc.getCredentialSubject().getId();
@@ -635,6 +744,7 @@ public class WalletService implements WalletServiceInterface {
         }
         if (!isExistRole)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_ROLE_MATCH_FAIL);
+
         if (!verifyProof(certVcStr, false, apiGateWayUrl))
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_CERT_VC_FAIL);
     }

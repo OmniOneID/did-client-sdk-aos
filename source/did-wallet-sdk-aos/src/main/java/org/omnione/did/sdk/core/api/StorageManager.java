@@ -411,7 +411,7 @@ class StorageManager<M extends Meta, T extends BaseObject> {
             KeystoreManager.generateKey(context, SIGNATURE_MANAGER_ALIAS_PREFIX, STORAGE_MANAGER_ALIAS);
         }
         byte[] signature = KeystoreManager.sign(STORAGE_MANAGER_ALIAS, DigestUtils.getDigest(tmp.getData().getBytes(), DigestEnum.DIGEST_ENUM.SHA_256));
-        return MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, signature);
+        return MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, signature);
     }
 
     private void verifyFile() throws WalletCoreException, GeneralSecurityException, IOException, UtilityException {
