@@ -293,11 +293,9 @@ class WalletCore implements WalletCoreInterface {
 
         if (hasZkp) {
             for (String identifier : identifiers) {
-                if (!zkpManager.isZkpCredentialsSaved(identifier)) {
-                    throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_REVOKE_CREDENTIAL_FAIL);
-                } else {
+                if (zkpManager.isZkpCredentialsSaved(identifier)) {
                     zkpManager.deleteCredentials(identifiers);
-                    WalletLogger.getInstance().d("delete credential success");
+                    WalletLogger.getInstance().d("delete zkp credential success");
                 }
             }
         }
