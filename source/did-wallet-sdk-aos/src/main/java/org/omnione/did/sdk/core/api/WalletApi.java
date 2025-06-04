@@ -21,8 +21,9 @@ import android.content.Context;
 import androidx.fragment.app.Fragment;
 
 import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
-import org.omnione.did.sdk.datamodel.protocol.P310ZkpRequestVo;
-import org.omnione.did.sdk.datamodel.protocol.P310ZkpResponseVo;
+import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
+import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
+import org.omnione.did.sdk.datamodel.protocol.P311ResponseVo;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
@@ -558,11 +559,11 @@ public class WalletApi {
      * @throws WalletCoreException if an error occurs within the wallet core during proof creation.
      * @throws UtilityException if a utility or cryptographic error occurs during the process.
      */
-    public P310ZkpRequestVo createZkpProof(String hWalletToken, P310ZkpResponseVo proofRequestProfileVo,
-                                        List<ProofParam> proofParams, Map<String, String> selfAttributes) throws WalletCoreException, UtilityException, WalletException {
+    public P311RequestVo createZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile,
+                                        List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws WalletCoreException, UtilityException, WalletException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
-                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
-        return walletService.createZkpProof(proofRequestProfileVo, proofParams, selfAttributes);
+                                                            WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        return walletService.createZkpProof(proofRequestProfile, proofParams, selfAttributes, txId);
     }
 
     /**
@@ -574,7 +575,8 @@ public class WalletApi {
      * @throws UtilityException if a utility or processing error occurs during the search.
      */
     public AvailableReferent searchZkpCredentials(String hWalletToken, ProofRequest proofRequest) throws WalletCoreException, UtilityException, WalletException {
-        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC));
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
+                                                            WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
         return walletCore.searchZkpCredentials(proofRequest);
     }
 
@@ -586,21 +588,11 @@ public class WalletApi {
      * @throws UtilityException if a utility or processing error occurs during credential retrieval.
      */
     public ArrayList<Credential> getAllZkpCredentials(String hWalletToken) throws WalletCoreException, UtilityException, WalletException {
-        this.walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC, WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        this.walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC,
+                                                                                    WalletTokenPurpose.WALLET_TOKEN_PURPOSE.DETAIL_VC,
+                                                                                    WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
         return walletCore.getAllZkpCredentials();
     }
-
-    /**
-     * Deletes all Zero-Knowledge Proof (ZKP) credentials stored in the wallet.
-     *
-     * @throws WalletCoreException if an error occurs while accessing or modifying the wallet data.
-     * @throws UtilityException if a utility or processing error occurs during the deletion process.
-     */
-    public void deleteAllZkpCredentials(String hWalletToken) throws WalletCoreException, UtilityException, WalletException {
-        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.REMOVE_VC));
-        walletCore.deleteAllZkpCredentials();
-    }
-
 
     public boolean isAnyZkpCredentialsSaved() throws WalletCoreException, UtilityException, WalletException {
         return walletCore.isAnyZkpCredentialsSaved();
@@ -611,7 +603,9 @@ public class WalletApi {
     }
 
     public List<Credential> getZkpCredentials(String hWalletToken, List<String> identifiers) throws WalletCoreException, UtilityException, WalletException {
-        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC, WalletTokenPurpose.WALLET_TOKEN_PURPOSE.DETAIL_VC));
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC,
+                                                            WalletTokenPurpose.WALLET_TOKEN_PURPOSE.DETAIL_VC,
+                                                            WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
         return walletCore.getZkpCredentials(identifiers);
     }
 

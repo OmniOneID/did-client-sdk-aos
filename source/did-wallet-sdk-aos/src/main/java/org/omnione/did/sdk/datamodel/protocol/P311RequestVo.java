@@ -23,16 +23,18 @@ import org.omnione.did.sdk.datamodel.security.AccE2e;
 
 import java.math.BigInteger;
 
-public class P310ZkpRequestVo extends BaseRequestVo {
+public class P311RequestVo extends BaseRequestVo {
+
+    private String offerId; //VP offer Id(uuid) option
     private AccE2e accE2e;
     private String encProof;
     @JsonAdapter(BigIntegerSerializer.class)
     private BigInteger nonce;
 
-    public P310ZkpRequestVo(String id) {
+    public P311RequestVo(String id) {
         super(id);
     }
-    public P310ZkpRequestVo(String id, String txId) {
+    public P311RequestVo(String id, String txId) {
         super(id, txId);
     }
 
@@ -58,5 +60,13 @@ public class P310ZkpRequestVo extends BaseRequestVo {
 
     public void setNonce(BigInteger nonce) {
         this.nonce = nonce;
+    }
+
+    public String getOfferId() {
+        return offerId;
+    }
+
+    public void setOfferId(String offerId) {
+        this.offerId = offerId;
     }
 }
