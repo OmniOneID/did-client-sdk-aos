@@ -456,7 +456,7 @@ public class WalletService implements WalletServiceInterface {
                     removeIds.add(verifiableCredential.getId());
             }
             if(removeIds.size() > 0)
-                walletCore.deleteCredentials(removeIds, hasZkp);
+                walletCore.deleteCredentials(removeIds);
         }
 
         boolean result = verifyProof(credInfo.getVc().toJson(), false, apiGateWayUrl);

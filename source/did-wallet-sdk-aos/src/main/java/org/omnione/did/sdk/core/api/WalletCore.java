@@ -284,22 +284,21 @@ class WalletCore implements WalletCoreInterface {
         return vcManager.getAllCredentials();
     }
     @Override
-    public void deleteCredentials(List<String> identifiers, boolean hasZkp) throws WalletCoreException, UtilityException, WalletException {
+    public void deleteCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException {
         if(WalletApi.isLock)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
 
         vcManager.deleteCredentials(identifiers);
         WalletLogger.getInstance().d("delete vc success");
 
-        if (hasZkp) {
-            for (String identifier : identifiers) {
-                if (zkpManager.isZkpCredentialsSaved(identifier)) {
-                    zkpManager.deleteCredentials(identifiers);
-                    WalletLogger.getInstance().d("delete zkp credential success");
-                }
+        for (String identifier : identifiers) {
+            if (zkpManager.isZkpCredentialsSaved(identifier)) {
+                zkpManager.deleteCredentials(identifiers);
+                WalletLogger.getInstance().d("delete zkp credential success");
             }
         }
     }
+
     @Override
     public VerifiablePresentation makePresentation(List<ClaimInfo> claimInfos, PresentationInfo presentationInfo) throws WalletCoreException, UtilityException, WalletException {
         if(WalletApi.isLock)

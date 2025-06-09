@@ -56,7 +56,7 @@ public interface WalletCoreInterface {
     void addCredentials(VerifiableCredential verifiableCredential) throws WalletCoreException, UtilityException, WalletException;
     List<VerifiableCredential> getCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException;
     List<VerifiableCredential> getAllCredentials() throws WalletCoreException, UtilityException, WalletException;
-    void deleteCredentials(List<String> identifiers, boolean hasZkp) throws WalletCoreException, UtilityException, WalletException;
+    void deleteCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException;
     VerifiablePresentation makePresentation(List<ClaimInfo> claimInfos, PresentationInfo presentationInfo) throws WalletCoreException, UtilityException, WalletException;
     void registerBioKey(Context ctx) throws WalletException;
     void authenticateBioKey(Fragment fragment, Context ctx) throws WalletCoreException, WalletException;

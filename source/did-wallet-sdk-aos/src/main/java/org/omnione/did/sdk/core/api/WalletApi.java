@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment;
 import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
 import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
-import org.omnione.did.sdk.datamodel.protocol.P311ResponseVo;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
@@ -402,7 +401,7 @@ public class WalletApi {
      */
     public void deleteCredentials(String hWalletToken, String vcId) throws WalletException, UtilityException, WalletCoreException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.REMOVE_VC));
-        walletCore.deleteCredentials(List.of(vcId), false);
+        walletCore.deleteCredentials(List.of(vcId));
     }
 
     /**
