@@ -21,7 +21,6 @@ import android.content.Context;
 import androidx.fragment.app.Fragment;
 
 import org.omnione.did.sdk.core.zkp.datamodel.ZKPInfo;
-import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
@@ -440,10 +439,10 @@ class WalletCore implements WalletCoreInterface {
     }
 
     @Override
-    public boolean verifyAndStoreZkpCredential(CredentialRequestMeta credentialRequestMeta,
-                                               CredentialPrimaryPublicKey credentialPrimaryPublicKey,
-                                               Credential credential) throws WalletCoreException, UtilityException {
-        return zkpManager.verifyAndStoreCredential(credentialRequestMeta, credentialPrimaryPublicKey, credential);
+    public void verifyAndStoreZkpCredential(CredentialRequestMeta credentialRequestMeta,
+                                            CredentialPrimaryPublicKey credentialPrimaryPublicKey,
+                                            Credential credential) throws WalletCoreException, UtilityException {
+        zkpManager.verifyAndStoreCredential(credentialRequestMeta, credentialPrimaryPublicKey, credential);
     }
 
     @Override

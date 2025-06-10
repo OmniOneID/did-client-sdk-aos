@@ -70,10 +70,9 @@ public interface WalletCoreInterface {
     void deleteZkpCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException;
     void deleteAllZkpCredentials() throws WalletCoreException, UtilityException;
     public CredentialRequestContainer createCredentialRequest(CredentialPrimaryPublicKey credentialPublicKey, CredentialOffer credOffer) throws WalletCoreException, UtilityException, WalletException;
-    boolean verifyAndStoreZkpCredential(CredentialRequestMeta credentialRequestMeta, CredentialPrimaryPublicKey credentialPrimaryPublicKey, Credential credential) throws WalletCoreException, UtilityException;
+    void verifyAndStoreZkpCredential(CredentialRequestMeta credentialRequestMeta, CredentialPrimaryPublicKey credentialPrimaryPublicKey, Credential credential) throws WalletCoreException, UtilityException;
     AvailableReferent searchZkpCredentials(ProofRequest proofRequest) throws WalletCoreException, UtilityException;
     ReferentInfo createZkpReferent(List<UserReferent> customReferents) throws WalletCoreException, UtilityException;
     Proof createZkpProof(ProofRequest proofRequest, List<ProofParam> proofParams, Map<String, String> selfAttributes) throws WalletCoreException, UtilityException;
-
     boolean isZkpCredentialsSaved(String identifier) throws WalletCoreException, UtilityException, WalletException;
 }
