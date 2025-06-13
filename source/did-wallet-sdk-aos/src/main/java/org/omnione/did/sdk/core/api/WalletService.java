@@ -147,7 +147,7 @@ public class WalletService implements WalletServiceInterface {
                 e2eKey,
                 iv
         );
-        String encVpStr = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, encVp);
+        String encVpStr = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, encVp);
         P311RequestVo returnEncVP = new P311RequestVo(proofRequestProfile.getId());
         returnEncVP.setEncProof(encVpStr);
         returnEncVP.setAccE2e(accE2e);
