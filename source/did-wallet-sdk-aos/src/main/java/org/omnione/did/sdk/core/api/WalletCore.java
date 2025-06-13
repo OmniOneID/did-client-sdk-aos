@@ -243,8 +243,8 @@ class WalletCore implements WalletCoreInterface {
             deviceKeyManager.deleteAllKeys();
         if(deviceDIDManager.isSaved())
             deviceDIDManager.deleteDocument();
-        if(keyManager.isAnyKeySaved())
-            keyManager.deleteAllKeys();
+//        if(keyManager.isAnyKeySaved())
+//            keyManager.deleteAllKeys();
         if(didManager.isSaved())
             didManager.deleteDocument();
         if(vcManager.isAnyCredentialsSaved())
