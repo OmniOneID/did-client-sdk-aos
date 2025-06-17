@@ -109,12 +109,24 @@ class WalletToken {
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL, "pkgName");
         if(userId.isEmpty())
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL, "userId");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                deleteTokenData();
-            }
-        }).start();
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                deleteTokenData();
+//            }
+//        }).start();
+
+        Thread thread = new Thread(() -> deleteTokenData());
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_TOKEN_FAIL, "Thread interrupted while deleting token data");
+        }
+
         WalletTokenSeed walletTokenSeed = new WalletTokenSeed();
         walletTokenSeed.setPurpose(purpose);
         walletTokenSeed.setPkgName(pkgName);
