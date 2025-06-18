@@ -579,7 +579,7 @@ public class WalletService implements WalletServiceInterface {
                         CipherInfo.SYMMETRIC_KEY_SIZE.fromValue(cipher[1]),
                         CipherInfo.SYMMETRIC_PADDING_TYPE.fromKey(reqE2e.getPadding().getValue()));
 
-        List<VerifiableCredential> vcList = walletCore.getAllCredentials();
+//        List<VerifiableCredential> vcList = walletCore.getAllCredentials();
 
         List<ClaimInfo> claimInfos = new ArrayList<>();
         ClaimInfo claimInfo = new ClaimInfo(
