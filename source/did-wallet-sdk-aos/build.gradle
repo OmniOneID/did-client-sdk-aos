@@ -1,0 +1,66 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    id 'com.android.library' version '8.2.1'
+}
+
+android {
+    namespace 'org.omnione.did.sdk.wallet'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 26
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments = ["notPackage": "org.bouncycastle.pqc.crypto.qtesla"]
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+}
+
+ext {
+    customVersionMajorMinorBuild = "2.0.0"
+}
+
+task deleteObjectJar(type: Delete){
+    delete "../release/${project.name}-${customVersionMajorMinorBuild}.jar"
+}
+
+task exportJar(type: Copy){
+    from('build/intermediates/aar_main_jar/release/')
+    into('../release/')
+//    into('../../../did-ca-aos/source/did-ca-aos/app/libs')
+    include('classes.jar')
+    rename('classes.jar', "${project.name}-${customVersionMajorMinorBuild}.jar")
+}
+
+
+exportJar.dependsOn(deleteObjectJar, build)
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation 'org.bitcoinj:bitcoinj-core:0.15.7'
+
+    api "androidx.room:room-runtime:2.6.1"
+    annotationProcessor "androidx.room:room-compiler:2.6.1"
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
+
+    implementation 'com.madgag.spongycastle:core:1.54.0.0'
+    implementation 'com.madgag.spongycastle:prov:1.54.0.0'
+    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
+    implementation 'com.madgag.spongycastle:pg:1.54.0.0'
+}

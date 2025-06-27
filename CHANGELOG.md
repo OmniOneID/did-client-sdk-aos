@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.0.0 (2025-04-30)
+
+### 🚀 New Features
+- Unified SDK architecture
+    - Merged Core SDK, Utility SDK, DataModel SDK, Communication SDK, and Wallet SDK into a single Wallet SDK module for streamlined usage and maintenance.
+- Added ZKP (Zero-Knowledge Proof) core functionality
+    - Integrated credential issuance and verification flows based on Indy AnonCreds ZKP.
+    - Supports credential request generation, proof creation, and selective disclosure.
+    - Added support for blinded credentials and proof validation via master secrets.
+
+
 ## v1.0.0 (2024-10-18)
 
 ### 🚀 New Features
@@ -22,3 +33,7 @@
     - Token management to access wallet
     - Wallet lock/unlock management
     - Provides core and service functions
+- Token management to access wallet
+- Wallet lock/unlock management
+- Provides core and service functions
+
