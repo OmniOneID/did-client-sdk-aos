@@ -56,7 +56,7 @@ public interface WalletCoreInterface {
     void addCredentials(VerifiableCredential verifiableCredential) throws WalletCoreException, UtilityException, WalletException;
     List<VerifiableCredential> getCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException;
     List<VerifiableCredential> getAllCredentials() throws WalletCoreException, UtilityException, WalletException;
-    void deleteCredentials(List<String> identifiers, boolean hasZkp) throws WalletCoreException, UtilityException, WalletException;
+    void deleteCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException;
     VerifiablePresentation makePresentation(List<ClaimInfo> claimInfos, PresentationInfo presentationInfo) throws WalletCoreException, UtilityException, WalletException;
     void registerBioKey(Context ctx) throws WalletException;
     void authenticateBioKey(Fragment fragment, Context ctx) throws WalletCoreException, WalletException;
@@ -70,10 +70,9 @@ public interface WalletCoreInterface {
     void deleteZkpCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException;
     void deleteAllZkpCredentials() throws WalletCoreException, UtilityException;
     public CredentialRequestContainer createCredentialRequest(CredentialPrimaryPublicKey credentialPublicKey, CredentialOffer credOffer) throws WalletCoreException, UtilityException, WalletException;
-    boolean verifyAndStoreZkpCredential(CredentialRequestMeta credentialRequestMeta, CredentialPrimaryPublicKey credentialPrimaryPublicKey, Credential credential) throws WalletCoreException, UtilityException;
+    void verifyAndStoreZkpCredential(CredentialRequestMeta credentialRequestMeta, CredentialPrimaryPublicKey credentialPrimaryPublicKey, Credential credential) throws WalletCoreException, UtilityException;
     AvailableReferent searchZkpCredentials(ProofRequest proofRequest) throws WalletCoreException, UtilityException;
     ReferentInfo createZkpReferent(List<UserReferent> customReferents) throws WalletCoreException, UtilityException;
     Proof createZkpProof(ProofRequest proofRequest, List<ProofParam> proofParams, Map<String, String> selfAttributes) throws WalletCoreException, UtilityException;
-
     boolean isZkpCredentialsSaved(String identifier) throws WalletCoreException, UtilityException, WalletException;
 }

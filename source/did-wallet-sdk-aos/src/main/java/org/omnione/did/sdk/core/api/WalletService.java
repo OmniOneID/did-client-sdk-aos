@@ -24,9 +24,8 @@ import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.protocol.P210ResponseVo;
 import org.omnione.did.sdk.datamodel.protocol.P220ResponseVo;
 import org.omnione.did.sdk.datamodel.did.DidDocVo;
-import org.omnione.did.sdk.datamodel.protocol.P310RequestVo;
-import org.omnione.did.sdk.datamodel.protocol.P310ZkpRequestVo;
-import org.omnione.did.sdk.datamodel.protocol.P310ZkpResponseVo;
+import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
+import org.omnione.did.sdk.datamodel.protocol.P311ResponseVo;
 import org.omnione.did.sdk.datamodel.security.AccE2e;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
@@ -63,11 +62,9 @@ import org.omnione.did.sdk.datamodel.zkp.Credential;
 import org.omnione.did.sdk.datamodel.zkp.CredentialDefinition;
 import org.omnione.did.sdk.datamodel.zkp.CredentialOffer;
 import org.omnione.did.sdk.datamodel.zkp.CredentialPrimaryPublicKey;
-import org.omnione.did.sdk.datamodel.zkp.CredentialRequest;
 import org.omnione.did.sdk.datamodel.zkp.CredentialRequestContainer;
 import org.omnione.did.sdk.datamodel.zkp.CredentialRequestMeta;
 import org.omnione.did.sdk.datamodel.zkp.ProofParam;
-import org.omnione.did.sdk.datamodel.zkp.ProofRequest;
 import org.omnione.did.sdk.utility.CryptoUtils;
 import org.omnione.did.sdk.utility.DataModels.CipherInfo;
 import org.omnione.did.sdk.utility.DataModels.DigestEnum;
@@ -119,9 +116,9 @@ public class WalletService implements WalletServiceInterface {
         this.bioPromptInterface = bioPromptInterface;
     }
 
-    public P310ZkpRequestVo createZkpProof(P310ZkpResponseVo proofRequestProfileVo, List<ProofParam> proofParams, Map<String, String> selfAttributes) throws WalletCoreException, UtilityException, WalletException {
+    public P311RequestVo createZkpProof(ProofRequestProfile proofRequestProfile, List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws WalletCoreException, UtilityException, WalletException {
 
-        String serverPublicKey = proofRequestProfileVo.getProofRequestProfile().getProfile().getReqE2e().getPublicKey();
+        String serverPublicKey = proofRequestProfile.getProfile().getReqE2e().getPublicKey();
         EcKeyPair e2eKeyPair = CryptoUtils.generateECKeyPair(EcType.EC_TYPE.SECP256_R1);
         byte[] iv = CryptoUtils.generateNonce(16);
         byte[] clientPublicKey = MultibaseUtils.decode(e2eKeyPair.getPublicKey());
@@ -130,17 +127,17 @@ public class WalletService implements WalletServiceInterface {
         accE2e.setPublicKey(MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, clientPublicKey));
         accE2e = (AccE2e) addProofsToDocument(accE2e, List.of(Constants.KEY_ID_KEY_AGREE), walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER).getId(), Constants.DID_DOC_TYPE_HOLDER, "", false);
         byte[] secretKey = CryptoUtils.generateSharedSecret(EcType.EC_TYPE.SECP256_R1, MultibaseUtils.decode(e2eKeyPair.getPrivateKey()), MultibaseUtils.decode(serverPublicKey));
-        byte[] serverNonce = MultibaseUtils.decode(proofRequestProfileVo.getProofRequestProfile().getProfile().getReqE2e().getNonce());
+        byte[] serverNonce = MultibaseUtils.decode(proofRequestProfile.getProfile().getReqE2e().getNonce());
         byte[] e2eKey = mergeSharedSecretAndNonce(secretKey, serverNonce, SymmetricCipherType.SYMMETRIC_CIPHER_TYPE.AES256CBC);
 
-        String[] cipher = proofRequestProfileVo.getProofRequestProfile().getProfile().getReqE2e().getCipher().getValue().split("-");
+        String[] cipher = proofRequestProfile.getProfile().getReqE2e().getCipher().getValue().split("-");
         CipherInfo info = new CipherInfo
                 (CipherInfo.ENCRYPTION_TYPE.fromValue(cipher[0]),
                         CipherInfo.ENCRYPTION_MODE.fromValue(cipher[2]),
                         CipherInfo.SYMMETRIC_KEY_SIZE.fromValue(cipher[1]),
-                        CipherInfo.SYMMETRIC_PADDING_TYPE.fromKey(proofRequestProfileVo.getProofRequestProfile().getProfile().getReqE2e().getPadding().getValue()));
+                        CipherInfo.SYMMETRIC_PADDING_TYPE.fromKey(proofRequestProfile.getProfile().getReqE2e().getPadding().getValue()));
 
-        org.omnione.did.sdk.datamodel.zkp.Proof proof = walletCore.createZkpProof(proofRequestProfileVo.getProofRequestProfile().getProfile().getProofRequest(), proofParams, selfAttributes);
+        org.omnione.did.sdk.datamodel.zkp.Proof proof = walletCore.createZkpProof(proofRequestProfile.getProfile().getProofRequest(), proofParams, selfAttributes);
 
         WalletLogger.getInstance().d("proof: "+proof.toJson());
 
@@ -150,12 +147,12 @@ public class WalletService implements WalletServiceInterface {
                 e2eKey,
                 iv
         );
-        String encVpStr = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_58_BTC, encVp);
-        P310ZkpRequestVo returnEncVP = new P310ZkpRequestVo(proofRequestProfileVo.getProofRequestProfile().getId());
+        String encVpStr = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, encVp);
+        P311RequestVo returnEncVP = new P311RequestVo(proofRequestProfile.getId());
         returnEncVP.setEncProof(encVpStr);
         returnEncVP.setAccE2e(accE2e);
-        returnEncVP.setTxId(proofRequestProfileVo.getTxId());
-        returnEncVP.setNonce(proofRequestProfileVo.getProofRequestProfile().getProfile().proofRequest.getNonce());
+        returnEncVP.setTxId(txId);
+        returnEncVP.setNonce(proofRequestProfile.getProfile().proofRequest.getNonce());
         return returnEncVP;
     }
 
@@ -459,7 +456,7 @@ public class WalletService implements WalletServiceInterface {
                     removeIds.add(verifiableCredential.getId());
             }
             if(removeIds.size() > 0)
-                walletCore.deleteCredentials(removeIds, hasZkp);
+                walletCore.deleteCredentials(removeIds);
         }
 
         boolean result = verifyProof(credInfo.getVc().toJson(), false, apiGateWayUrl);
@@ -582,7 +579,7 @@ public class WalletService implements WalletServiceInterface {
                         CipherInfo.SYMMETRIC_KEY_SIZE.fromValue(cipher[1]),
                         CipherInfo.SYMMETRIC_PADDING_TYPE.fromKey(reqE2e.getPadding().getValue()));
 
-        List<VerifiableCredential> vcList = walletCore.getAllCredentials();
+//        List<VerifiableCredential> vcList = walletCore.getAllCredentials();
 
         List<ClaimInfo> claimInfos = new ArrayList<>();
         ClaimInfo claimInfo = new ClaimInfo(

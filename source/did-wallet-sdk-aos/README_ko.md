@@ -6,8 +6,8 @@ Open DID에 필요한 WalletToken, Lock/Unlock, Key, DID Document(DID 문서), V
 ## S/W 사양
 | 구분 | 내용                |
 |------|----------------------------|
-| OS  | Android 13|
-| Language  | Java 17|
+| OS  | Android 14|
+| Language  | Java 21|
 | IDE  | Android Studio 4|
 | Build System  | Gradle 8.2 |
 | Compatibility | Android API level 34 or higher  |
@@ -75,5 +75,5 @@ task exportJar(type: Copy){
 ## API 규격서
 | 구분 | API 문서 Link |
 |------|----------------------------|
-| WalletAPI  | [Wallet SDK API](../../docs/api/wallet/WalletAPI_ko.md) |
-| ErrorCode      | [Error Code](../../docs/api/wallet/WalletError.md) |
+| WalletAPI  | [Wallet SDK API](../../docs/api/public/WalletAPI_ko.md) |
+| ErrorCode      | [Error Code](../../docs/api/public/WalletError.md) |

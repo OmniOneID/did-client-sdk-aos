@@ -22,7 +22,7 @@ import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
 import org.omnione.did.sdk.datamodel.util.JsonSortUtil;
 
-public class P310ZkpResponseVo extends BaseResponseVo {
+public class P311ResponseVo extends BaseResponseVo {
 
     @SerializedName("proofRequestProfile")
     private ProofRequestProfile profile;

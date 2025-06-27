@@ -59,7 +59,6 @@ public class RevokeVc {
         P220RequestVo requestVo = new P220RequestVo(WalletUtil.createMessageId(), txId);
         requestVo.setServerToken(serverToken);
         requestVo.setReqRevokeVc(reqRevokeVC);
-        String request = requestVo.toJson();
-        return request;
+        return requestVo.toJson();
     }
 }

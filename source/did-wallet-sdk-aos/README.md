@@ -4,8 +4,8 @@ This document is a guide for using the OpenDID Wallet SDK, and provides function
 ## S/W Specifications
 | Category | Details                |
 |------|----------------------------|
-| OS  | Android 13|
-| Language  | Java 17|
+| OS  | Android 14|
+| Language  | Java 21|
 | IDE  | Android Studio 4|
 | Build System  | Gradle 8.2 |
 | Compatibility | Android API level 34 or higher  |
@@ -73,5 +73,5 @@ task exportJar(type: Copy){
 ## API Specification
 | Category | API Document Link |
 |------|----------------------------|
-| WalletAPI  | [Wallet SDK API](../../docs/api/wallet/WalletAPI.md) |
-| ErrorCode      | [Error Code](../../docs/api/wallet/WalletError.md) |
+| WalletAPI  | [Wallet SDK API](../../docs/api/public/WalletAPI.md) |
+| ErrorCode      | [Error Code](../../docs/api/public/WalletError.md) |

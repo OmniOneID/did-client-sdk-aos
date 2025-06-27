@@ -63,21 +63,47 @@ public class WalletLogger {
         return sb.toString();
     }
 
+
     public void d(String logMsg) {
         if(isEnabled) {
-            Log.d("WALLET_LOG", logMsg);
+            if (logMsg.length() > 4000) {
+                Log.d("WALLET_LOG", logMsg.substring(0, 4000));
+                WalletLogger.getInstance().d(logMsg.substring(4000));
+            } else {
+                Log.d("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+            }
         }
     }
+
     public void e(String logMsg) {
-        if(isEnabled)
-            Log.e("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+        if(isEnabled) {
+            if (logMsg.length() > 4000) {
+                Log.e("WALLET_LOG", logMsg.substring(0, 4000));
+                WalletLogger.getInstance().e(logMsg.substring(4000));
+            } else {
+                Log.e("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+            }
+        }
     }
+
     public void v(String logMsg) {
-        if(isEnabled)
-            Log.v("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+        if(isEnabled) {
+            if (logMsg.length() > 4000) {
+                Log.v("WALLET_LOG", logMsg.substring(0, 4000));
+                WalletLogger.getInstance().v(logMsg.substring(4000));
+            } else {
+                Log.v("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+            }
+        }
     }
     public void i(String logMsg) {
-        if(isEnabled)
-            Log.i("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+        if(isEnabled) {
+            if(logMsg.length() > 4000) {
+                Log.i("WALLET_LOG", logMsg.substring(0, 4000));
+                WalletLogger.getInstance().i(logMsg.substring(4000));
+            } else {
+                Log.i("WALLET_LOG", buildLogMsg(logMsg + " :: " + lineOut()));
+            }
+        }
     }
 }
