@@ -35,6 +35,7 @@ import org.omnione.did.sdk.datamodel.zkp.ProofRequest;
 import org.omnione.did.sdk.datamodel.zkp.ReferentInfo;
 import org.omnione.did.sdk.datamodel.zkp.UserReferent;
 import org.omnione.did.sdk.utility.Errors.UtilityException;
+import org.omnione.did.sdk.wallet.walletservice.config.Constants;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
 import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
@@ -215,6 +216,16 @@ public class WalletApi {
     public DIDDocument createHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID));
         return walletService.createHolderDIDDoc();
+    }
+
+    public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.UPDATE_DID));
+        return walletService.updateHolderDIDDoc();
+
+    }
+
+    public void saveDocument() throws WalletException, WalletCoreException, UtilityException {
+        walletCore.saveDocument(Constants.DID_DOC_TYPE_HOLDER);
     }
 
     /**
@@ -562,7 +573,7 @@ public class WalletApi {
      * @throws UtilityException if any cryptographic or general utility-related issue arises during processing.
      * @throws WalletException if there is a problem related to the wallet such as invalid state or data.
      */
-    public P311RequestVo createZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile,
+    public P311RequestVo createEncZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile,
                                         List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws WalletCoreException, UtilityException, WalletException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
                                                             WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));

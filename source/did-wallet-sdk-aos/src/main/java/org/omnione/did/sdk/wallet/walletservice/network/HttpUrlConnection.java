@@ -22,6 +22,11 @@ import org.omnione.did.sdk.communication.urlconnection.HttpUrlConnectionTask;
 public class HttpUrlConnection implements NetworkManager {
     public String send(String url, String method, String request) throws CommunicationException {
         HttpUrlConnectionTask httpFunc = new HttpUrlConnectionTask();
-        return httpFunc.makeHttpRequest(url, method, request);
+        return httpFunc.makeHttpRequest(url, method, request, null);
+    }
+
+    public String send(String url, String method, String request, String accessToken) throws CommunicationException {
+        HttpUrlConnectionTask httpFunc = new HttpUrlConnectionTask();
+        return httpFunc.makeHttpRequest(url, method, request, accessToken);
     }
 }

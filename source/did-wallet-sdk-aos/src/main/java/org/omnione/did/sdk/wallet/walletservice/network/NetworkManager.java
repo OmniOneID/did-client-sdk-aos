@@ -24,4 +24,5 @@ import org.omnione.did.sdk.communication.exception.CommunicationException;
 public interface NetworkManager {
     String send(String url, String method, String request) throws CommunicationException;
 
+    String send(String url, String method, String request, String accessToken) throws CommunicationException;
 }

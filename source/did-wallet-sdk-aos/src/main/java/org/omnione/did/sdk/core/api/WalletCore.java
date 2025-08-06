@@ -103,6 +103,41 @@ class WalletCore implements WalletCoreInterface {
         bioPromptHelper = new BioPromptHelper(context);
         walletLogger = WalletLogger.getInstance();
     }
+
+    public DIDDocument updateHolderDIDDoc() throws WalletCoreException, UtilityException, WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+
+
+        KeyGenWalletMethodType keyGenWalletMethodType = new KeyGenWalletMethodType();
+        WalletKeyGenRequest keyGenInfo = new WalletKeyGenRequest(
+                Constants.KEY_ID_KEY_AGREE,
+                AlgorithmType.ALGORITHM_TYPE.SECP256R1,
+                StorageOption.STORAGE_OPTION.WALLET,
+                keyGenWalletMethodType
+        );
+        keyManager.generateKey(keyGenInfo);
+
+        String controller = Config.DID_CONTROLLER;
+        List<KeyInfo> keyInfos = keyManager.getKeyInfos(List.of(Constants.KEY_ID_PIN, Constants.KEY_ID_BIO, Constants.KEY_ID_KEY_AGREE));
+        List<DIDKeyInfo> didKeyInfos = new ArrayList<>();
+        for(KeyInfo keyInfo : keyInfos){
+            DIDKeyInfo didKeyInfo = new DIDKeyInfo();
+            if(keyInfo.getId().equals(Constants.KEY_ID_PIN)) {
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+            }
+            if(keyInfo.getId().equals(Constants.KEY_ID_BIO)) {
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+            }
+            if(keyInfo.getId().equals(Constants.KEY_ID_KEY_AGREE))
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), controller);
+            didKeyInfos.add(didKeyInfo);
+        }
+        didManager.updateDIDDoc(didKeyInfos, controller, null);
+        return didManager.getDocument();
+
+    }
+
     @Override
     public DIDDocument createDeviceDIDDoc() throws WalletCoreException, UtilityException {
         if(!deviceKeyManager.isAnyKeySaved()) {
@@ -222,7 +257,7 @@ class WalletCore implements WalletCoreInterface {
     public void saveDocument(int type) throws WalletCoreException, UtilityException, WalletException {
         if(WalletApi.isLock)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
-
+        
         if(type == Constants.DID_DOC_TYPE_DEVICE){
             deviceDIDManager.saveDocument();
         } else {

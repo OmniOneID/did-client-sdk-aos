@@ -32,7 +32,7 @@ public class HttpUrlConnectionTask {
     public HttpUrlConnectionTask(){
 
     }
-    public String makeHttpRequest(String urlString, String method, String payload) throws CommunicationException {
+    public String makeHttpRequest(String urlString, String method, String payload, String accessToken) throws CommunicationException {
         WalletLogger.getInstance().d("request : " + payload + " / " + urlString + " / [" + method + "]");
         if(urlString.isEmpty()){
             throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_INVALID_PARAMETER, "urlString");
@@ -52,6 +52,9 @@ public class HttpUrlConnectionTask {
             urlConnection.setRequestMethod(method);
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
+            if (accessToken != null) {
+                urlConnection.setRequestProperty("Authorization", "Bearer "+accessToken);
+            }
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept", "application/json");
 

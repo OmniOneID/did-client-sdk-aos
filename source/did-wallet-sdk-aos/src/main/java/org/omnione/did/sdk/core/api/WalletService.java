@@ -287,6 +287,14 @@ public class WalletService implements WalletServiceInterface {
         walletCore.saveDocument(Constants.DID_DOC_TYPE_HOLDER);
         return holderDIDDoc;
     }
+
+    public DIDDocument updateHolderDIDDoc() throws UtilityException, WalletCoreException, WalletException {
+        DIDDocument holderDIDDoc = walletCore.updateHolderDIDDoc();
+        // TAS 등록 요청
+        // 실패 시 예외 처리
+        return holderDIDDoc;
+    }
+
     @Override
     public SignedDidDoc createSignedDIDDoc(DIDDocument ownerDIDDoc) throws WalletException, WalletCoreException, UtilityException{
         if(ownerDIDDoc == null)
@@ -607,6 +615,7 @@ public class WalletService implements WalletServiceInterface {
                 signedVp = (VerifiablePresentation) addProofsToDocument(vp, List.of(Constants.KEY_ID_BIO), walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER).getId(), Constants.DID_DOC_TYPE_HOLDER, "", false);
             }
         }
+        // and 처리로직 필요
         byte[] encVp = CryptoUtils.encrypt(
                 signedVp.toJson().getBytes(),
                 info,

@@ -33,4 +33,7 @@ public class NetworkAdapter implements NetworkManager{
         return networkManager.send(url, method, request);
     }
 
+    public String send(String url, String method, String request, String accessToken) throws CommunicationException {
+        return networkManager.send(url, method, request);
+    }
 }

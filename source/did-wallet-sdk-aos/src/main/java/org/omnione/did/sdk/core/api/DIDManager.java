@@ -77,7 +77,7 @@ class DIDManager<E extends BaseObject> {
      */
     public void createDocument(String did, List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws WalletCoreException {
         if(isSaved()){
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_DID_MANAGER_DOCUMENT_IS_ALREADY_EXISTS);
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_DID_MANAGER_DOCUMENT_ALREADY_EXISTS);
         }
         if(keyInfos == null){
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_DID_MANAGER_INVALID_PARAMETER, "keyInfos");
@@ -98,8 +98,24 @@ class DIDManager<E extends BaseObject> {
             verificationMethod.add(method);
         }
         didDocument.setVerificationMethod(verificationMethod);
-
         addMethodType(keyInfos);
+    }
+
+    public void updateDIDDoc(List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws WalletCoreException, UtilityException {
+
+        DIDDocument didDoc = getDocument();
+        ArrayList<VerificationMethod> verificationMethod = new ArrayList<VerificationMethod>();
+        for(DIDKeyInfo keyInfo : keyInfos){
+            VerificationMethod method = new VerificationMethod();
+            method.setId(keyInfo.getKeyInfo().getId());
+            method.setType(DIDKeyType.DID_KEY_TYPE.secp256r1VerificationKey2018);
+            method.setController(controller);
+            method.setPublicKeyMultibase(keyInfo.getKeyInfo().getPublicKey());
+            method.setAuthType(keyInfo.getKeyInfo().getAuthType());
+            verificationMethod.add(method);
+        }
+        didDocument.setVerificationMethod(verificationMethod);
+        replaceDocument(didDoc, true);
     }
 
     /**
@@ -111,7 +127,7 @@ class DIDManager<E extends BaseObject> {
     public DIDDocument getDocument() throws WalletCoreException, UtilityException {
         if(didDocument == null) {
             if(!isSaved())
-                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_DID_MANAGER_UNEXPECTED_CONDITION);
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_DID_MANAGER_NOT_FOUND_DOCUMENT);
             didDocument = storageManager.getAllItems().get(0).getItem();
         }
         return didDocument;
@@ -126,6 +142,7 @@ class DIDManager<E extends BaseObject> {
     public void replaceDocument(DIDDocument didDocument, boolean needUpdate) {
         this.didDocument = didDocument;
         if(needUpdate){
+            updateVersionId();
             updateTime();
         }
     }
@@ -295,16 +312,14 @@ class DIDManager<E extends BaseObject> {
      *
      * @throws Exception if the DID Document is not saved.
      */
-    public void resetChanges() throws WalletCoreException {
-        if(!isSaved())
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_DID_MANAGER_DUPLICATE_KEY_ID_EXISTS_IN_VERIFICATION_METHOD);
+    public void resetChanges() {
         didDocument = null;
     }
 
     private void prepareToEditDocument() throws WalletCoreException, UtilityException {
         if(didDocument == null){
             if(!isSaved())
-                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_DID_MANAGER_UNEXPECTED_CONDITION);
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_DID_MANAGER_NOT_FOUND_DOCUMENT);
             else
                 didDocument = storageManager.getAllItems().get(0).getItem();
         }
@@ -364,6 +379,12 @@ class DIDManager<E extends BaseObject> {
     private void updateTime() {
         didDocument.setUpdated(getDate());
     }
+
+    private void updateVersionId() {
+        // ++ versionId
+        didDocument.setVersionId(String.valueOf((Integer.parseInt(didDocument.getVersionId()))+1));
+    }
+
     public boolean isSaved(){
         return storageManager.isSaved();
     }
