@@ -107,6 +107,12 @@ public class SignedDidDoc implements ProofContainer {
 
     @Override
     public void fromJson(String val) {
-
+        Gson gson = new Gson();
+        SignedDidDoc obj = gson.fromJson(val, SignedDidDoc.class);
+        this.ownerDidDoc = obj.getOwnerDidDoc();
+        this.wallet = obj.getWallet();
+        this.nonce = obj.getNonce();
+        this.proof = obj.getProof();
+        this.proofs = obj.getProofs();
     }
 }

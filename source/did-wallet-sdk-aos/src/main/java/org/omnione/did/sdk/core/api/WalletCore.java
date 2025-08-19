@@ -376,7 +376,7 @@ class WalletCore implements WalletCoreInterface {
         bioPromptHelper.registerBioKey(ctx, null);
     }
     @Override
-    public void authenticateBioKey(Fragment fragment, Context ctx) throws WalletCoreException, WalletException {
+    public void authenticateBioKey(Context ctx) throws WalletCoreException, WalletException {
         if(WalletApi.isLock)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
 
@@ -398,7 +398,7 @@ class WalletCore implements WalletCoreInterface {
                 bioPromptInterface.onFail(result);
             }
         });
-        bioPromptHelper.authenticateBioKey(fragment, ctx, null);
+        bioPromptHelper.authenticateBioKey(ctx, null);
 
     }
     @Override

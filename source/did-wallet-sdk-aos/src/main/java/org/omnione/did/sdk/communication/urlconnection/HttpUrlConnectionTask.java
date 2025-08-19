@@ -53,7 +53,7 @@ public class HttpUrlConnectionTask {
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
             if (accessToken != null) {
-                urlConnection.setRequestProperty("Authorization", "Bearer "+accessToken);
+                urlConnection.setRequestProperty("Authorization", "Bearer " +accessToken);
             }
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept", "application/json");

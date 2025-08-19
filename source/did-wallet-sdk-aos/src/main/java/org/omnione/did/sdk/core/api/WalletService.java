@@ -653,7 +653,7 @@ public class WalletService implements WalletServiceInterface {
             bioPromptHelper.registerBioKey(ctx, null);
     }
 
-    public void authenticateUnlockBioKey(Fragment fragment, Context ctx) {
+    public void authenticateUnlockBioKey(Context ctx) {
             bioPromptHelper.setBioPromptListener(new BioPromptHelper.BioPromptInterface() {
                 @Override
                 public void onSuccess(String result) {
@@ -672,7 +672,7 @@ public class WalletService implements WalletServiceInterface {
                     bioPromptInterface.onFail(result);
                 }
             });
-            bioPromptHelper.authenticateBioKey(fragment, ctx, null);
+            bioPromptHelper.authenticateBioKey(ctx, null);
     }
 
     private byte[] mergeSharedSecretAndNonce(byte[] sharedSecret, byte[] nonce, SymmetricCipherType.SYMMETRIC_CIPHER_TYPE cipherType) throws UtilityException {

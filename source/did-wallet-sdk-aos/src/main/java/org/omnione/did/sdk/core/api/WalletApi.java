@@ -467,11 +467,10 @@ public class WalletApi {
     /**
      * Authenticates a biometric key for signing.
      *
-     * @param fragment The fragment used for biometric authentication.
      * @param ctx      The context used for biometric authentication.
      * @throws Exception - Any error that occurs during biometric authentication.
      */
-    public void authenticateBioKey(Fragment fragment, Context ctx) throws WalletCoreException, WalletException {
+    public void authenticateBioKey(Context ctx) throws WalletCoreException, WalletException {
         walletCore.setBioPromptListener(new BioPromptHelper.BioPromptInterface() {
             @Override
             public void onSuccess(String result) {
@@ -493,7 +492,7 @@ public class WalletApi {
                 bioPromptInterface.onFail(result);
             }
         });
-        walletCore.authenticateBioKey(fragment, ctx);
+        walletCore.authenticateBioKey(ctx);
 
     }
 
