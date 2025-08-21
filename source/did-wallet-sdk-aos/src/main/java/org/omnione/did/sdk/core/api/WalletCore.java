@@ -273,17 +273,26 @@ class WalletCore implements WalletCoreInterface {
     }
 
     @Override
-    public void deleteWallet() throws WalletCoreException {
-        if(deviceKeyManager.isAnyKeySaved())
-            deviceKeyManager.deleteAllKeys();
-        if(deviceDIDManager.isSaved())
-            deviceDIDManager.deleteDocument();
-//        if(keyManager.isAnyKeySaved())
-//            keyManager.deleteAllKeys();
-        if(didManager.isSaved())
+    public void deleteWallet(boolean deleteAll) throws WalletCoreException {
+
+        if (didManager.isSaved()) {
             didManager.deleteDocument();
-        if(vcManager.isAnyCredentialsSaved())
+        }
+        if (vcManager.isAnyCredentialsSaved()) {
             vcManager.deleteAllCredentials();
+        }
+
+        if (deleteAll) {
+            if (deviceKeyManager.isAnyKeySaved()) {
+                deviceKeyManager.deleteAllKeys();
+            }
+            if (deviceDIDManager.isSaved()) {
+                deviceDIDManager.deleteDocument();
+            }
+            if (keyManager.isAnyKeySaved()) {
+                keyManager.deleteAllKeys();
+            }
+        }
     }
     @Override
     public boolean isAnyCredentialsSaved() throws WalletException {

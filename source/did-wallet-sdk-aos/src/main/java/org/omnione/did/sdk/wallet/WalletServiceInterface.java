@@ -38,7 +38,7 @@ public interface WalletServiceInterface {
     void createDeviceDocument(String walletUrl, String tasUrl) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
     boolean bindUser();
     boolean unbindUser();
-    void deleteWallet() throws WalletCoreException, WalletException;
+    void deleteWallet(boolean deleteAll) throws WalletCoreException, WalletException;
     DIDDocument createHolderDIDDoc() throws UtilityException, WalletCoreException, WalletException;
     SignedDidDoc createSignedDIDDoc(DIDDocument ownerDIDDoc) throws WalletException, WalletCoreException, UtilityException;
     SignedWalletInfo getSignedWalletInfo() throws WalletException, WalletCoreException, UtilityException;

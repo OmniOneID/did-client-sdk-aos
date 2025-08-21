@@ -269,7 +269,7 @@ public class WalletService implements WalletServiceInterface {
         return true;
     }
     @Override
-    public void deleteWallet() throws WalletCoreException {
+    public void deleteWallet(boolean deleteAll) throws WalletCoreException {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -279,7 +279,7 @@ public class WalletService implements WalletServiceInterface {
                 walletDB.tokenDao().deleteAll();
             }
         }).start();
-        walletCore.deleteWallet();
+        walletCore.deleteWallet(deleteAll);
     }
     @Override
     public DIDDocument createHolderDIDDoc() throws UtilityException, WalletCoreException, WalletException {

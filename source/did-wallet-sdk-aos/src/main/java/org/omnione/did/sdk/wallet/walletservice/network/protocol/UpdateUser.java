@@ -55,7 +55,6 @@ public class UpdateUser {
         P141RequestVo requestVo = new P141RequestVo(WalletUtil.createMessageId(), txId);
         requestVo.setServerToken(serverToken);
         requestVo.setDidAuth(didAuth);
-        String request = requestVo.toJson();
-        return request;
+        return requestVo.toJson();
     }
 }
