@@ -120,9 +120,11 @@ public class WalletApi {
         return isExistWallet();
     }
 
-    public void deleteWallet() throws WalletCoreException {
+
+    // deleteAll If set to true, it deletes both deviceKey and holderKey. If set to false, it deletes only holderKey.
+    public void deleteWallet(boolean deleteAll) throws WalletCoreException {
         walletLogger.d("deleteWallet");
-        walletService.deleteWallet();
+        walletService.deleteWallet(deleteAll);
     }
 
     /**
@@ -258,7 +260,7 @@ public class WalletApi {
      * @throws Exception - Any error that occurs during wallet token verification or key pair generation.
      */
     public void generateKeyPair(String hWalletToken, String passcode) throws WalletException, UtilityException, WalletCoreException {
-        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID));
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID, WalletTokenPurpose.WALLET_TOKEN_PURPOSE.UPDATE_DID));
         walletCore.generateKeyPair(passcode);
     }
 
