@@ -339,9 +339,9 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
-    public CompletableFuture<String> requestUpdateUser(String tasUrl, String serverToken, DIDAuth signedDIDAuth, String txId) throws WalletException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestUpdateUser(String tasUrl, String serverToken, DIDAuth signedDIDAuth, SignedDidDoc signedDIDDoc, String txId) throws WalletException, ExecutionException, InterruptedException {
         UpdateUser updateUser = new UpdateUser(context);
-        String result = updateUser.updateUser(tasUrl, txId, serverToken, signedDIDAuth).get();
+        String result = updateUser.updateUser(tasUrl, txId, serverToken, signedDIDAuth, signedDIDDoc).get();
         if (result == null)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_UPDATE_USER_FAIL);
         return CompletableFuture.completedFuture(result);

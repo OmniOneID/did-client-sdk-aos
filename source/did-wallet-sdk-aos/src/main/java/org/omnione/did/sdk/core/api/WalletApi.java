@@ -323,13 +323,14 @@ public class WalletApi {
      * @param tasUrl        The URL of the TAS (Trusted Authority Service).
      * @param serverToken   The server-issued token.
      * @param signedDIDAuth The signed DID authentication document.
+     * @param signedDIDDoc The signed DID document.
      * @param txId          The transaction ID.
      * @return CompletableFuture<String> - A `CompletableFuture` representing the result of the user DID update request.
      * @throws Exception - Any error that occurs during wallet token verification, user DID update request, or related processes.
      */
-    public CompletableFuture<String> requestUpdateUser(String hWalletToken, String tasUrl, String serverToken, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestUpdateUser(String hWalletToken, String tasUrl, String serverToken, DIDAuth signedDIDAuth, SignedDidDoc signedDIDDoc, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.UPDATE_DID));
-        return walletService.requestUpdateUser(tasUrl, serverToken, signedDIDAuth, txId);
+        return walletService.requestUpdateUser(tasUrl, serverToken, signedDIDAuth, signedDIDDoc, txId);
     }
 
     /**
