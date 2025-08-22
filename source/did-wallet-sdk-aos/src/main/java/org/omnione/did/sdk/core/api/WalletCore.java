@@ -108,15 +108,14 @@ class WalletCore implements WalletCoreInterface {
         if(WalletApi.isLock)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
 
-
-        KeyGenWalletMethodType keyGenWalletMethodType = new KeyGenWalletMethodType();
-        WalletKeyGenRequest keyGenInfo = new WalletKeyGenRequest(
-                Constants.KEY_ID_KEY_AGREE,
-                AlgorithmType.ALGORITHM_TYPE.SECP256R1,
-                StorageOption.STORAGE_OPTION.WALLET,
-                keyGenWalletMethodType
-        );
-        keyManager.generateKey(keyGenInfo);
+//        KeyGenWalletMethodType keyGenWalletMethodType = new KeyGenWalletMethodType();
+//        WalletKeyGenRequest keyGenInfo = new WalletKeyGenRequest(
+//                Constants.KEY_ID_KEY_AGREE,
+//                AlgorithmType.ALGORITHM_TYPE.SECP256R1,
+//                StorageOption.STORAGE_OPTION.WALLET,
+//                keyGenWalletMethodType
+//        );
+//        keyManager.generateKey(keyGenInfo);
 
         String controller = Config.DID_CONTROLLER;
         List<KeyInfo> keyInfos = keyManager.getKeyInfos(List.of(Constants.KEY_ID_PIN, Constants.KEY_ID_BIO, Constants.KEY_ID_KEY_AGREE));

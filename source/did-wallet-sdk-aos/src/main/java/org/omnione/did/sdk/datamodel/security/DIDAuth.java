@@ -16,12 +16,14 @@
 
 package org.omnione.did.sdk.datamodel.security;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.omnione.did.sdk.datamodel.common.Proof;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.SortData;
+import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
 
 import java.util.List;
 
@@ -77,5 +79,11 @@ public class DIDAuth extends SortData implements ProofContainer {
     @Override
     public void fromJson(String val) {
 
+        Gson gson = new Gson();
+        DIDAuth obj = gson.fromJson(val, DIDAuth.class);
+        this.did = obj.getDID();
+        this.authNonce = obj.getAuthNonce();
+        this.proof = obj.getProof();
+        this.proofs = obj.getProofs();
     }
 }

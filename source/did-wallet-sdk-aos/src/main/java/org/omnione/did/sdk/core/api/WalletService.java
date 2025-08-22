@@ -289,10 +289,7 @@ public class WalletService implements WalletServiceInterface {
     }
 
     public DIDDocument updateHolderDIDDoc() throws UtilityException, WalletCoreException, WalletException {
-        DIDDocument holderDIDDoc = walletCore.updateHolderDIDDoc();
-        // TAS 등록 요청
-        // 실패 시 예외 처리
-        return holderDIDDoc;
+        return walletCore.updateHolderDIDDoc();
     }
 
     @Override

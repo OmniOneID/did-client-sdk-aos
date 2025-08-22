@@ -115,6 +115,7 @@ class DIDManager<E extends BaseObject> {
             verificationMethod.add(method);
         }
         didDocument.setVerificationMethod(verificationMethod);
+        addMethodType(keyInfos);
         replaceDocument(didDoc, true);
     }
 
