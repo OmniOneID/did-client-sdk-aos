@@ -280,6 +280,9 @@ class WalletCore implements WalletCoreInterface {
         if (vcManager.isAnyCredentialsSaved()) {
             vcManager.deleteAllCredentials();
         }
+        if (keyManager.isAnyKeySaved()) {
+            keyManager.deleteAllKeys();
+        }
 
         if (deleteAll) {
             if (deviceKeyManager.isAnyKeySaved()) {
@@ -287,9 +290,6 @@ class WalletCore implements WalletCoreInterface {
             }
             if (deviceDIDManager.isSaved()) {
                 deviceDIDManager.deleteDocument();
-            }
-            if (keyManager.isAnyKeySaved()) {
-                keyManager.deleteAllKeys();
             }
         }
     }

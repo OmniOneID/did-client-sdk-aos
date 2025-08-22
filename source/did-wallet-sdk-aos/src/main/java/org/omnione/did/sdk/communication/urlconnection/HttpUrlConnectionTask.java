@@ -89,6 +89,7 @@ public class HttpUrlConnectionTask {
                     error.append(inputLine);
                 }
                 in.close();
+                WalletLogger.getInstance().d("response : " + error.toString() + " / " + responseCode);
                 throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_SERVER_FAIL , error.toString());
             } else {
                 in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -98,6 +99,7 @@ public class HttpUrlConnectionTask {
                     error.append(inputLine);
                 }
                 in.close();
+                WalletLogger.getInstance().d("response : " + error.toString() + " / " + responseCode);
                 throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_INCORRECT_URL_CONNECTION , urlString);
             }
         } catch (IOException e) {
