@@ -271,6 +271,10 @@ class WalletCore implements WalletCoreInterface {
         return deviceKeyManager.isAnyKeySaved() && deviceDIDManager.isSaved();
     }
 
+    public void deleteKey(List<String> keyId) throws WalletCoreException, UtilityException {
+        keyManager.deleteKeys(keyId);
+    }
+
     @Override
     public void deleteWallet(boolean deleteAll) throws WalletCoreException {
 

@@ -32,6 +32,8 @@ public class P132RequestVo extends BaseRequestVo {
     private String iv;
     private String kycTxId;
 
+    private String kycToken;
+
     public P132RequestVo(String id) {
         super(id);
     }
@@ -93,6 +95,14 @@ public class P132RequestVo extends BaseRequestVo {
 
     public void setKycTxId(String kycTxId) {
         this.kycTxId = kycTxId;
+    }
+
+    public String getKycToken() {
+        return kycToken;
+    }
+
+    public void setKycToken(String kycToken) {
+        this.kycToken = kycToken;
     }
     //    public String toJson() {
 //        Gson gson = new GsonBuilder()

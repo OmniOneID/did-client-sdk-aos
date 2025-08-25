@@ -316,6 +316,11 @@ public class WalletApi {
         return walletService.requestRestoreUser(tasUrl, serverToken, signedDIDAuth, txId);
     }
 
+    public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.UPDATE_DID));
+        walletCore.deleteKey(keyIds);
+    }
+
     /**
      * Requests user DID update with the given wallet token, server token, signed DID authentication, and transaction ID.
      *
