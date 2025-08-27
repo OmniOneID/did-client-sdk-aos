@@ -385,6 +385,10 @@ public class WalletApi {
         return walletService.requestRevokeVc(tasUrl, serverToken, txId, vcId, issuerNonce, passcode, authType);
     }
 
+    public boolean isAnyCredentialsSaved() throws WalletException {
+        return walletCore.isAnyCredentialsSaved();
+    }
+
     /**
      * Retrieves all Verifiable Credentials (VCs) associated with the provided wallet token.
      *
