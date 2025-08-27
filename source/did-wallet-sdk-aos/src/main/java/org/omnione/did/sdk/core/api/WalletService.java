@@ -274,7 +274,9 @@ public class WalletService implements WalletServiceInterface {
             @Override
             public void run() {
                 DBManager walletDB = DBManager.getDatabases(context);
-                walletDB.caPkgDao().deleteAll();
+                if (deleteAll) {
+                    walletDB.caPkgDao().deleteAll();
+                }
                 walletDB.userDao().deleteAll();
                 walletDB.tokenDao().deleteAll();
             }
