@@ -80,6 +80,10 @@ public class HttpUrlConnectionTask {
                 in.close();
                 WalletLogger.getInstance().d("response : " + response.toString() + " / " + responseCode);
                 return response.toString();
+            } else if( responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                WalletLogger.getInstance().d("response : unauthorized " + " / " + responseCode);
+                throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_UNAUTHORIZED , accessToken);
+
             } else if( responseCode == HttpURLConnection.HTTP_BAD_REQUEST
                     || responseCode == HttpURLConnection.HTTP_SERVER_ERROR) {
                 in = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));

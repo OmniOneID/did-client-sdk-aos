@@ -25,10 +25,11 @@ public enum CommunicationErrorCode {
     // ComponentCode - Communication (CMM)
 
     COMMUNICATION_BASE("00"),
-    ERR_CODE_COMMUNICATION_UNKNOWN (COMMUNICATION_BASE, 000, "unknown error"),
+    ERR_CODE_COMMUNICATION_UNKNOWN (COMMUNICATION_BASE, 000, "unknown error: "),
     ERR_CODE_COMMUNICATION_INVALID_PARAMETER          (COMMUNICATION_BASE,  001, "Invalid parameter : "),
     ERR_CODE_COMMUNICATION_INCORRECT_URL_CONNECTION (COMMUNICATION_BASE, 002, "Incorrect url connection : "),
-    ERR_CODE_COMMUNICATION_SERVER_FAIL (COMMUNICATION_BASE, 003, "ServerFail : ");
+    ERR_CODE_COMMUNICATION_SERVER_FAIL (COMMUNICATION_BASE, 003, "ServerFail : "),
+    ERR_CODE_COMMUNICATION_UNAUTHORIZED (COMMUNICATION_BASE, 004, "unauthorized : ");
 
     private final String communicationCode = "MSDKCMM";
     private int code;
