@@ -312,7 +312,7 @@ public class WalletTest {
     @Test
     public void walletTest() throws Exception {
         Log.i("WalletTest", "===========================Create Wallet =========================");
-        testWalletApi.deleteWallet();
+        testWalletApi.deleteWallet(true);
         Assert.assertTrue(testWalletApi.createWallet("wallet","tas"));
         testWalletApi.createWalletTokenSeed(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PERSONALIZE, "org.omnione.did.ca","fbc20bee");
         Log.i("WalletTest", "===========================================================");

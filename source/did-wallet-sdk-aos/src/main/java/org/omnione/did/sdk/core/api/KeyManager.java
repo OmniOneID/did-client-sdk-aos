@@ -409,9 +409,9 @@ class KeyManager<E extends BaseObject>{
      *
      * @throws Exception If an error occurs during the deletion of all keys from storage or keystore.
      */
-    public void deleteAllKeys() throws WalletCoreException {
+    public void deleteAllKeys(boolean isKeystore) throws WalletCoreException {
         storageManager.removeAllItems();
-        if(KeystoreManager.isKeySaved(SIGNATURE_MANAGER_ALIAS_PREFIX, null)){
+        if(isKeystore && KeystoreManager.isKeySaved(SIGNATURE_MANAGER_ALIAS_PREFIX, null)){
             KeystoreManager.deleteKey(SIGNATURE_MANAGER_ALIAS_PREFIX, null);
         }
     }

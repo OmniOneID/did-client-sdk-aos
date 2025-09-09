@@ -51,7 +51,7 @@ public interface WalletCoreInterface {
     DIDDocument getDocument(int type) throws WalletCoreException, UtilityException, WalletException;
     void saveDocument(int type) throws WalletCoreException, UtilityException, WalletException;
     boolean isExistWallet();
-    void deleteWallet(boolean deleteAll) throws WalletCoreException;
+    void deleteWallet(boolean deleteAll) throws WalletCoreException, UtilityException;
     boolean isAnyCredentialsSaved() throws WalletException;
     void addCredentials(VerifiableCredential verifiableCredential) throws WalletCoreException, UtilityException, WalletException;
     List<VerifiableCredential> getCredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException;
