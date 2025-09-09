@@ -54,7 +54,7 @@ public class DIDManagerTest {
 
         KeyManager<DetailKeyInfo> keyManager = new KeyManager<>("didTest", appContext);
         if(keyManager.isAnyKeySaved())
-            keyManager.deleteAllKeys();
+            keyManager.deleteAllKeys(true);
         // NONE KEY 생성
         WalletKeyGenRequest keyGenInfo = new WalletKeyGenRequest(
                 "FREE",
@@ -158,7 +158,7 @@ public class DIDManagerTest {
         didManager.deleteDocument();
         Log.d("DIDManagerTest","isSaved : " + didManager.isSaved());
 
-        keyManager.deleteAllKeys();
+        keyManager.deleteAllKeys(true);
 
     }
 }
