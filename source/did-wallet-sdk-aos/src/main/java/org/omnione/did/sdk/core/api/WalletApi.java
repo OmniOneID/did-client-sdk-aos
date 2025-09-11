@@ -317,7 +317,7 @@ public class WalletApi {
     }
 
     public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException {
-        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.UPDATE_DID));
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID, WalletTokenPurpose.WALLET_TOKEN_PURPOSE.UPDATE_DID));
         walletCore.deleteKey(keyIds);
     }
 

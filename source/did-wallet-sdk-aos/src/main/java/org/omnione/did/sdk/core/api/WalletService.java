@@ -285,9 +285,10 @@ public class WalletService implements WalletServiceInterface {
     }
     @Override
     public DIDDocument createHolderDIDDoc() throws UtilityException, WalletCoreException, WalletException {
-        DIDDocument holderDIDDoc = walletCore.createHolderDIDDoc();
-        walletCore.saveDocument(Constants.DID_DOC_TYPE_HOLDER);
-        return holderDIDDoc;
+//        DIDDocument holderDIDDoc = walletCore.createHolderDIDDoc();
+//        walletCore.saveDocument(Constants.DID_DOC_TYPE_HOLDER);
+//        return holderDIDDoc;
+        return walletCore.createHolderDIDDoc();
     }
 
     public DIDDocument updateHolderDIDDoc() throws UtilityException, WalletCoreException, WalletException {
