@@ -169,17 +169,20 @@ boolean success = walletApi.createWallet();
 ## 3. deleteWallet
 
 ### Description
-`DeviceKey Wallet을 삭제한다.`
+`소유자의 지갑 데이터를 삭제합니다. deleteAll 플래그에 따라 모든 지갑 관련 데이터(CA 패키지 정보, 사용자 데이터 및 토큰 포함)를 삭제하거나 부분 삭제를 수행합니다.
+삭제 프로세스는 데이터베이스 레코드에 대해 비동기적으로 실행되며, 핵심 지갑 삭제 로직도 호출합니다.`
 
 ### Declaration
 
 ```java
-public void deleteWallet() throws Exception
+public void deleteWallet(booelan deleteAll) throws WalletCoreException
 ```
 
 ### Parameters
 
-Void
+| Name      | Type    | Description | **M/O** | **Note**                                    |
+| --------- | ------- | ----------- | ------- | --------------------------------------------|
+| deleteAll | boolean |true로 설정 시 deviceKey와 holderKey 모두 삭제, false로 설정 시 holderKey만 삭제.| M |   |
 
 ### Returns
 
@@ -188,7 +191,7 @@ N/A
 ### Usage
 
 ```java
-walletApi.deleteWallet();
+walletApi.deleteWallet(true);
 ```
 
 <br>
@@ -1018,6 +1021,119 @@ public void changeLock(String oldPin, String newPin) throws Exception
 String oldPin = "123456";
 String newPin = "654321";
 walletApi.changeLock(oldPin, newPin);
+```
+
+<br>
+
+
+## 30. updateHolderDIDDoc
+
+### Description
+`제공된 지갑 토큰을 사용하여 사용자의 기존 DID 문서를 업데이트합니다.`
+
+### Declaration
+
+```java
+public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+```
+
+### Parameters
+
+| Name         | Type   | Description | **M/O** | **Note** |
+| ------------ | ------ | ----------- | ------- | -------- |
+| hWalletToken | String | 월렛 토큰     | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+walletApi.updateHolderDIDDoc(hWalletToken);
+```
+
+<br>
+
+## 31. saveDocument
+
+### Description
+`사용자의 DID 문서를 영구 저장소에 저장합니다.`
+
+### Declaration
+
+```java
+public void saveDocument() throws WalletException, WalletCoreException, UtilityException
+
+```
+
+### Parameters
+N/A
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.saveDocument()
+```
+
+<br>
+
+## 32. deleteKey
+
+### Description
+`제공된 지갑 토큰에 필요한 권한이 있는지 확인한 후, 사용자의 DID(탈중앙화 식별자) 문서와 연결된 지정된 키를 삭제합니다.`
+
+### Declaration
+
+```java
+public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+```
+
+### Parameters
+
+| Name         | Type         | Description | **M/O** | **Note** |
+| ------------ | ------------ | ----------- | ------- | -------- |
+| hWalletToken | String       | 월렛토큰    | M       |          |
+| keyIds       | List<String> | 키 IDs      | M       |          |
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+```
+
+<br>
+
+## 33. isAnyCredentialsSaved
+
+### Description
+`사용자의 지갑에 증명서가 저장되어 있는지 확인합니다.`
+
+### Declaration
+
+```java
+public void isAnyCredentialsSaved() throws WalletException
+```
+
+### Parameters
+
+N/A
+
+### Returns
+boolean
+
+### Usage
+
+```java
+
+if (!walletApi.isAnyCredentialsSaved()) {
+    ...
+}
 ```
 
 <br>

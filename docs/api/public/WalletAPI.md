@@ -169,17 +169,19 @@ boolean success = walletApi.createWallet();
 ## 3. deleteWallet
 
 ### Description
-`Delete DeviceKey Wallet..`
+`Deletes the holder’s wallet data. Depending on the deleteAll flag, it either deletes all wallet-related data (including CA package information, user data, and tokens) or performs a partial deletion. The deletion process runs asynchronously for database records and also invokes the core wallet deletion logic.`
 
 ### Declaration
 
 ```java
-public void deleteWallet() throws Exception
+public void deleteWallet(booelan deleteAll) throws WalletCoreException
 ```
 
 ### Parameters
 
-Void
+| Name      | Type    | Description | **M/O** | **Note**                                    |
+| --------- | ------- | ----------- | ------- | --------------------------------------------|
+| deleteAll | boolean |If set to true, deletes both deviceKey and holderKey. If set to false, deletes only holderKey| M |   |
 
 ### Returns
 
@@ -188,7 +190,7 @@ N/A
 ### Usage
 
 ```java
-walletApi.deleteWallet();
+walletApi.deleteWallet(true);
 ```
 
 <br>
@@ -1019,6 +1021,118 @@ public void changeLock(String oldPin, String newPin) throws Exception
 String oldPin = "123456";
 String newPin = "654321";
 walletApi.changeLock(oldPin, newPin);
+```
+
+<br>
+
+## 30. updateHolderDIDDoc
+
+### Description
+`Updates the existing DID document for the holder using the provided wallet token.`
+
+### Declaration
+
+```java
+public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+```
+
+### Parameters
+
+| Name         | Type   | Description | **M/O** | **Note** |
+| ------------ | ------ | ----------- | ------- | -------- |
+| hWalletToken | String | wallet token     | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+walletApi.updateHolderDIDDoc(hWalletToken);
+```
+
+<br>
+
+## 31. saveDocument
+
+### Description
+`Saves the holder’s DID document into persistent storage.`
+
+### Declaration
+
+```java
+public void saveDocument() throws WalletException, WalletCoreException, UtilityException
+
+```
+
+### Parameters
+N/A
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.saveDocument()
+```
+
+<br>
+
+## 32. deleteKey
+
+### Description
+`Deletes the specified keys associated with the holder’s DID document after verifying that the provided wallet token has the required permissions.`
+
+### Declaration
+
+```java
+public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+```
+
+### Parameters
+
+| Name         | Type         | Description                     | **M/O** | **Note** |
+| ------------ | ------------ | ------------------------------- | ------- | -------- |
+| hWalletToken | String       | wallet token                    | M       |          |
+| keyIds       | List<String> | a list of key IDs to be deleted | M       |          |
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+```
+
+<br>
+
+## 33. isAnyCredentialsSaved
+
+### Description
+`Checks whether any credentials are saved in the holder’s wallet.`
+
+### Declaration
+
+```java
+public void isAnyCredentialsSaved() throws WalletException
+```
+
+### Parameters
+
+N/A
+
+### Returns
+boolean
+
+### Usage
+
+```java
+
+if (!walletApi.isAnyCredentialsSaved()) {
+    ...
+}
 ```
 
 <br>
