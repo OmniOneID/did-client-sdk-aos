@@ -121,7 +121,14 @@ public class WalletApi {
     }
 
 
-    // deleteAll If set to true, it deletes both deviceKey and holderKey. If set to false, it deletes only holderKey.
+    //
+    /**
+     * Deletes the holder’s wallet data. Depending on the {@code deleteAll} flag, it either deletes all wallet-related data
+     * (including CA package information, user data, and tokens) or performs a partial deletion.
+     * The deletion process runs asynchronously for database records and also invokes the core wallet deletion logic.
+     * @param deleteAll deleteAll If set to true, it deletes both deviceKey and holderKey. If set to false, it deletes only holderKey.
+     * @throws Exception - If an error occurs in the core wallet functionalities while deleting the wallet.
+     */
     public void deleteWallet(boolean deleteAll) throws WalletCoreException {
         walletLogger.d("deleteWallet");
         walletService.deleteWallet(deleteAll);
@@ -220,12 +227,21 @@ public class WalletApi {
         return walletService.createHolderDIDDoc();
     }
 
+    /**
+     Updates the existing DID (Decentralized Identifier) document for the holder using the provided wallet token.
+     @param hWalletToken The wallet token to be used for updating the DID document.
+     @return DIDDocument - The updated DID document.
+     @throws Exception - If an error occurs during the wallet token verification, DID document update, or any related operation.
+     */
     public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.UPDATE_DID));
         return walletService.updateHolderDIDDoc();
-
     }
 
+    /**
+     Saves the holder's DID (Decentralized Identifier) document into persistent storage.
+     @throws Exception - If an error occurs related to wallet operations during the save process.
+     */
     public void saveDocument() throws WalletException, WalletCoreException, UtilityException {
         walletCore.saveDocument(Constants.DID_DOC_TYPE_HOLDER);
     }
@@ -316,6 +332,12 @@ public class WalletApi {
         return walletService.requestRestoreUser(tasUrl, serverToken, signedDIDAuth, txId);
     }
 
+    /**
+     Deletes the specified keys associated with the holder’s DID (Decentralized Identifier) document, after verifying the provided wallet token for the required permissions.
+     @param hWalletToken The wallet token used to authorize the key deletion operation.
+     @param keyIds A list of key identifiers to be deleted from the wallet.
+     @throws Exception - If an error occurs in the core wallet functionalities while deleting the keys.
+     */
     public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID, WalletTokenPurpose.WALLET_TOKEN_PURPOSE.UPDATE_DID));
         walletCore.deleteKey(keyIds);
@@ -385,6 +407,11 @@ public class WalletApi {
         return walletService.requestRevokeVc(tasUrl, serverToken, txId, vcId, issuerNonce, passcode, authType);
     }
 
+    /**
+     Checks whether any credentials are saved in the holder’s wallet.
+     @return boolean - {@code true} if at least one credential is saved, {@code false} otherwise.
+     @throws Exception - If an error occurs during the wallet operation while checking saved credentials.
+     */
     public boolean isAnyCredentialsSaved() throws WalletException {
         return walletCore.isAnyCredentialsSaved();
     }
