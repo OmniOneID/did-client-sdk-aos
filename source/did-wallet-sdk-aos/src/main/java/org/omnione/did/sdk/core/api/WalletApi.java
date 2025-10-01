@@ -18,16 +18,23 @@ package org.omnione.did.sdk.core.api;
 
 import android.content.Context;
 
-import androidx.fragment.app.Fragment;
-
-import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
-import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
-import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
-import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
+import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
+import org.omnione.did.sdk.core.exception.WalletCoreException;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
+import org.omnione.did.sdk.datamodel.common.enums.WalletTokenPurpose;
 import org.omnione.did.sdk.datamodel.did.DIDDocument;
+import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
+import org.omnione.did.sdk.datamodel.profile.IssueProfile;
+import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.profile.ReqE2e;
+import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
+import org.omnione.did.sdk.datamodel.security.DIDAuth;
+import org.omnione.did.sdk.datamodel.token.SignedWalletInfo;
+import org.omnione.did.sdk.datamodel.token.WalletTokenData;
+import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
+import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
+import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
 import org.omnione.did.sdk.datamodel.zkp.ProofParam;
@@ -35,18 +42,9 @@ import org.omnione.did.sdk.datamodel.zkp.ProofRequest;
 import org.omnione.did.sdk.datamodel.zkp.ReferentInfo;
 import org.omnione.did.sdk.datamodel.zkp.UserReferent;
 import org.omnione.did.sdk.utility.Errors.UtilityException;
+import org.omnione.did.sdk.wallet.walletservice.LockManager;
 import org.omnione.did.sdk.wallet.walletservice.config.Constants;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
-import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
-import org.omnione.did.sdk.datamodel.security.DIDAuth;
-import org.omnione.did.sdk.datamodel.profile.IssueProfile;
-import org.omnione.did.sdk.datamodel.token.SignedWalletInfo;
-import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
-import org.omnione.did.sdk.wallet.walletservice.LockManager;
-import org.omnione.did.sdk.datamodel.token.WalletTokenData;
-import org.omnione.did.sdk.datamodel.common.enums.WalletTokenPurpose;
-import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
-import org.omnione.did.sdk.core.exception.WalletCoreException;
 import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 
 import java.util.ArrayList;
@@ -97,6 +95,22 @@ public class WalletApi {
             instance = new WalletApi(context);
         }
         return instance;
+    }
+
+    /**
+     * Authenticates a PIN using the provided ID and PIN byte array.
+     * This method delegates the PIN authentication process to the underlying wallet core.
+     *
+     * @param id The identifier associated with the PIN to be authenticated.
+     *           This could be a user ID, key ID, or any other relevant identifier.
+     * @param pin A byte array representation of the PIN to be authenticated.
+     *            The PIN should be converted to bytes using a consistent encoding (e.g., UTF-8).
+     * @throws Exception If an error occurs within the wallet core during the PIN authentication process.
+     *                             This might include issues like incorrect PIN, too many failed attempts (if handled by core),
+     *                             or other core-specific errors.
+     */
+    public void authenticatePin(String id, byte[] pin) throws WalletCoreException, UtilityException {
+        walletCore.authenticatePin(id, pin);
     }
 
     public boolean isExistWallet() {

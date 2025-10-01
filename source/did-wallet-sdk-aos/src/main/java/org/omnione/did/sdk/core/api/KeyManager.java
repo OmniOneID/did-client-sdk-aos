@@ -60,6 +60,62 @@ class KeyManager<E extends BaseObject>{
         storageManager = new StorageManager<>(fileName, FileExtension.FILE_EXTENSION.KEY, true, context, DetailKeyInfo.class, KeyInfo.class);
     }
 
+
+
+    public void authenticatePin(String id, byte[] pin) throws WalletCoreException, UtilityException {
+
+        if(id.length() == 0) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_INVALID_PARAMETER, "id");
+        }
+
+        List<String> identifiers = new ArrayList<>();
+        identifiers.add(id);
+        List<UsableInnerWalletItem<KeyInfo, DetailKeyInfo>> walletItems = storageManager.getItems(identifiers);
+        KeyInfo signkeyInfo = walletItems.get(0).getMeta();
+        DetailKeyInfo signDetailKeyInfo = walletItems.get(0).getItem();
+
+        byte[] publicKey = MultibaseUtils.decode(signkeyInfo.getPublicKey());
+
+        switch (signkeyInfo.getAccessMethod()) {
+            case WALLET_PIN:
+                if (pin == null) {
+                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_INVALID_PARAMETER, "pin");
+                }
+                byte[] multibaseDecoded = MultibaseUtils.decode(signDetailKeyInfo.getPrivateKey());
+                if (multibaseDecoded == null) {
+                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_FAILED_TO_DECODE, "Data(R)");
+
+                }
+                byte[] salt = MultibaseUtils.decode(signDetailKeyInfo.getSalt());
+                if (salt == null) {
+                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_FAILED_TO_DECODE, "Data(A)");
+
+                }
+
+                int iteration = 2048;
+                byte[] symmetricKey = CryptoUtils.pbkdf2(pin, salt, iteration, 48);
+                byte[] key = Arrays.copyOfRange(symmetricKey, 0, 32);
+                byte[] iv = Arrays.copyOfRange(symmetricKey, 32, symmetricKey.length);
+                byte[] PINDecoded = CryptoUtils.decrypt(
+                        multibaseDecoded,
+                        new CipherInfo(CipherInfo.ENCRYPTION_TYPE.AES, CipherInfo.ENCRYPTION_MODE.CBC, CipherInfo.SYMMETRIC_KEY_SIZE.AES_256, CipherInfo.SYMMETRIC_PADDING_TYPE.PKCS5),
+                        key,
+                        iv
+                );
+
+                Secp256R1Manager keyAlgorithm = new Secp256R1Manager();
+                keyAlgorithm.checkKeyPairMatch(PINDecoded, publicKey);
+                Arrays.fill(pin, (byte) 0x00);
+                Arrays.fill(multibaseDecoded, (byte) 0x00);
+                Arrays.fill(salt, (byte) 0x00);
+                Arrays.fill(symmetricKey, (byte) 0x00);
+                Arrays.fill(PINDecoded, (byte) 0x00);
+                break;
+            default:
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_UNSUPPORTED_ALGORITHM);
+
+        }
+    }
     /**
      * isKeySaved: Checks if a key with the given ID is saved.
      *

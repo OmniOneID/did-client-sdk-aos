@@ -18,21 +18,35 @@ package org.omnione.did.sdk.core.api;
 
 import android.content.Context;
 
-import androidx.fragment.app.Fragment;
-
+import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
+import org.omnione.did.sdk.core.didmanager.datamodel.DIDKeyInfo;
+import org.omnione.did.sdk.core.didmanager.datamodel.DIDMethodType;
+import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.keymanager.datamodel.DetailKeyInfo;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyGenWalletMethodType;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyInfo;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyStoreAccessMethod;
+import org.omnione.did.sdk.core.keymanager.datamodel.SecureKeyGenRequest;
+import org.omnione.did.sdk.core.keymanager.datamodel.StorageOption;
+import org.omnione.did.sdk.core.keymanager.datamodel.WalletKeyGenRequest;
+import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
+import org.omnione.did.sdk.core.vcmanager.datamodel.PresentationInfo;
 import org.omnione.did.sdk.core.zkp.datamodel.ZKPInfo;
+import org.omnione.did.sdk.datamodel.common.enums.AlgorithmType;
+import org.omnione.did.sdk.datamodel.did.DIDDocument;
+import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
 import org.omnione.did.sdk.datamodel.zkp.CredentialOffer;
 import org.omnione.did.sdk.datamodel.zkp.CredentialPrimaryPublicKey;
+import org.omnione.did.sdk.datamodel.zkp.CredentialRequestContainer;
 import org.omnione.did.sdk.datamodel.zkp.CredentialRequestMeta;
 import org.omnione.did.sdk.datamodel.zkp.Proof;
 import org.omnione.did.sdk.datamodel.zkp.ProofParam;
 import org.omnione.did.sdk.datamodel.zkp.ProofRequest;
 import org.omnione.did.sdk.datamodel.zkp.ReferentInfo;
 import org.omnione.did.sdk.datamodel.zkp.UserReferent;
-import org.omnione.did.sdk.datamodel.zkp.CredentialRequestContainer;
 import org.omnione.did.sdk.utility.DataModels.DigestEnum;
 import org.omnione.did.sdk.utility.DataModels.MultibaseType;
 import org.omnione.did.sdk.utility.DigestUtils;
@@ -41,22 +55,6 @@ import org.omnione.did.sdk.utility.MultibaseUtils;
 import org.omnione.did.sdk.wallet.WalletCoreInterface;
 import org.omnione.did.sdk.wallet.walletservice.config.Config;
 import org.omnione.did.sdk.wallet.walletservice.config.Constants;
-import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
-import org.omnione.did.sdk.core.didmanager.datamodel.DIDMethodType;
-import org.omnione.did.sdk.core.exception.WalletCoreException;
-import org.omnione.did.sdk.core.keymanager.datamodel.DetailKeyInfo;
-import org.omnione.did.sdk.core.keymanager.datamodel.KeyGenWalletMethodType;
-import org.omnione.did.sdk.core.keymanager.datamodel.KeyStoreAccessMethod;
-import org.omnione.did.sdk.core.keymanager.datamodel.SecureKeyGenRequest;
-import org.omnione.did.sdk.core.keymanager.datamodel.WalletKeyGenRequest;
-import org.omnione.did.sdk.datamodel.did.DIDDocument;
-import org.omnione.did.sdk.core.didmanager.datamodel.DIDKeyInfo;
-import org.omnione.did.sdk.datamodel.common.enums.AlgorithmType;
-import org.omnione.did.sdk.core.keymanager.datamodel.StorageOption;
-import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
-import org.omnione.did.sdk.core.keymanager.datamodel.KeyInfo;
-import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
-import org.omnione.did.sdk.core.vcmanager.datamodel.PresentationInfo;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletErrorCode;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
 import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
@@ -102,6 +100,10 @@ class WalletCore implements WalletCoreInterface {
         }
         bioPromptHelper = new BioPromptHelper(context);
         walletLogger = WalletLogger.getInstance();
+    }
+
+    public void authenticatePin(String id, byte[] pin) throws WalletCoreException, UtilityException {
+        keyManager.authenticatePin(id, pin);
     }
 
     public DIDDocument updateHolderDIDDoc() throws WalletCoreException, UtilityException, WalletException {
