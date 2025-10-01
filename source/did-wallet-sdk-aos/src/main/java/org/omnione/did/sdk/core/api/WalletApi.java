@@ -590,12 +590,12 @@ public class WalletApi {
     /**
      * Changes the Unlock PIN.
      *
-     * @param oldPin The current PIN.
-     * @param newPin The new PIN.
+     * @param oldPassCode The current oldPassCode.
+     * @param newPassCode The new newPassCode.
      * @throws Exception Throws an exception if parameter validation fails or if an error occurs during encryption/decryption.
      */
-    public void changeLock(String oldPin, String newPin) throws UtilityException, WalletCoreException, WalletException {
-        lockManager.changeLock(oldPin, newPin);
+    public void changeLock(String oldPassCode, String newPassCode) throws UtilityException, WalletCoreException, WalletException {
+        lockManager.changeLock(oldPassCode, newPassCode);
     }
 
 

@@ -60,8 +60,6 @@ class KeyManager<E extends BaseObject>{
         storageManager = new StorageManager<>(fileName, FileExtension.FILE_EXTENSION.KEY, true, context, DetailKeyInfo.class, KeyInfo.class);
     }
 
-
-
     public void authenticatePin(String id, byte[] pin) throws WalletCoreException, UtilityException {
 
         if(id.length() == 0) {
