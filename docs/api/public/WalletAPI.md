@@ -19,13 +19,15 @@ Android Wallet API
 ==
 
 - Subject: WalletAPI
-- Writer: Sangjun Kim
-- Date: 2024-08-19
-- Version: v1.0.0
+- Writer: Dongjun Park
+- Date: 2025-10-14
+- Version: v2.0.1
 
-| Version | Date       | History                 |
-| ------- | ---------- | ------------------------|
-| v1.0.0  | 2024-08-19 | Initial                 |
+| Version | Date       | History                                      |
+| ------- | ---------- | -------------------------------------------- |
+| v2.0.1  | 2025-10-14 | Add DID-related function and authenticatePin |
+| v2.0.0  | 2025-04-30 | ZKP                                          |
+| v1.0.0  | 2024-08-19 | Initial                                      |
 
 
 <div style="page-break-after: always;"></div>
@@ -68,7 +70,12 @@ Android Wallet API
     - [33. getAllZkpCredentials](#33-getallzkpcredentials)
     - [34. isAnyZkpCredentialsSaved](#34-isanyzkpcredentialssaved)
     - [35. getZkpCredentials](#35-getzkpcredentials)
-
+    - [36. updateHolderDIDDoc](#36-updateholderdiddoc)
+    - [37. saveDocument](#37-savedocument)
+    - [38. deleteKey](#38-deletekey)
+    - [39. isAnyCredentialsSaved](#39-isanycredentialssaved)
+    - [40. authenticatePin](#40-authenticatepin)
+  
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
 - [Value Object](#value-object)
@@ -1221,6 +1228,151 @@ public List<Credential> getZkpCredentials(String hWalletToken, List<String> iden
 
 ```java
 List<Credential> credentialList = walletApi.getZkpCredentials(hWalletToken, List.of(vcId));
+```
+
+<br>
+
+## 36. updateHolderDIDDoc
+
+### Description
+`Updates the existing DID document for the holder using the provided wallet token.`
+
+### Declaration
+
+```java
+public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+```
+
+### Parameters
+
+| Name         | Type   | Description | **M/O** | **Note** |
+| ------------ | ------ | ----------- | ------- | -------- |
+| hWalletToken | String | wallet token     | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+walletApi.updateHolderDIDDoc(hWalletToken);
+```
+
+<br>
+
+## 37. saveDocument
+
+### Description
+`Saves the holder’s DID document into persistent storage.`
+
+### Declaration
+
+```java
+public void saveDocument() throws WalletException, WalletCoreException, UtilityException
+
+```
+
+### Parameters
+N/A
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.saveDocument()
+```
+
+<br>
+
+## 38. deleteKey
+
+### Description
+`Deletes the specified keys associated with the holder’s DID document after verifying that the provided wallet token has the required permissions.`
+
+### Declaration
+
+```java
+public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+```
+
+### Parameters
+
+| Name         | Type         | Description                     | **M/O** | **Note** |
+| ------------ | ------------ | ------------------------------- | ------- | -------- |
+| hWalletToken | String       | wallet token                    | M       |          |
+| keyIds       | List<String> | a list of key IDs to be deleted | M       |          |
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+```
+
+<br>
+
+## 39. isAnyCredentialsSaved
+
+### Description
+`Checks whether any credentials are saved in the holder’s wallet.`
+
+### Declaration
+
+```java
+public void isAnyCredentialsSaved() throws WalletException
+```
+
+### Parameters
+
+N/A
+
+### Returns
+boolean
+
+### Usage
+
+```java
+
+if (!walletApi.isAnyCredentialsSaved()) {
+    ...
+}
+```
+
+<br>
+
+## 40. authenticatePin
+
+### Description
+`Proceed with PIN authentication`
+
+### Declaration
+
+```java
+public void authenticatePin(String id, byte[] pin) throws Exception
+```
+
+### Parameters
+
+| Name | Type   | Description                  | **M/O** | **Note** |
+| ---- | ------ | ---------------------------- | ------- | -------- |
+| id   | String | key ID                       | M       |          |
+| pin  | byte[] | PIN data entered by the user | M       |          |
+
+### Returns
+
+N/A
+
+### Usage
+
+```java
+
+try {
+    walletApi.authenticatePin("pin", oldPin.getBytes());
+} catch {}
 ```
 
 <br>

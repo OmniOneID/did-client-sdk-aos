@@ -19,14 +19,15 @@ Android Wallet API
 ==
 
 - Subject: WalletAPI
-- Writer: Sangjun Kim
-- Date: 2024-08-19
-- Version: v1.0.0
+- Writer: Dongjun Park
+- Date: 2025-10-14
+- Version: v2.0.1
 
-| Version | Date       | History                 |
-| ------- | ---------- | ------------------------|
-| v2.0.0  | 2024-08-19 | ZKP 추가                 |
-| v1.0.0  | 2024-08-19 | 초기 작성                 |
+| Version | Date       | History                                      |
+| ------- | ---------- | -------------------------------------------- |
+| v2.0.1  | 2025-10-14 | DID 관련 함수 및 authenticatePin 추가 |
+| v2.0.0  | 2024-04-30 | ZKP 추가                                     |
+| v1.0.0  | 2024-08-19 | 초기 작성                                    |
 
 
 <div style="page-break-after: always;"></div>
@@ -69,6 +70,11 @@ Android Wallet API
     - [33. getAllZkpCredentials](#33-getallzkpcredentials)
     - [34. isAnyZkpCredentialsSaved](#34-isanyzkpcredentialssaved)
     - [35. getZkpCredentials](#35-getzkpcredentials)
+    - [36. updateHolderDIDDoc](#36-updateholderdiddoc)
+    - [37. saveDocument](#37-savedocument)
+    - [38. deleteKey](#38-deletekey)
+    - [39. isAnyCredentialsSaved](#39-isanycredentialssaved)
+    - [40. authenticatePin](#40-authenticatepin)
   
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
@@ -1221,6 +1227,150 @@ public List<Credential> getZkpCredentials(String hWalletToken, List<String> iden
 
 ```java
 List<Credential> credentialList = walletApi.getZkpCredentials(hWalletToken, List.of(vcId));
+```
+
+<br>
+
+## 36. updateHolderDIDDoc
+
+### Description
+`제공된 지갑 토큰을 사용하여 사용자의 기존 DID 문서를 업데이트합니다.`
+
+### Declaration
+
+```java
+public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+```
+
+### Parameters
+
+| Name         | Type   | Description | **M/O** | **Note** |
+| ------------ | ------ | ----------- | ------- | -------- |
+| hWalletToken | String | 월렛 토큰     | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+walletApi.updateHolderDIDDoc(hWalletToken);
+```
+
+<br>
+
+## 37. saveDocument
+
+### Description
+`사용자의 DID 문서를 영구 저장소에 저장합니다.`
+
+### Declaration
+
+```java
+public void saveDocument() throws WalletException, WalletCoreException, UtilityException
+
+```
+
+### Parameters
+N/A
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.saveDocument()
+```
+
+<br>
+
+## 38. deleteKey
+
+### Description
+`제공된 지갑 토큰에 필요한 권한이 있는지 확인한 후, 사용자의 DID(탈중앙화 식별자) 문서와 연결된 지정된 키를 삭제합니다.`
+
+### Declaration
+
+```java
+public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+```
+
+### Parameters
+
+| Name         | Type         | Description | **M/O** | **Note** |
+| ------------ | ------------ | ----------- | ------- | -------- |
+| hWalletToken | String       | 월렛토큰    | M       |          |
+| keyIds       | List<String> | 키 IDs      | M       |          |
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+```
+
+<br>
+
+## 39. isAnyCredentialsSaved
+
+### Description
+`사용자의 지갑에 증명서가 저장되어 있는지 확인합니다.`
+
+### Declaration
+
+```java
+public void isAnyCredentialsSaved() throws WalletException
+```
+
+### Parameters
+
+N/A
+
+### Returns
+boolean
+
+### Usage
+
+```java
+
+if (!walletApi.isAnyCredentialsSaved()) {
+    ...
+}
+```
+
+<br>
+
+## 40. authenticatePin
+
+### Description
+`핀 인증을 진행`
+
+### Declaration
+
+```java
+public void authenticatePin(String id, byte[] pin) throws WalletException
+```
+
+### Parameters
+
+| Name | Type   | Description               | **M/O** | **Note** |
+| ---- | ------ | ------------------------- | ------- | -------- |
+| id   | String | 키 ID                     | M       |          |
+| pin  | byte[] | 사용자가 입력한 핀 데이터       | M       |          |
+
+### Returns
+
+N/A
+
+### Usage
+
+```java
+try {
+    walletApi.authenticatePin("pin", oldPin.getBytes());
+} catch {}
 ```
 
 <br>
