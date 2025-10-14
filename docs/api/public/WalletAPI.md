@@ -62,6 +62,12 @@ Android Wallet API
     - [27. isSavedBioKey](#27-issavedbiokey)
     - [28. changePin](#28-changepin)
     - [29. changeLock](#29-changelock)
+    - [30. createZkpReferent](#30-createzkpreferent)
+    - [31. createEncZkpProof](#31-createenczkpproof)
+    - [32. searchZkpCredentials](#32-searchzkpcredentials)
+    - [33. getAllZkpCredentials](#33-getallzkpcredentials)
+    - [34. isAnyZkpCredentialsSaved](#34-isanyzkpcredentialssaved)
+    - [35. getZkpCredentials](#35-getzkpcredentials)
 
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
@@ -169,19 +175,17 @@ boolean success = walletApi.createWallet();
 ## 3. deleteWallet
 
 ### Description
-`Deletes the holder’s wallet data. Depending on the deleteAll flag, it either deletes all wallet-related data (including CA package information, user data, and tokens) or performs a partial deletion. The deletion process runs asynchronously for database records and also invokes the core wallet deletion logic.`
+`Delete DeviceKey Wallet..`
 
 ### Declaration
 
 ```java
-public void deleteWallet(booelan deleteAll) throws WalletCoreException
+public void deleteWallet() throws Exception
 ```
 
 ### Parameters
 
-| Name      | Type    | Description | **M/O** | **Note**                                    |
-| --------- | ------- | ----------- | ------- | --------------------------------------------|
-| deleteAll | boolean |If set to true, deletes both deviceKey and holderKey. If set to false, deletes only holderKey| M |   |
+Void
 
 ### Returns
 
@@ -190,7 +194,7 @@ N/A
 ### Usage
 
 ```java
-walletApi.deleteWallet(true);
+walletApi.deleteWallet();
 ```
 
 <br>
@@ -1025,98 +1029,148 @@ walletApi.changeLock(oldPin, newPin);
 
 <br>
 
-## 30. updateHolderDIDDoc
+## 30. createZkpReferent
 
 ### Description
-`Updates the existing DID document for the holder using the provided wallet token.`
+`Create Referents for each credential based on the user-selected referent information.`
 
 ### Declaration
 
 ```java
-public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+public ReferentInfo createZkpReferent(List<UserReferent> customReferents) throws Exception
 ```
 
 ### Parameters
 
-| Name         | Type   | Description | **M/O** | **Note** |
-| ------------ | ------ | ----------- | ------- | -------- |
-| hWalletToken | String | wallet token     | M       |          |
+| Name            | Type | Description                                                            | **M/O** | **Note** |
+| --------------- | ---- | ---------------------------------------------------------------------- | ------- | -------- |
+| customReferents | List | A list of user-defined referents to be included in the ZKP generation. | M       |          |
 
 ### Returns
 
+| Type         | Description                                                          | **M/O** | **Note** |
+| ------------ | -------------------------------------------------------------------- | ------- | -------- |
+| ReferentInfo | An object used to build ZKP referents for credential proof creation. | M       |          |
 
 ### Usage
 
 ```java
-walletApi.updateHolderDIDDoc(hWalletToken);
+
+ReferentInfo referentInfo = WalletApi.getInstance(getContext()).createZkpReferent(customReferents);
 ```
 
 <br>
 
-## 31. saveDocument
+## 31. createEncZkpProof
 
 ### Description
-`Saves the holder’s DID document into persistent storage.`
+`Generate a ZKP proof based on the user's credentials and referents.`
 
 ### Declaration
 
 ```java
-public void saveDocument() throws WalletException, WalletCoreException, UtilityException
-
+public P311RequestVo createEncZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile,
+                                        List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws Exception
 ```
 
 ### Parameters
-N/A
+
+| Name                | Type   | Description                                                                                                      | **M/O** | **Note** |
+| ------------------- | ------ | ---------------------------------------------------------------------------------------------------------------- | ------- | -------- |
+| walletToken         | String | Wallet Token                                                                                                     | M       |          |
+| proofRequestProfile | String | The profile containing verifier's requirements for proof, such as requested attributes and predicates.           | M       |          |
+| proofParams         | String | A list of proof parameters including credentials, referents, and other necessary information for ZKP generation. | M       |          |
+| selfAttributes      | String | A map of self-attested attributes that are not backed by credentials but are asserted by the prover.             | M       |          |
+| txId                | String | A transaction ID used for tracking or logging the proof creation process.                                        | M       |          |
 
 ### Returns
-N/A
+
+| Type         | Description                                                          | **M/O** | **Note** |
+| ------------ | -------------------------------------------------------------------- | ------- | -------- |
+| P311RequestVo | An object representing the generated ZKP, which will be used for verifiable presentation. | M       |          |
 
 ### Usage
 
 ```java
-walletApi.saveDocument()
+P311RequestVo requestVo = WalletApi.getInstance(context).createEncZkpProof(hWalletToken, vpProfile, proofParams, selfAttr, txId);
 ```
 
 <br>
 
-## 32. deleteKey
+## 32. searchZkpCredentials
 
 ### Description
-`Deletes the specified keys associated with the holder’s DID document after verifying that the provided wallet token has the required permissions.`
+`Search credentials matching the ProofRequest and generate a list of available Referents.`
 
 ### Declaration
 
 ```java
-public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+public AvailableReferent searchZkpCredentials(String hWalletToken, ProofRequest proofRequest) throws Exception
 ```
 
 ### Parameters
 
-| Name         | Type         | Description                     | **M/O** | **Note** |
-| ------------ | ------------ | ------------------------------- | ------- | -------- |
-| hWalletToken | String       | wallet token                    | M       |          |
-| keyIds       | List<String> | a list of key IDs to be deleted | M       |          |
+| Name         | Type         | Description                                                                                | **M/O** | **Note** |
+| ------------ | ------------ | ------------------------------------------------------------------------------------------ | ------- | -------- |
+| hWalletToken | String       | Wallet Token                                                                               | M       |          |
+| proofRequest | ProofRequest | The proof request containing required attributes and predicates specified by the verifier. | M       |          |
+
 
 ### Returns
-N/A
+
+| Type         | Description                                                          | **M/O** | **Note** |
+| ------------ | -------------------------------------------------------------------- | ------- | -------- |
+| AvailableReferent | An object containing a list of matching credentials and referents that can be used to construct a ZKP. | M       |          |
 
 ### Usage
 
 ```java
-walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+AvailableReferent availableReferent = walletApi.searchZkpCredentials(VerifyProof.getInstance(activity).hWalletToken, proofRequestProfileVo.getProofRequestProfile().getProfile().getProofRequest());
 ```
 
 <br>
 
-## 33. isAnyCredentialsSaved
+## 33. getAllZkpCredentials
 
 ### Description
-`Checks whether any credentials are saved in the holder’s wallet.`
+`Retrieve all stored credentials.`
 
 ### Declaration
 
 ```java
-public void isAnyCredentialsSaved() throws WalletException
+public ArrayList<Credential> getAllZkpCredentials(String hWalletToken) throws Exception
+```
+
+### Parameters
+
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| hWalletToken | String | Wallet Token      | M       |          |
+
+
+### Returns
+
+| Type         | Description                                                          | **M/O** | **Note** |
+| ------------ | -------------------------------------------------------------------- | ------- | -------- |
+| List | A list of credentials that can be used for ZKP-based verifiable presentations. | M       |          |
+
+### Usage
+
+```java
+List<Credential> zkpVcList = walletApi.getAllZkpCredentials(hWalletToken);
+```
+
+<br>
+
+## 34. isAnyZkpCredentialsSaved
+
+### Description
+`Check if any credentials are saved.`
+
+### Declaration
+
+```java
+public boolean isAnyZkpCredentialsSaved() throws throws Exception
 ```
 
 ### Parameters
@@ -1124,15 +1178,49 @@ public void isAnyCredentialsSaved() throws WalletException
 N/A
 
 ### Returns
-boolean
+
+| Type         | Description                                                          | **M/O** | **Note** |
+| ------------ | -------------------------------------------------------------------- | ------- | -------- |
+| boolean | if at least one ZKP-compatible credential is stored in the wallet; {@code false} otherwise. | M       |          |
 
 ### Usage
 
 ```java
-
-if (!walletApi.isAnyCredentialsSaved()) {
+if (walletApi.isAnyZkpCredentialsSaved()) {
     ...
 }
+```
+
+<br>
+
+## 35. getZkpCredentials
+
+### Description
+`Retrieve credentials based on given credential IDs.`
+
+### Declaration
+
+```java
+public List<Credential> getZkpCredentials(String hWalletToken, List<String> identifiers) throws Exception
+```
+
+### Parameters
+
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| hWalletToken | String | Wallet Token      | M       |          |
+| identifiers | List | A list of credential identifiers    | M       |          |
+
+### Returns
+
+| Type         | Description                                                          | **M/O** | **Note** |
+| ------------ | -------------------------------------------------------------------- | ------- | -------- |
+| List | A list of credentials corresponding to the given identifiers that can be used for ZKP-based presentations. | M       |          |
+
+### Usage
+
+```java
+List<Credential> credentialList = walletApi.getZkpCredentials(hWalletToken, List.of(vcId));
 ```
 
 <br>

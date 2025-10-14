@@ -25,6 +25,7 @@ Android Wallet API
 
 | Version | Date       | History                 |
 | ------- | ---------- | ------------------------|
+| v2.0.0  | 2024-08-19 | ZKP 추가                 |
 | v1.0.0  | 2024-08-19 | 초기 작성                 |
 
 
@@ -62,7 +63,13 @@ Android Wallet API
     - [27. isSavedBioKey](#27-issavedbiokey)
     - [28. changePin](#28-changepin)
     - [29. changeLock](#29-changelock)
-
+    - [30. createZkpReferent](#30-createzkpreferent)
+    - [31. createEncZkpProof](#31-createenczkpproof)
+    - [32. searchZkpCredentials](#32-searchzkpcredentials)
+    - [33. getAllZkpCredentials](#33-getallzkpcredentials)
+    - [34. isAnyZkpCredentialsSaved](#34-isanyzkpcredentialssaved)
+    - [35. getZkpCredentials](#35-getzkpcredentials)
+  
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
 - [Value Object](#value-object)
@@ -169,20 +176,17 @@ boolean success = walletApi.createWallet();
 ## 3. deleteWallet
 
 ### Description
-`소유자의 지갑 데이터를 삭제합니다. deleteAll 플래그에 따라 모든 지갑 관련 데이터(CA 패키지 정보, 사용자 데이터 및 토큰 포함)를 삭제하거나 부분 삭제를 수행합니다.
-삭제 프로세스는 데이터베이스 레코드에 대해 비동기적으로 실행되며, 핵심 지갑 삭제 로직도 호출합니다.`
+`DeviceKey Wallet을 삭제한다.`
 
 ### Declaration
 
 ```java
-public void deleteWallet(booelan deleteAll) throws WalletCoreException
+public void deleteWallet() throws Exception
 ```
 
 ### Parameters
 
-| Name      | Type    | Description | **M/O** | **Note**                                    |
-| --------- | ------- | ----------- | ------- | --------------------------------------------|
-| deleteAll | boolean |true로 설정 시 deviceKey와 holderKey 모두 삭제, false로 설정 시 holderKey만 삭제.| M |   |
+Void
 
 ### Returns
 
@@ -191,7 +195,7 @@ N/A
 ### Usage
 
 ```java
-walletApi.deleteWallet(true);
+walletApi.deleteWallet();
 ```
 
 <br>
@@ -1025,99 +1029,148 @@ walletApi.changeLock(oldPin, newPin);
 
 <br>
 
-
-## 30. updateHolderDIDDoc
+## 30. createZkpReferent
 
 ### Description
-`제공된 지갑 토큰을 사용하여 사용자의 기존 DID 문서를 업데이트합니다.`
+`사용자가 선택한 참조 대상 정보를 기반으로 각 자격 증명에 대한 참조 대상을 생성`
 
 ### Declaration
 
 ```java
-public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+public ReferentInfo createZkpReferent(List<UserReferent> customReferents) throws Exception
+```
+
+### Parameters
+
+| Name            | Type | Description                                  | **M/O** | **Note** |
+| --------------- | ---- | -------------------------------------------- | ------- | -------- |
+| customReferents | List | ZKP 생성에 포함될 사용자 정의 참조 대상 목록           | M       |          |
+
+### Returns
+
+| Type         | Description                                       | **M/O** | **Note** |
+| ------------ | --------------------------------------------------| ------- | -------- |
+| ReferentInfo | 자격 증명 생성을 위한 ZKP 참조 객체를 구축하는 데 사용되는 객체 | M       |          |
+
+### Usage
+
+```java
+
+ReferentInfo referentInfo = WalletApi.getInstance(getContext()).createZkpReferent(customReferents);
+```
+
+<br>
+
+## 31. createEncZkpProof
+
+### Description
+`사용자의 자격 증명과 참조 정보를 기반으로 ZKP 증명을 생성`
+
+### Declaration
+
+```java
+public P311RequestVo createEncZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile,
+                                        List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws Exception
+```
+
+### Parameters
+
+| Name                | Type   | Description                                                   | **M/O** | **Note** |
+| ------------------- | ------ | ------------------------------------------------------------- | ------- | -------- |
+| walletToken         | String | 월렛 토큰                                                        | M       |          |
+| proofRequestProfile | String | 요청된 속성 및 술어와 같은 검증자의 증명 요구 사항을 포함하는 프로필           | M       |          |
+| proofParams         | String | ZKP 생성에 필요한 자격 증명, 참조 정보 및 기타 정보를 포함한 증명 매개변수 목록 | M       |          |
+| selfAttributes      | String | 자격 증명에 의해 뒷받침되지 않지만 증명자가 주장하는 자체 증명 속성의 맵        | M       |          |
+| txId                | String | 증명 생성 프로세스를 추적하거나 기록하는 데 사용되는 거래 ID                 | M       |          |
+
+### Returns
+
+| Type          | Description                                          | **M/O** | **Note** |
+| ------------- | ---------------------------------------------------- | ------- | -------- |
+| P311RequestVo | 검증 가능한 표현에 사용될 생성된 ZKP를 나타내는 객체             | M       |          |
+
+### Usage
+
+```java
+P311RequestVo requestVo = walletApi.createEncZkpProof(hWalletToken, vpProfile, proofParams, selfAttr, txId);
+```
+
+<br>
+
+## 32. searchZkpCredentials
+
+### Description
+`ProofRequest와 일치하는 자격 증명을 검색하고 사용 가능한 참조 대상 목록을 생성`
+
+### Declaration
+
+```java
+public AvailableReferent searchZkpCredentials(String hWalletToken, ProofRequest proofRequest) throws Exception
+```
+
+### Parameters
+
+| Name         | Type         | Description                               | **M/O** | **Note** |
+| ------------ | ------------ | ----------------------------------------- | ------- | -------- |
+| hWalletToken | String       | 월렛 토큰                                   | M       |          |
+| proofRequest | ProofRequest | 검증자가 지정한 필수 속성과 술어를 포함하는 증명 요청  | M       |          |
+
+
+### Returns
+
+| Type              | Description                                                          | **M/O** | **Note** |
+| ----------------- | -------------------------------------------------------------------- | ------- | -------- |
+| AvailableReferent | ZKP를 구성하는 데 사용할 수 있는 일치하는 자격 증명과 참조 항목 목록이 포함된 객체      | M       |          |
+
+### Usage
+
+```java
+AvailableReferent availableReferent = walletApi.searchZkpCredentials(VerifyProof.getInstance(activity).hWalletToken, proofRequestProfileVo.getProofRequestProfile().getProfile().getProofRequest());
+```
+
+<br>
+
+## 33. getAllZkpCredentials
+
+### Description
+`저장된 모든 자격 증명을 검색`
+
+### Declaration
+
+```java
+public ArrayList<Credential> getAllZkpCredentials(String hWalletToken) throws Exception
 ```
 
 ### Parameters
 
 | Name         | Type   | Description | **M/O** | **Note** |
 | ------------ | ------ | ----------- | ------- | -------- |
-| hWalletToken | String | 월렛 토큰     | M       |          |
+| hWalletToken | String | 월렛 토큰   | M       |          |
+
 
 ### Returns
 
+| Type | Description                                                       | **M/O** | **Note** |
+| ---- | ----------------------------------------------------------------- | ------- | -------- |
+| List | ZKP 기반 검증 가능한 프레젠테이션에 사용할 수 있는 자격 증명 목록                | M       |          |
 
 ### Usage
 
 ```java
-walletApi.updateHolderDIDDoc(hWalletToken);
+List<Credential> zkpVcList = walletApi.getAllZkpCredentials(hWalletToken);
 ```
 
 <br>
 
-## 31. saveDocument
+## 34. isAnyZkpCredentialsSaved
 
 ### Description
-`사용자의 DID 문서를 영구 저장소에 저장합니다.`
+`자격 증명이 저장되었는지 확인`
 
 ### Declaration
 
 ```java
-public void saveDocument() throws WalletException, WalletCoreException, UtilityException
-
-```
-
-### Parameters
-N/A
-
-### Returns
-N/A
-
-### Usage
-
-```java
-walletApi.saveDocument()
-```
-
-<br>
-
-## 32. deleteKey
-
-### Description
-`제공된 지갑 토큰에 필요한 권한이 있는지 확인한 후, 사용자의 DID(탈중앙화 식별자) 문서와 연결된 지정된 키를 삭제합니다.`
-
-### Declaration
-
-```java
-public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
-```
-
-### Parameters
-
-| Name         | Type         | Description | **M/O** | **Note** |
-| ------------ | ------------ | ----------- | ------- | -------- |
-| hWalletToken | String       | 월렛토큰    | M       |          |
-| keyIds       | List<String> | 키 IDs      | M       |          |
-
-### Returns
-N/A
-
-### Usage
-
-```java
-walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
-```
-
-<br>
-
-## 33. isAnyCredentialsSaved
-
-### Description
-`사용자의 지갑에 증명서가 저장되어 있는지 확인합니다.`
-
-### Declaration
-
-```java
-public void isAnyCredentialsSaved() throws WalletException
+public boolean isAnyZkpCredentialsSaved() throws throws Exception
 ```
 
 ### Parameters
@@ -1125,15 +1178,49 @@ public void isAnyCredentialsSaved() throws WalletException
 N/A
 
 ### Returns
-boolean
+
+| Type         | Description                                                          | **M/O** | **Note** |
+| ------------ | -------------------------------------------------------------------- | ------- | -------- |
+| boolean      | 지갑에 ZKP 호환 자격 증명이 하나 이상 저장된 경우입니다. 그렇지 않은 경우 false      | M       |          |
 
 ### Usage
 
 ```java
-
-if (!walletApi.isAnyCredentialsSaved()) {
+if (walletApi.isAnyZkpCredentialsSaved()) {
     ...
 }
+```
+
+<br>
+
+## 35. getZkpCredentials
+
+### Description
+`주어진 자격 증명 ID를 기반으로 자격 증명을 검색`
+
+### Declaration
+
+```java
+public List<Credential> getZkpCredentials(String hWalletToken, List<String> identifiers) throws Exception
+```
+
+### Parameters
+
+| Name         | Type   | Description           | **M/O** | **Note** |
+| ------------ | ------ | --------------------- | ------- | -------- |
+| hWalletToken | String | 월렛 토큰               | M       |          |
+| identifiers  | List   | 자격 증명 식별자 목록      | M       |          |
+
+### Returns
+
+| Type | Description                                                                    | **M/O** | **Note** |
+| ---- | ------------------------------------------------------------------------------ | ------- | -------- |
+| List | ZKP 기반 프레젠테이션에 사용할 수 있는 주어진 식별자에 해당하는 자격 증명 목록                   | M       |          |
+
+### Usage
+
+```java
+List<Credential> credentialList = walletApi.getZkpCredentials(hWalletToken, List.of(vcId));
 ```
 
 <br>
