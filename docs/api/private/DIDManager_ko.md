@@ -19,13 +19,14 @@ Android DIDManager API
 ==
 
 - 주제: DIDManager
-- 작성: Sangjun Kim
-- 일자: 2024-07-10
-- 버전: v1.0.0
+- 작성: Dongjun Park
+- 일자: 2025-10-15
+- 버전: v1.0.1
 
-| 버전   | 일자       | 변경 내용                 |
-| ------ | ---------- | -------------------------|
-| v1.0.0 | 2024-07-10 | 초기 작성                 |
+| 버전   | 일자       | 변경 내용            |
+| ------ | ---------- | -------------------- |
+| v1.0.1 | 2025-10-15 | DIDDoc 업데이트 추가 |
+| v1.0.0 | 2024-07-10 | 초기 작성            |
 
 
 <div style="page-break-after: always;"></div>
@@ -45,6 +46,7 @@ Android DIDManager API
     - [11. addService](#11-addservice)
     - [12. removeService](#12-removeservice)
     - [13. resetChanges](#13-resetchanges)
+    - [14. updateDocument](#14-updatedocument)
 - [Enumerators](#enumerators)
     - [1. DID_METHOD_TYPE](#1-did_method_type)
     - [2. DID_KEY_TYPE](#2-did_key_type)
@@ -167,12 +169,12 @@ void createDocument(String did, List<DIDKeyInfo> keyInfos, String controller, Li
 
 
 ### Parameters
-| Parameter | Type   | Description                | **M/O** | **비고** |
-|-----------|--------|----------------------------|---------|---------|
-| did    | String    | 사용자 DID |M| DID 생성은 [genDID](#2-gendid)를 참고 |
-| keyInfos    | List&lt;DIDKeyInfo&gt; | DID 문서에 등록할 공개키 정보 객체의 배열 |    M    | [DIDKeyInfo](#2-didkeyinfo) |
-| controller    | String    | DID 문서에 controller로 등록할 DID. <br>null이면, `did` 항목을 사용한다. |    M    | |
-| service    | List&lt;Service&gt;    | DID 문서에 명시할 서비스 정보 객체  |    M    | [Service](#4-service) |
+| Parameter  | Type                   | Description                                                              | **M/O** | **비고**                              |
+| ---------- | ---------------------- | ------------------------------------------------------------------------ | ------- | ------------------------------------- |
+| did        | String                 | 사용자 DID                                                               | M       | DID 생성은 [genDID](#2-gendid)를 참고 |
+| keyInfos   | List&lt;DIDKeyInfo&gt; | DID 문서에 등록할 공개키 정보 객체의 배열                                | M       | [DIDKeyInfo](#2-didkeyinfo)           |
+| controller | String                 | DID 문서에 controller로 등록할 DID. <br>null이면, `did` 항목을 사용한다. | M       |                                       |
+| service    | List&lt;Service&gt;    | DID 문서에 명시할 서비스 정보 객체                                       | M       | [Service](#4-service)                 |
 
 ### Returns
 void
@@ -491,6 +493,39 @@ DIDManager<DIDDocument> didManager = new DIDManager<>("MyWallet", this);
 
 didManager.resetChanges());
 ```
+<br>
+
+## 14. updateDocument
+
+### Description
+`"DIDDocument 객체"를 업데이트하고 내부 변수로 관리합니다.`
+
+### Declaration
+
+```java
+void updateDocument(List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws Exception
+```
+
+### Parameters
+
+| Parameter  | Type                   | Description                                                       | **M/O** | **Notes**                   |
+| ---------- | ---------------------- | ----------------------------------------------------------------- | ------- | --------------------------- |
+| keyInfos   | List&lt;DIDKeyInfo&gt; | DID 문서에 등록할 공개키 정보 객체의 배열                                  | M       | [DIDKeyInfo](#2-didkeyinfo) |
+| controller | String                 | DID 문서에 controller로 등록할 DID. <br>null이면, `did` 항목을 사용한다.   | M       |                             |
+| service    | List&lt;Service&gt;    | DID 문서에 명시할 서비스 정보 객체                                        | M       | [Service](#4-service)       |
+
+
+### Returns
+
+void
+
+### Usage
+```java
+DIDManager<DIDDocument> didManager = new DIDManager<>("MyWallet", this);
+
+didManager.updateDIDDoc(didKeyInfos, controller, null);
+```
+
 <br>
 
 # Enumerators

@@ -134,7 +134,7 @@ class WalletCore implements WalletCoreInterface {
                 didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), controller);
             didKeyInfos.add(didKeyInfo);
         }
-        didManager.updateDIDDoc(didKeyInfos, controller, null);
+        didManager.updateDocument(didKeyInfos, controller, null);
         return didManager.getDocument();
 
     }

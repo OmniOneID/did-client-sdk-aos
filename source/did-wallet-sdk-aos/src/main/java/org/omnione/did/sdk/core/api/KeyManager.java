@@ -60,6 +60,28 @@ class KeyManager<E extends BaseObject>{
         storageManager = new StorageManager<>(fileName, FileExtension.FILE_EXTENSION.KEY, true, context, DetailKeyInfo.class, KeyInfo.class);
     }
 
+    /**
+     * Authenticates a user's PIN by decrypting a stored private key and verifying it against the corresponding public key.
+     * This method orchestrates the entire process: fetching the key information from storage using the provided ID,
+     * deriving a symmetric key from the user's PIN and a stored salt, decrypting the private key,
+     * and finally checking if the decrypted private key matches the stored public key.
+     * It also securely clears sensitive byte arrays from memory after use.
+     *
+     * @param id The identifier for the key to be authenticated. It is used to retrieve key metadata
+     *           and the encrypted private key from secure storage. Cannot be an empty string.
+     * @param pin The user's PIN as a byte array, which is required to derive the decryption key.
+     *            This parameter must not be null for PIN-based authentication.
+     * @throws WalletCoreException If any part of the authentication process fails. This includes:
+     *                             <ul>
+     *                               <li>If the provided {@code id} or {@code pin} is invalid (e.g., empty or null).</li>
+     *                               <li>If the key information cannot be found in storage for the given {@code id}.</li>
+     *                               <li>If decoding of the private key, public key, or salt from Multibase format fails.</li>
+     *                               <li>If the key's access method is not supported (not {@code WALLET_PIN}).</li>
+     *                               <li>If the decrypted private key does not match the public key, indicating a PIN mismatch.</li>
+     *                             </ul>
+     * @throws UtilityException If a utility-related error occurs, such as during cryptographic operations
+     *                          or Multibase decoding, although many are wrapped in {@code WalletCoreException}.
+     */
     public void authenticatePin(String id, byte[] pin) throws WalletCoreException, UtilityException {
 
         if(id.length() == 0) {
