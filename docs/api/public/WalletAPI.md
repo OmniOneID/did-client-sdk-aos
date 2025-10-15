@@ -33,48 +33,54 @@ Android Wallet API
 <div style="page-break-after: always;"></div>
 
 # Table of Contents
-- [APIs](#api-list)
-    - [0. constructor](#0-constructor)
-    - [1. isExistWallet](#1-isexistwallet)
-    - [2. createWallet](#2-createwallet)
-    - [3. deleteWallet](#3-deletewallet)
-    - [4. createWalletTokenSeed](#4-createwallettokenseed)
-    - [5. createNonceForWalletToken](#5-createnonceforwallettoken)
-    - [6. bindUser](#6-binduser)
-    - [7. unbindUser](#7-unbinduser)
-    - [8. registerLock](#8-registerlock)
-    - [9. authenticateLock](#9-authenticatelock)
-    - [10. createHolderDIDDoc](#10-createholderdiddoc)
-    - [11. createSignedDIDDoc](#11-createsigneddiddoc)
-    - [12. getDIDDocument](#12-getdiddocument)
-    - [13. generateKeyPair](#13-generatekeypair)
-    - [14. isLock](#14-islock)
-    - [15. getSignedWalletInfo](#15-getsignedwalletinfo)
-    - [16. requestRegisterUser](#16-requestregisteruser)
-    - [17. getSignedDIDAuth](#17-getsigneddidauth)
-    - [18. requestIssueVc](#18-requestissuevc)
-    - [19. requestRevokeVc](#19-requestrevokevc)
-    - [20. getAllCredentials](#20-getallcredentials)
-    - [21. getCredentials](#21-getcredentials)
-    - [22. deleteCredentials](#22-deletecredentials)
-    - [23. createEncVp](#23-createencvp)
-    - [24. registerBioKey](#24-registerbiokey)
-    - [25. authenticateBioKey](#25-authenticatebiokey)
-    - [26. addProofsToDocument](#26-addproofstodocument)
-    - [27. isSavedBioKey](#27-issavedbiokey)
-    - [28. changePin](#28-changepin)
-    - [29. changeLock](#29-changelock)
-    - [30. createZkpReferent](#30-createzkpreferent)
-    - [31. createEncZkpProof](#31-createenczkpproof)
-    - [32. searchZkpCredentials](#32-searchzkpcredentials)
-    - [33. getAllZkpCredentials](#33-getallzkpcredentials)
-    - [34. isAnyZkpCredentialsSaved](#34-isanyzkpcredentialssaved)
-    - [35. getZkpCredentials](#35-getzkpcredentials)
-    - [36. updateHolderDIDDoc](#36-updateholderdiddoc)
-    - [37. saveDocument](#37-savedocument)
-    - [38. deleteKey](#38-deletekey)
-    - [39. isAnyCredentialsSaved](#39-isanycredentialssaved)
-    - [40. authenticatePin](#40-authenticatepin)
+- [APIs](#api-목록)
+    - [1. constructor](#1-constructor)
+    - [2. Wallet](#2-wallet)
+        - [2.1. isExistWallet](#21-isexistwallet)
+        - [2.2. createWallet](#22-createwallet)
+        - [2.3. deleteWallet](#23-deletewallet)
+        - [2.4. createWalletTokenSeed](#24-createwallettokenseed)
+        - [2.5. createNonceForWalletToken](#25-createnonceforwallettoken)
+        - [2.6. bindUser](#26-bindUser)
+        - [2.7. unbindUser](#27-unbinduser)
+        - [2.8. requestRegisterUser](#28-requestregisteruser)
+        - [2.9. getSignedWalletInfo](#29-getsignedwalletinfo)
+    - [3. DIDKey](#3-didkey)
+        - [3.1. createHolderDIDDoc](#31-createholderdiddoc)
+        - [3.2. createSignedDIDDoc](#32-createsigneddiddoc)
+        - [3.3. getDIDDocument](#33-getdiddocument)
+        - [3.4. generateKeyPair](#34-generatekeypair)
+        - [3.5. getSignedDIDAuth](#35-getsigneddidauth)
+        - [3.6. updateHolderDIDDoc](#36-updateholderdiddoc)
+        - [3.7. saveDocument](#37-savedocument)
+        - [3.8. deleteKey](#38-deletekey)
+        - [3.9. requestUpdateUser](#39-requestupdateuser)
+        - [3.10. requestRestoreUser](#310-requestrestoreuser)
+    - [4. Credential](#4-credential)
+        - [4.1. requestIssueVc](#41-requestissuevc)
+        - [4.2. requestRevokeVc](#42-requestrevokevc)
+        - [4.3. getAllCredentials](#43-getallcredentials)
+        - [4.4. getCredentials](#44-getcredentials)
+        - [4.5. deleteCredentials](#45-deletecredentials)
+        - [4.6. createEncVp](#46-createencvp)
+        - [4.7. addProofsToDocument](#47-addproofstodocument)
+        - [4.8. isAnyCredentialsSaved](#48-isanycredentialssaved)
+    - [5. ZKP](#5-zkp)
+        - [5.1. createZkpReferent](#51-createzkpreferent)
+        - [5.2. createEncZkpProof](#52-createenczkpproof)
+        - [5.3. searchZkpCredentials](#53-searchzkpcredentials)
+        - [5.4. getAllZkpCredentials](#54-getallzkpcredentials)
+        - [5.5. isAnyZkpCredentialsSaved](#55-isanyzkpcredentialssaved)
+        - [5.6. getZkpCredentials](#56-getzkpcredentials)
+    - [6. SecurityAuth](#6-securityauth)
+        - [6.1. registerLock](#61-registerlock)
+        - [6.2. authenticateLock](#61-authenticatelock)
+        - [6.3. isLock](#61-islock)
+        - [6.4. registerBioKey](#64-registerbiokey)
+        - [6.5. authenticateBioKey](#65-authenticatebiokey)
+        - [6.6. changePin](#66-changepin)
+        - [6.7. changeLock](#67-changelock)
+        - [6.8. authenticatePin](#68-authenticatepin)
   
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
@@ -85,8 +91,10 @@ Android Wallet API
     - [4. SignedDIDDoc](#4-signeddiddoc)
     - [5. SignedWalletInfo](#5-signedwalletinfo)
     - [6. DIDAuth](#6-didauth)
-# API List
-## 0. constructor
+
+
+# API 목록
+## 1. constructor
 
 ### Description
  `WalletApi construct`
@@ -117,7 +125,8 @@ WalletApi walletApi = WalletApi.getInstatnce(context)
 
 <br>
 
-## 1. isExistWallet
+## 2. Wallet
+### 2.1. isExistWallet
 
 ### Description
  `Check whether DeviceKey Wallet exists.`
@@ -146,7 +155,7 @@ boolean exists = walletApi.isExistWallet();
 
 <br>
 
-## 2. createWallet
+### 2.2. createWallet
 
 ### Description
 `Create a DeviceKey Wallet.`
@@ -179,7 +188,7 @@ boolean success = walletApi.createWallet();
 
 <br>
 
-## 3. deleteWallet
+### 2.3. deleteWallet
 
 ### Description
 `Delete DeviceKey Wallet..`
@@ -187,12 +196,14 @@ boolean success = walletApi.createWallet();
 ### Declaration
 
 ```java
-public void deleteWallet() throws Exception
+public void deleteWallet(boolean deleteAll) throws Exception
 ```
 
 ### Parameters
 
-Void
+| Name      | Type    | Description           | **M/O** | **Note** |
+| --------- | ------- | --------------------- | ------- | -------- |
+| deleteAll | boolean | Wallet deletion scope | M       |          |
 
 ### Returns
 
@@ -201,12 +212,12 @@ N/A
 ### Usage
 
 ```java
-walletApi.deleteWallet();
+walletApi.deleteWallet(deleteAll);
 ```
 
 <br>
 
-## 4. createWalletTokenSeed
+### 2.4. createWalletTokenSeed
 
 ### Description
 `Generate a wallet token seed.`
@@ -239,7 +250,7 @@ WalletTokenSeed tokenSeed = walletApi.createWalletTokenSeed(purpose, "org.opendi
 
 <br>
 
-## 5. createNonceForWalletToken
+### 2.5. createNonceForWalletToken
 
 ### Description
 `Generate a nonce for creating wallet tokens.`
@@ -270,7 +281,7 @@ String nonce = walletApi.createNonceForWalletToken(walletTokenData);
 
 <br>
 
-## 6. bindUser
+### 2.6. bindUser
 
 ### Description
 `Perform user personalization in Wallet.`
@@ -301,7 +312,7 @@ boolean success = walletApi.bindUser("hWalletToken");
 
 <br>
 
-## 7. unbindUser
+### 2.7. unbindUser
 
 ### Description
 `Perform user depersonalization.`
@@ -332,249 +343,7 @@ boolean success = walletApi.unbindUser("hWalletToken");
 
 <br>
 
-## 8. registerLock
-
-### Description
-`Sets the lock status of the wallet.`
-
-### Declaration
-
-```java
-public boolean registerLock(String hWalletToken, String passCode, boolean isLock) throws Exception
-```
-
-### Parameters
-
-| Name         | Type   | Description                        | **M/O** | **Note** |
-|--------------|--------|-----------------------------|---------|----------|
-| hWalletToken | String | Wallet Token                   | M       |          |
-| passcode     | String | Unlock PIN               | M       |          |
-| isLock       | boolean | Whether the lock is activated           | M       |          |
-
-### Returns
-
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| Bool | Returns whether the lock setup was successful. | M       |          |
-
-### Usage
-
-```java
-boolean success = walletApi.registerLock("hWalletToken", "123456", true);
-```
-
-<br>
-
-## 9. authenticateLock
-
-### Description
-`Perform authentication to unlock the wallet.`
-
-### Declaration
-
-```java
-public void authenticateLock(String passCode) throws Exception
-```
-
-### Parameters
-
-| Name         | Type   | Description                        | **M/O** | **Note** |
-|--------------|--------|-----------------------------|---------|----------|
-| passCode     | String |Unlock PIN               | M       | PIN set when registerLock          | 
-
-### Returns
-
-Void
-
-### Usage
-
-```java
-walletApi.authenticateLock("hWalletToken", "123456");
-```
-
-<br>
-
-## 10. createHolderDIDDoc
-
-### Description
-`Create a user DID Document.`
-
-### Declaration
-
-```java
-public DIDDocument createHolderDIDDoc(String hWalletToken) throws Exception
-```
-
-### Parameters
-
-| Name          | Type   | Description                       | **M/O** | **Note** |
-|---------------|--------|----------------------------|---------|----------|
-| hWalletToken  | String | Wallet Token                  | O       |          |
-
-### Returns
-
-| Type         | Description                  | **M/O** | **Note** |
-|--------------|-----------------------|---------|----------|
-| DIDDocument  | DID Document   | M       |          |
-
-### Usage
-
-```java
-DIDDocument didDoc = walletApi.createHolderDIDDoc("hWalletToken");
-```
-
-<br>
-
-## 11. createSignedDIDDoc
-
-### Description
-`Creates a signed user DID Document object.`
-
-### Declaration
-
-```java
-public SignedDidDoc createSignedDIDDoc(DIDDocument ownerDIDDoc) throws Exception
-```
-
-### Parameters
-
-| Name          | Type   | Description                       | **M/O** | **Note** |
-|---------------|--------|----------------------------|---------|----------|
-| ownerDIDDoc  | DIDDocument | Owner's DID document object                 | M       |          |
-
-### Returns
-
-| Type            | Description                  | **M/O** | **Note** |
-|-----------------|-----------------------|---------|----------|
-| SignedDidDoc | Signed DID Document Object   | M       |[SignedDIDDoc](#4-signeddiddoc)          |
-
-### Usage
-
-```java
-SignedDidDoc signedDidDoc = walletApi.createSignedDIDDoc(ownerDIDDoc);
-```
-
-<br>
-
-## 12. getDIDDocument
-
-### Description
-`Retrieve the DID Document.`
-
-### Declaration
-
-```java
-public DIDDocument getDIDDocument(int type) throws Exception
-```
-
-### Parameters
-
-| Name          | Type   | Description                       | **M/O** | **Note** |
-|---------------|--------|----------------------------|---------|----------|
-| type  | int | 1 : deviceKey DID Document, 2: holder DID document                  | M       |          |
-
-### Returns
-
-| Type         | Description                  | **M/O** | **Note** |
-|--------------|-----------------------|---------|----------|
-| DIDDocument  | DID Document       | M       |          |
-
-### Usage
-
-```java
-DIDDocument didDoc = walletApi.getDIDDocument("hWalletToken", 1);
-```
-
-<br>
-
-## 13. generateKeyPair
-
-### Description
-`Generate a PIN key pair for signing and store it in your Wallet.`
-
-### Declaration
-
-```java
-public void generateKeyPair(String hWalletToken, String passcode) throws Exception
-```
-
-### Parameters
-
-| Name         | Type   | Description                        | **M/O** | **Note** |
-|--------------|--------|-----------------------------|---------|----------|
-| hWalletToken | String |Wallet Token                   | M       |          |
-| passCode     | String |PIN for signing               | M       | When generating a key for PIN signing      | 
-
-### Returns
-
-Void
-
-### Usage
-
-```java
-walletApi.generateKeyPair("hWalletToken", "123456");
-```
-
-<br>
-
-## 14. isLock
-
-### Description
-`Check the lock type of the wallet.`
-
-### Declaration
-
-```java
-public boolean isLock() throws Exception
-```
-
-### Parameters
- Void
-
-### Returns
-
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| boolean | Returns the wallet lock type. | M       |          |
-
-### Usage
-
-```java
-boolean isLocked = walletApi.isLock();
-```
-
-<br>
-
-## 15. getSignedWalletInfo
-
-### Description
-`signed wallet information.`
-
-### Declaration
-
-```java
-public SignedWalletInfo getSignedWalletInfo() throws Exception
-```
-
-### Parameters
-
-Void
-
-### Returns
-
-| Type             | Description                    | **M/O** | **Note** |
-|------------------|-------------------------|---------|----------|
-| SignedWalletInfo | Signed WalletInfo object      | M       |[SignedWalletInfo](#5-signedwalletinfo)          |
-
-### Usage
-
-```java
-SignedWalletInfo signedInfo = walletApi.getSignedWalletInfo();
-```
-
-<br>
-
-## 16. requestRegisterUser
+### 2.8. requestRegisterUser
 
 ### Description
 `Request user registration.`
@@ -609,7 +378,162 @@ String _M132_RequestRegisterUser = walletApi.requestRegisterUser("hWalletToken",
 
 <br>
 
-## 17. getSignedDIDAuth
+### 2.9. getSignedWalletInfo
+
+### Description
+`signed wallet information.`
+
+### Declaration
+
+```java
+public SignedWalletInfo getSignedWalletInfo() throws Exception
+```
+
+### Parameters
+
+Void
+
+### Returns
+
+| Type             | Description                    | **M/O** | **Note** |
+|------------------|-------------------------|---------|----------|
+| SignedWalletInfo | Signed WalletInfo object      | M       |[SignedWalletInfo](#5-signedwalletinfo)          |
+
+### Usage
+
+```java
+SignedWalletInfo signedInfo = walletApi.getSignedWalletInfo();
+```
+
+<br>
+
+
+## 3. DIDKey
+
+### 3.1. createHolderDIDDoc
+
+### Description
+`Create a user DID Document.`
+
+### Declaration
+
+```java
+public DIDDocument createHolderDIDDoc(String hWalletToken) throws Exception
+```
+
+### Parameters
+
+| Name          | Type   | Description                       | **M/O** | **Note** |
+|---------------|--------|----------------------------|---------|----------|
+| hWalletToken  | String | Wallet Token                  | O       |          |
+
+### Returns
+
+| Type         | Description                  | **M/O** | **Note** |
+|--------------|-----------------------|---------|----------|
+| DIDDocument  | DID Document   | M       |          |
+
+### Usage
+
+```java
+DIDDocument didDoc = walletApi.createHolderDIDDoc("hWalletToken");
+```
+
+<br>
+
+### 3.2. createSignedDIDDoc
+
+### Description
+`Creates a signed user DID Document object.`
+
+### Declaration
+
+```java
+public SignedDidDoc createSignedDIDDoc(DIDDocument ownerDIDDoc) throws Exception
+```
+
+### Parameters
+
+| Name          | Type   | Description                       | **M/O** | **Note** |
+|---------------|--------|----------------------------|---------|----------|
+| ownerDIDDoc  | DIDDocument | Owner's DID document object                 | M       |          |
+
+### Returns
+
+| Type            | Description                  | **M/O** | **Note** |
+|-----------------|-----------------------|---------|----------|
+| SignedDidDoc | Signed DID Document Object   | M       |[SignedDIDDoc](#4-signeddiddoc)          |
+
+### Usage
+
+```java
+SignedDidDoc signedDidDoc = walletApi.createSignedDIDDoc(ownerDIDDoc);
+```
+
+<br>
+
+### 3.3. getDIDDocument
+
+### Description
+`Retrieve the DID Document.`
+
+### Declaration
+
+```java
+public DIDDocument getDIDDocument(int type) throws Exception
+```
+
+### Parameters
+
+| Name          | Type   | Description                       | **M/O** | **Note** |
+|---------------|--------|----------------------------|---------|----------|
+| type  | int | 1 : deviceKey DID Document, 2: holder DID document                  | M       |          |
+
+### Returns
+
+| Type         | Description                  | **M/O** | **Note** |
+|--------------|-----------------------|---------|----------|
+| DIDDocument  | DID Document       | M       |          |
+
+### Usage
+
+```java
+DIDDocument didDoc = walletApi.getDIDDocument("hWalletToken", 1);
+```
+
+<br>
+
+### 3.4. generateKeyPair
+
+### Description
+`Generate a PIN key pair for signing and store it in your Wallet.`
+
+### Declaration
+
+```java
+public void generateKeyPair(String hWalletToken, String passcode) throws Exception
+```
+
+### Parameters
+
+| Name         | Type   | Description                        | **M/O** | **Note** |
+|--------------|--------|-----------------------------|---------|----------|
+| hWalletToken | String |Wallet Token                   | M       |          |
+| passCode     | String |PIN for signing               | M       | When generating a key for PIN signing      | 
+
+### Returns
+
+Void
+
+### Usage
+
+```java
+walletApi.generateKeyPair("hWalletToken", "123456");
+```
+
+<br>
+
+### 3.5. getSignedDIDAuth
 
 ### Description
 `Perform DIDAuth signing.`
@@ -641,7 +565,165 @@ DIDAuth signedDIDAuth = walletApi.getSignedDIDAuth("authNonce", "123456");
 
 <br>
 
-## 18. requestIssueVc
+
+### 3.6. updateHolderDIDDoc
+
+### Description
+`Updates the existing DID document for the holder using the provided wallet token.`
+
+### Declaration
+
+```java
+public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+```
+
+### Parameters
+
+| Name         | Type   | Description | **M/O** | **Note** |
+| ------------ | ------ | ----------- | ------- | -------- |
+| hWalletToken | String | wallet token     | M       |          |
+
+### Returns
+
+
+### Usage
+
+```java
+walletApi.updateHolderDIDDoc(hWalletToken);
+```
+
+<br>
+
+### 3.7. saveDocument
+
+### Description
+`Saves the holder’s DID document into persistent storage.`
+
+### Declaration
+
+```java
+public void saveDocument() throws WalletException, WalletCoreException, UtilityException
+
+```
+
+### Parameters
+N/A
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.saveDocument()
+```
+
+<br>
+
+### 3.8. deleteKey
+
+### Description
+`Deletes the specified keys associated with the holder’s DID document after verifying that the provided wallet token has the required permissions.`
+
+### Declaration
+
+```java
+public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+```
+
+### Parameters
+
+| Name         | Type         | Description                     | **M/O** | **Note** |
+| ------------ | ------------ | ------------------------------- | ------- | -------- |
+| hWalletToken | String       | wallet token                    | M       |          |
+| keyIds       | List<String> | a list of key IDs to be deleted | M       |          |
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+```
+
+<br>
+
+### 3.9. requestUpdateUser
+
+### Description
+`Requests user DID update with the given wallet token, server token, signed DID authentication, and transaction ID.`
+
+### Declaration
+
+```java
+CompletableFuture<String> requestUpdateUser(String hWalletToken, String tasUrl, String serverToken, DIDAuth signedDIDAuth, SignedDidDoc signedDIDDoc, String txId) throws Exception
+```
+
+### Parameters
+
+| Name          | Type         | Description                    | **M/O** | **Note** |
+| ------------- | ------------ | ------------------------------ | ------- | -------- |
+| hWalletToken  | String       | Wallet Token                   | M       |          |
+| tasUrl        | String       | TAS url                        | M       |          |
+| serverToken   | String       | Server Token                   | M       |          |
+| signedDIDAuth | DIDAuth      | Signed DID Authenticate Object | M       |          |
+| signedDIDDoc  | SignedDidDoc | Signed DID Document Object     | M       |          |
+| txId          | String       | txId                           | M       |          |
+
+### Returns
+
+| Type   | Description | **M/O** | **Note** |
+| ------ | ----------- | ------- | -------- |
+| String | txId        | M       |          |
+
+### Usage
+
+```java
+walletApi.requestUpdateUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAuth, signedDidDoc, txId).get();
+```
+
+<br>
+
+### 3.10. requestRestoreUser
+
+### Description
+`Requests user restoration with the given wallet token, server token, signed DID authentication, and transaction ID.`
+
+### Declaration
+
+```java
+CompletableFuture<String> requestRestoreUser(String hWalletToken, String tasUrl, String serverToken, DIDAuth signedDIDAuth, String txId) throws Exception
+```
+
+### Parameters
+
+| Name          | Type    | Description                    | **M/O** | **Note** |
+| ------------- | ------- | ------------------------------ | ------- | -------- |
+| hWalletToken  | String  | Wallet Token                   | M       |          |
+| tasUrl        | String  | TAS url                        | M       |          |
+| serverToken   | String  | Server Token                   | M       |          |
+| signedDIDAuth | DIDAuth | Signed DID Authenticate Object | M       |          |
+| txId          | String  | txId                           | M       |          |
+
+### Returns
+
+| Type   | Description | **M/O** | **Note** |
+| ------ | ----------- | ------- | -------- |
+| String | txId        | M       |          |
+
+### Usage
+
+```java
+walletApi.requestRestoreUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAuth, txId).get();
+```
+
+<br>
+
+
+## 4. Credential
+
+### 4.1. requestIssueVc
 
 ### Description
 `Request for issuance of VC.`
@@ -678,7 +760,7 @@ String vcId = walletApi.requestIssueVc("hWalletToken", "txId", "hServerToken", "
 
 <br>
 
-## 19. requestRevokeVc
+### 4.2. requestRevokeVc
 
 ### Description
 `Request for revocation of VC.`
@@ -718,7 +800,7 @@ String result = walletApi.requestRevokeVc("hWalletToken", "hServerToken", "txId"
 
 <br>
 
-## 20. getAllCredentials
+### 4.3. getAllCredentials
 
 ### Description
 `Get all VCs stored in the Wallet.`
@@ -749,7 +831,7 @@ List<VerifiableCredential> vcList = walletApi.getAllCredentials("hWalletToken");
 
 <br>
 
-## 21. getCredentials
+### 4.4. getCredentials
 
 ### Description
 `Query a specific VC.`
@@ -781,7 +863,7 @@ List<VerifiableCredential> vcList = walletApi.getCredentials("hWalletToken", Lis
 
 <br>
 
-## 22. deleteCredentials
+### 4.5. deleteCredentials
 
 ### Description
 `Delete a specific VC.`
@@ -810,7 +892,7 @@ walletApi.deleteCredentials("hWalletToken", "vcId");
 
 <br>
 
-## 23. createEncVp
+### 4.6. createEncVp
 
 ### Description
 `Generate encrypted VP and accE2e.`
@@ -848,66 +930,8 @@ EncVP encVp = walletApi.createEncVp("hWalletToken", "vcId", List.of("claim_code"
 
 <br>
 
-## 24. registerBioKey
 
-### Description
-`Register the biometric authentication key for signing.`
-
-### Declaration
-
-```java
-public void registerBioKey(Context context)
-```
-
-### Parameters
-
-| Name         | Type     | Description                        | **M/O** | **Note** |
-|--------------|----------|-----------------------------|---------|----------|
-| context       | Context   |        | M       |          |
-
-### Returns
-N/A
-
-### Usage
-
-```java
-walletApi.registerBioKey("hWalletToken", context);
-```
-
-<br>
-
-## 25. authenticateBioKey
-
-### Description
-`Authentication is performed to use the biometric authentication key for signing.`
-
-### Declaration
-
-```java
-public void authenticateBioKey(Fragment fragment, Context context) throws Exception
-```
-
-### Parameters
-
-| Name         | Type     | Description                        | **M/O** | **Note** |
-|--------------|----------|-----------------------------|---------|----------|
-| hWalletToken | String   | Wallet Token                   | M       |          |
-| fragment       | Fragment   |       | M       |          |
-| context       | Context   |        | M       |          |
-
-### Returns
-
-N/A
-
-### Usage
-
-```java
-walletApi.authenticateBioKey(fragment.this, context);
-```
-
-<br>
-
-## 26. addProofsToDocument
+### 4.7. addProofsToDocument
 
 ### Description
 `Add a Proof object to the object that needs to be signed.`
@@ -920,14 +944,14 @@ public ProofContainer addProofsToDocument(ProofContainer document, List<String> 
 
 ### Parameters
 
-| Name         | Type         | Description                        | **M/O** | **Note** |
-|--------------|--------------|-----------------------------|---------|----------|
-| document     | ProofContainer     | Document object that inherits Proof object                       | M       |          |
-| keyIds       | List&lt;String&gt;       | Key ID List to sign                 | M       |          |
-| did     | String     | Signature target DID                        | M       |          |
-| type       | int       | 1 : deviceKey DID Document, 2: holder DID document                 | M       |          |
-| passcode     | String     | PIN for signing                        | O       | When signing a PIN key        |
-| isDIDAuth       | boolean       | true if it is a DIDAuth object / false otherwise              | M       |          |
+| Name      | Type               | Description                                        | **M/O** | **Note**               |
+| --------- | ------------------ | -------------------------------------------------- | ------- | ---------------------- |
+| document  | ProofContainer     | Document object that inherits Proof object         | M       |                        |
+| keyIds    | List&lt;String&gt; | Key ID List to sign                                | M       |                        |
+| did       | String             | Signature target DID                               | M       |                        |
+| type      | int                | 1 : deviceKey DID Document, 2: holder DID document | M       |                        |
+| passcode  | String             | PIN for signing                                    | O       | When signing a PIN key |
+| isDIDAuth | boolean            | true if it is a DIDAuth object / false otherwise   | M       |                        |
 
 ### Returns
 
@@ -944,99 +968,39 @@ DIDDocument signedDIDDoc = (DIDDocument) walletApi.addProofsToDocument(didDocume
 <br>
 
 
-## 27. isSavedBioKey
+### 4.8. isAnyCredentialsSaved
 
 ### Description
-`Check if there is a saved biometric authentication key.`
+`Checks whether any credentials are saved in the holder’s wallet.`
 
 ### Declaration
 
 ```java
-public boolean isSavedBioKey() throws Exception
+public void isAnyCredentialsSaved() throws WalletException
 ```
 
 ### Parameters
 
-Void
+N/A
 
 ### Returns
-
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| boolean | Returns whether a biometric authentication key exists | M       |          |
+boolean
 
 ### Usage
 
 ```java
-boolean hasBioKey = walletApi.isSavedBioKey();
+
+if (!walletApi.isAnyCredentialsSaved()) {
+    ...
+}
 ```
 
 <br>
 
-## 28. changePin
 
-### Description
-`Change PIN for signing`
+## 5. ZKP
 
-### Declaration
-
-```java
-public void changePin(String keyId, String oldPin, String newPin) throws Exception
-```
-
-### Parameters
-
-| Name   | Type   | Description   | **M/O** | **Note** |
-| ------ | ------ | ------------- | ------- | -------- |
-| keyId     | String | key ID for signing | M       |          |
-| oldPIN | String | old PIN      | M       |          |
-| newPIN | String | new PIN    | M       |          |
-
-### Returns
-
-
-### Usage
-
-```java
-String oldPin = "123456";
-String newPin = "654321";
-walletApi.changePin(Constants.KEY_ID_PIN, oldPin, newPin);
-```
-
-<br>
-
-## 29. changeLock
-
-### Description
-`Change PIN for Unlock`
-
-### Declaration
-
-```java
-public void changeLock(String oldPin, String newPin) throws Exception
-```
-
-### Parameters
-
-| Name   | Type   | Description   | **M/O** | **Note** |
-| ------ | ------ | ------------- | ------- | -------- |
-| oldPIN | String | old PIN      | M       |          |
-| newPIN | String | new PIN    | M       |          |
-
-### Returns
-
-
-### Usage
-
-```java
-String oldPin = "123456";
-String newPin = "654321";
-walletApi.changeLock(oldPin, newPin);
-```
-
-<br>
-
-## 30. createZkpReferent
+### 5.1. createZkpReferent
 
 ### Description
 `Create Referents for each credential based on the user-selected referent information.`
@@ -1068,7 +1032,7 @@ ReferentInfo referentInfo = WalletApi.getInstance(getContext()).createZkpReferen
 
 <br>
 
-## 31. createEncZkpProof
+### 5.2. createEncZkpProof
 
 ### Description
 `Generate a ZKP proof based on the user's credentials and referents.`
@@ -1104,7 +1068,7 @@ P311RequestVo requestVo = WalletApi.getInstance(context).createEncZkpProof(hWall
 
 <br>
 
-## 32. searchZkpCredentials
+### 5.3. searchZkpCredentials
 
 ### Description
 `Search credentials matching the ProofRequest and generate a list of available Referents.`
@@ -1137,7 +1101,7 @@ AvailableReferent availableReferent = walletApi.searchZkpCredentials(VerifyProof
 
 <br>
 
-## 33. getAllZkpCredentials
+### 5.4. getAllZkpCredentials
 
 ### Description
 `Retrieve all stored credentials.`
@@ -1169,7 +1133,7 @@ List<Credential> zkpVcList = walletApi.getAllZkpCredentials(hWalletToken);
 
 <br>
 
-## 34. isAnyZkpCredentialsSaved
+### 5.5. isAnyZkpCredentialsSaved
 
 ### Description
 `Check if any credentials are saved.`
@@ -1200,7 +1164,7 @@ if (walletApi.isAnyZkpCredentialsSaved()) {
 
 <br>
 
-## 35. getZkpCredentials
+### 5.6. getZkpCredentials
 
 ### Description
 `Retrieve credentials based on given credential IDs.`
@@ -1232,22 +1196,180 @@ List<Credential> credentialList = walletApi.getZkpCredentials(hWalletToken, List
 
 <br>
 
-## 36. updateHolderDIDDoc
+
+## 6. SecurityAuth
+
+### 6.1. registerLock
 
 ### Description
-`Updates the existing DID document for the holder using the provided wallet token.`
+`Sets the lock status of the wallet.`
 
 ### Declaration
 
 ```java
-public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+public boolean registerLock(String hWalletToken, String passCode, boolean isLock) throws Exception
 ```
 
 ### Parameters
 
-| Name         | Type   | Description | **M/O** | **Note** |
-| ------------ | ------ | ----------- | ------- | -------- |
-| hWalletToken | String | wallet token     | M       |          |
+| Name         | Type   | Description                        | **M/O** | **Note** |
+|--------------|--------|-----------------------------|---------|----------|
+| hWalletToken | String | Wallet Token                   | M       |          |
+| passcode     | String | Unlock PIN               | M       |          |
+| isLock       | boolean | Whether the lock is activated           | M       |          |
+
+### Returns
+
+| Type    | Description                | **M/O** | **Note** |
+|---------|---------------------|---------|----------|
+| Bool | Returns whether the lock setup was successful. | M       |          |
+
+### Usage
+
+```java
+boolean success = walletApi.registerLock("hWalletToken", "123456", true);
+```
+
+<br>
+
+### 6.2. authenticateLock
+
+### Description
+`Perform authentication to unlock the wallet.`
+
+### Declaration
+
+```java
+public void authenticateLock(String passCode) throws Exception
+```
+
+### Parameters
+
+| Name         | Type   | Description                        | **M/O** | **Note** |
+|--------------|--------|-----------------------------|---------|----------|
+| passCode     | String |Unlock PIN               | M       | PIN set when registerLock          | 
+
+### Returns
+
+Void
+
+### Usage
+
+```java
+walletApi.authenticateLock("hWalletToken", "123456");
+```
+
+<br>
+
+
+
+### 6.3. isLock
+
+### Description
+`Check the lock type of the wallet.`
+
+### Declaration
+
+```java
+public boolean isLock() throws Exception
+```
+
+### Parameters
+ Void
+
+### Returns
+
+| Type    | Description                | **M/O** | **Note** |
+|---------|---------------------|---------|----------|
+| boolean | Returns the wallet lock type. | M       |          |
+
+### Usage
+
+```java
+boolean isLocked = walletApi.isLock();
+```
+
+<br>
+
+
+### 6.4. registerBioKey
+
+### Description
+`Register the biometric authentication key for signing.`
+
+### Declaration
+
+```java
+public void registerBioKey(Context context)
+```
+
+### Parameters
+
+| Name         | Type     | Description                        | **M/O** | **Note** |
+|--------------|----------|-----------------------------|---------|----------|
+| context       | Context   |        | M       |          |
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.registerBioKey("hWalletToken", context);
+```
+
+<br>
+
+### 6.5. authenticateBioKey
+
+### Description
+`Authentication is performed to use the biometric authentication key for signing.`
+
+### Declaration
+
+```java
+public void authenticateBioKey(Fragment fragment, Context context) throws Exception
+```
+
+### Parameters
+
+| Name         | Type     | Description                        | **M/O** | **Note** |
+|--------------|----------|-----------------------------|---------|----------|
+| hWalletToken | String   | Wallet Token                   | M       |          |
+| fragment       | Fragment   |       | M       |          |
+| context       | Context   |        | M       |          |
+
+### Returns
+
+N/A
+
+### Usage
+
+```java
+walletApi.authenticateBioKey(fragment.this, context);
+```
+
+<br>
+
+
+### 6.6. changePin
+
+### Description
+`Change PIN for signing`
+
+### Declaration
+
+```java
+public void changePin(String keyId, String oldPin, String newPin) throws Exception
+```
+
+### Parameters
+
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| keyId     | String | key ID for signing | M       |          |
+| oldPIN | String | old PIN      | M       |          |
+| newPIN | String | new PIN    | M       |          |
 
 ### Returns
 
@@ -1255,96 +1377,46 @@ public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletExceptio
 ### Usage
 
 ```java
-walletApi.updateHolderDIDDoc(hWalletToken);
+String oldPin = "123456";
+String newPin = "654321";
+walletApi.changePin(Constants.KEY_ID_PIN, oldPin, newPin);
 ```
 
 <br>
 
-## 37. saveDocument
+### 6.7. changeLock
 
 ### Description
-`Saves the holder’s DID document into persistent storage.`
+`Change PIN for Unlock`
 
 ### Declaration
 
 ```java
-public void saveDocument() throws WalletException, WalletCoreException, UtilityException
-
-```
-
-### Parameters
-N/A
-
-### Returns
-N/A
-
-### Usage
-
-```java
-walletApi.saveDocument()
-```
-
-<br>
-
-## 38. deleteKey
-
-### Description
-`Deletes the specified keys associated with the holder’s DID document after verifying that the provided wallet token has the required permissions.`
-
-### Declaration
-
-```java
-public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+public void changeLock(String oldPin, String newPin) throws Exception
 ```
 
 ### Parameters
 
-| Name         | Type         | Description                     | **M/O** | **Note** |
-| ------------ | ------------ | ------------------------------- | ------- | -------- |
-| hWalletToken | String       | wallet token                    | M       |          |
-| keyIds       | List<String> | a list of key IDs to be deleted | M       |          |
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| oldPIN | String | old PIN      | M       |          |
+| newPIN | String | new PIN    | M       |          |
 
 ### Returns
-N/A
+
 
 ### Usage
 
 ```java
-walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+String oldPin = "123456";
+String newPin = "654321";
+walletApi.changeLock(oldPin, newPin);
 ```
 
 <br>
 
-## 39. isAnyCredentialsSaved
 
-### Description
-`Checks whether any credentials are saved in the holder’s wallet.`
-
-### Declaration
-
-```java
-public void isAnyCredentialsSaved() throws WalletException
-```
-
-### Parameters
-
-N/A
-
-### Returns
-boolean
-
-### Usage
-
-```java
-
-if (!walletApi.isAnyCredentialsSaved()) {
-    ...
-}
-```
-
-<br>
-
-## 40. authenticatePin
+### 6.8. authenticatePin
 
 ### Description
 `Proceed with PIN authentication`

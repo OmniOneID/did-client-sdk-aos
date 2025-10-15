@@ -34,48 +34,53 @@ Android Wallet API
 
 # 목차
 - [APIs](#api-목록)
-    - [0. constructor](#0-constructor)
-    - [1. isExistWallet](#1-isexistwallet)
-    - [2. createWallet](#2-createwallet)
-    - [3. deleteWallet](#3-deletewallet)
-    - [4. createWalletTokenSeed](#4-createwallettokenseed)
-    - [5. createNonceForWalletToken](#5-createnonceforwallettoken)
-    - [6. bindUser](#6-binduser)
-    - [7. unbindUser](#7-unbinduser)
-    - [8. registerLock](#8-registerlock)
-    - [9. authenticateLock](#9-authenticatelock)
-    - [10. createHolderDIDDoc](#10-createholderdiddoc)
-    - [11. createSignedDIDDoc](#11-createsigneddiddoc)
-    - [12. getDIDDocument](#12-getdiddocument)
-    - [13. generateKeyPair](#13-generatekeypair)
-    - [14. isLock](#14-islock)
-    - [15. getSignedWalletInfo](#15-getsignedwalletinfo)
-    - [16. requestRegisterUser](#16-requestregisteruser)
-    - [17. getSignedDIDAuth](#17-getsigneddidauth)
-    - [18. requestIssueVc](#18-requestissuevc)
-    - [19. requestRevokeVc](#19-requestrevokevc)
-    - [20. getAllCredentials](#20-getallcredentials)
-    - [21. getCredentials](#21-getcredentials)
-    - [22. deleteCredentials](#22-deletecredentials)
-    - [23. createEncVp](#23-createencvp)
-    - [24. registerBioKey](#24-registerbiokey)
-    - [25. authenticateBioKey](#25-authenticatebiokey)
-    - [26. addProofsToDocument](#26-addproofstodocument)
-    - [27. isSavedBioKey](#27-issavedbiokey)
-    - [28. changePin](#28-changepin)
-    - [29. changeLock](#29-changelock)
-    - [30. createZkpReferent](#30-createzkpreferent)
-    - [31. createEncZkpProof](#31-createenczkpproof)
-    - [32. searchZkpCredentials](#32-searchzkpcredentials)
-    - [33. getAllZkpCredentials](#33-getallzkpcredentials)
-    - [34. isAnyZkpCredentialsSaved](#34-isanyzkpcredentialssaved)
-    - [35. getZkpCredentials](#35-getzkpcredentials)
-    - [36. updateHolderDIDDoc](#36-updateholderdiddoc)
-    - [37. saveDocument](#37-savedocument)
-    - [38. deleteKey](#38-deletekey)
-    - [39. isAnyCredentialsSaved](#39-isanycredentialssaved)
-    - [40. authenticatePin](#40-authenticatepin)
-  
+    - [1. constructor](#1-constructor)
+    - [2. Wallet](#2-wallet)
+        - [2.1. isExistWallet](#21-isexistwallet)
+        - [2.2. createWallet](#22-createwallet)
+        - [2.3. deleteWallet](#23-deletewallet)
+        - [2.4. createWalletTokenSeed](#24-createwallettokenseed)
+        - [2.5. createNonceForWalletToken](#25-createnonceforwallettoken)
+        - [2.6. bindUser](#26-bindUser)
+        - [2.7. unbindUser](#27-unbinduser)
+        - [2.8. requestRegisterUser](#28-requestregisteruser)
+        - [2.9. getSignedWalletInfo](#29-getsignedwalletinfo)
+    - [3. DIDKey](#3-didkey)
+        - [3.1. createHolderDIDDoc](#31-createholderdiddoc)
+        - [3.2. createSignedDIDDoc](#32-createsigneddiddoc)
+        - [3.3. getDIDDocument](#33-getdiddocument)
+        - [3.4. generateKeyPair](#34-generatekeypair)
+        - [3.5. getSignedDIDAuth](#35-getsigneddidauth)
+        - [3.6. updateHolderDIDDoc](#36-updateholderdiddoc)
+        - [3.7. saveDocument](#37-savedocument)
+        - [3.8. deleteKey](#38-deletekey)
+        - [3.9. requestUpdateUser](#39-requestupdateuser)
+        - [3.10. requestRestoreUser](#310-requestrestoreuser)
+    - [4. Credential](#4-credential)
+        - [4.1. requestIssueVc](#41-requestissuevc)
+        - [4.2. requestRevokeVc](#42-requestrevokevc)
+        - [4.3. getAllCredentials](#43-getallcredentials)
+        - [4.4. getCredentials](#44-getcredentials)
+        - [4.5. deleteCredentials](#45-deletecredentials)
+        - [4.6. createEncVp](#46-createencvp)
+        - [4.7. addProofsToDocument](#47-addproofstodocument)
+        - [4.8. isAnyCredentialsSaved](#48-isanycredentialssaved)
+    - [5. ZKP](#5-zkp)
+        - [5.1. createZkpReferent](#51-createzkpreferent)
+        - [5.2. createEncZkpProof](#52-createenczkpproof)
+        - [5.3. searchZkpCredentials](#53-searchzkpcredentials)
+        - [5.4. getAllZkpCredentials](#54-getallzkpcredentials)
+        - [5.5. isAnyZkpCredentialsSaved](#55-isanyzkpcredentialssaved)
+        - [5.6. getZkpCredentials](#56-getzkpcredentials)
+    - [6. SecurityAuth](#6-securityauth)
+        - [6.1. registerLock](#61-registerlock)
+        - [6.2. authenticateLock](#61-authenticatelock)
+        - [6.3. isLock](#61-islock)
+        - [6.4. registerBioKey](#64-registerbiokey)
+        - [6.5. authenticateBioKey](#65-authenticatebiokey)
+        - [6.6. changePin](#66-changepin)
+        - [6.7. changeLock](#67-changelock)
+        - [6.8. authenticatePin](#68-authenticatepin)
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
 - [Value Object](#value-object)
@@ -85,8 +90,10 @@ Android Wallet API
     - [4. SignedDIDDoc](#4-signeddiddoc)
     - [5. SignedWalletInfo](#5-signedwalletinfo)
     - [6. DIDAuth](#6-didauth)
+
+
 # API 목록
-## 0. constructor
+## 1. constructor
 
 ### Description
  `WalletApi 생성자`
@@ -117,7 +124,9 @@ WalletApi walletApi = WalletApi.getInstatnce(context)
 
 <br>
 
-## 1. isExistWallet
+## 2. Wallet
+
+### 2.1. isExistWallet
 
 ### Description
  `DeviceKey Wallet 존재 유무를 확인한다.`
@@ -146,7 +155,7 @@ boolean exists = walletApi.isExistWallet();
 
 <br>
 
-## 2. createWallet
+### 2.2. createWallet
 
 ### Description
 `DeviceKey Wallet을 생성한다.`
@@ -167,8 +176,8 @@ public boolean createWallet() throws Exception
 
 ### Returns
 
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
+| Type    | Description                       | **M/O** | **Note** |
+| ------- | --------------------------------- | ------- | -------- |
 | boolean | Wallet 생성 성공 여부를 반환한다. | M       |          |
 
 ### Usage
@@ -179,7 +188,7 @@ boolean success = walletApi.createWallet();
 
 <br>
 
-## 3. deleteWallet
+### 2.3. deleteWallet
 
 ### Description
 `DeviceKey Wallet을 삭제한다.`
@@ -187,12 +196,15 @@ boolean success = walletApi.createWallet();
 ### Declaration
 
 ```java
-public void deleteWallet() throws Exception
+public void deleteWallet(boolean deleteAll) throws Exception
 ```
 
 ### Parameters
 
-Void
+| Name      | Type    | Description    | **M/O** | **Note** |
+| --------- | ------- | -------------- | ------- | -------- |
+| deleteAll | boolean | 월렛 삭제 범위 | M       |          |
+
 
 ### Returns
 
@@ -201,12 +213,12 @@ N/A
 ### Usage
 
 ```java
-walletApi.deleteWallet();
+walletApi.deleteWallet(deleteAll);
 ```
 
 <br>
 
-## 4. createWalletTokenSeed
+### 2.4. createWalletTokenSeed
 
 ### Description
 `월렛 토큰 시드를 생성한다.`
@@ -239,7 +251,7 @@ WalletTokenSeed tokenSeed = walletApi.createWalletTokenSeed(purpose, "org.opendi
 
 <br>
 
-## 5. createNonceForWalletToken
+### 2.5. createNonceForWalletToken
 
 ### Description
 `월렛 토큰 생성을 위한 nonce를 생성한다.`
@@ -270,7 +282,7 @@ String nonce = walletApi.createNonceForWalletToken(walletTokenData);
 
 <br>
 
-## 6. bindUser
+### 2.6. bindUser
 
 ### Description
 `Wallet에 사용자 개인화를 수행한다.`
@@ -301,7 +313,7 @@ boolean success = walletApi.bindUser("hWalletToken");
 
 <br>
 
-## 7. unbindUser
+### 2.7. unbindUser
 
 ### Description
 `사용자 비개인화를 수행한다.`
@@ -332,249 +344,8 @@ boolean success = walletApi.unbindUser("hWalletToken");
 
 <br>
 
-## 8. registerLock
 
-### Description
-`Wallet의 잠금 상태를 설정한다.`
-
-### Declaration
-
-```java
-public boolean registerLock(String hWalletToken, String passCode, boolean isLock) throws Exception
-```
-
-### Parameters
-
-| Name         | Type   | Description                        | **M/O** | **Note** |
-|--------------|--------|-----------------------------|---------|----------|
-| hWalletToken | String | 월렛토큰                   | M       |          |
-| passCode     | String | Unlock PIN               | M       |          |
-| isLock       | boolean | 잠금 활성화 여부            | M       |          |
-
-### Returns
-
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| boolean | 잠금 설정 성공 여부를 반환한다. | M       |          |
-
-### Usage
-
-```java
-boolean success = walletApi.registerLock("hWalletToken", "123456", true);
-```
-
-<br>
-
-## 9. authenticateLock
-
-### Description
-`Wallet의 Unlock을 위한 인증을 수행한다.`
-
-### Declaration
-
-```java
-public void authenticateLock(String passCode) throws Exception
-```
-
-### Parameters
-
-| Name         | Type   | Description                        | **M/O** | **Note** |
-|--------------|--------|-----------------------------|---------|----------|
-| passCode     | String |Unlock PIN               | M       | registerLock 시 설정한 PIN          | 
-
-### Returns
-
-Void
-
-### Usage
-
-```java
-walletApi.authenticateLock("hWalletToken", "123456");
-```
-
-<br>
-
-## 10. createHolderDIDDoc
-
-### Description
-`사용자 DID Document를 생성한다.`
-
-### Declaration
-
-```java
-public DIDDocument createHolderDIDDoc(String hWalletToken) throws Exception
-```
-
-### Parameters
-
-| Name          | Type   | Description                       | **M/O** | **Note** |
-|---------------|--------|----------------------------|---------|----------|
-| hWalletToken  | String | 월렛토큰                  | M       |          |
-
-### Returns
-
-| Type         | Description                  | **M/O** | **Note** |
-|--------------|-----------------------|---------|----------|
-| DIDDocument  | 사용자 DID Document   | M       |          |
-
-### Usage
-
-```java
-DIDDocument didDoc = walletApi.createHolderDIDDoc("hWalletToken");
-```
-
-<br>
-
-## 11. createSignedDIDDoc
-
-### Description
-`서명된 사용자 DID Document 객체를 생성한다.`
-
-### Declaration
-
-```java
-public SignedDidDoc createSignedDIDDoc(DIDDocument ownerDIDDoc) throws Exception
-```
-
-### Parameters
-
-| Name          | Type   | Description                       | **M/O** | **Note** |
-|---------------|--------|----------------------------|---------|----------|
-| ownerDIDDoc  | DIDDocument | 소유자의 DID Document 객체                 | M       |          |
-
-### Returns
-
-| Type            | Description                  | **M/O** | **Note** |
-|-----------------|-----------------------|---------|----------|
-| SignedDidDoc | 서명된 DID Document 객체   | M       |[SignedDIDDoc](#4-signeddiddoc)          |
-
-### Usage
-
-```java
-SignedDidDoc signedDidDoc = walletApi.createSignedDIDDoc(ownerDIDDoc);
-```
-
-<br>
-
-## 12. getDIDDocument
-
-### Description
-`DID Document를 조회한다.`
-
-### Declaration
-
-```java
-public DIDDocument getDIDDocument(int type) throws Exception
-```
-
-### Parameters
-
-| Name          | Type   | Description                       | **M/O** | **Note** |
-|---------------|--------|----------------------------|---------|----------|
-| type  | int | 1 : deviceKey DID Document, 2: holder DID document                  | M       |          |
-
-### Returns
-
-| Type         | Description                  | **M/O** | **Note** |
-|--------------|-----------------------|---------|----------|
-| DIDDocument  | DID Document       | M       |          |
-
-### Usage
-
-```java
-DIDDocument didDoc = walletApi.getDIDDocument("hWalletToken", 1);
-```
-
-<br>
-
-## 13. generateKeyPair
-
-### Description
-`서명을 위한 PIN 키 쌍을 생성하여 Wallet에 저장한다.`
-
-### Declaration
-
-```java
-public void generateKeyPair(String hWalletToken, String passcode) throws Exception
-```
-
-### Parameters
-
-| Name         | Type   | Description                        | **M/O** | **Note** |
-|--------------|--------|-----------------------------|---------|----------|
-| hWalletToken | String |월렛토큰                   | M       |          |
-| passCode     | String |서명용 PIN               | M       | PIN 서명용 키 생성 시        | 
-
-### Returns
-
-Void
-
-### Usage
-
-```java
-walletApi.generateKeyPair("hWalletToken", "123456");
-```
-
-<br>
-
-## 14. isLock
-
-### Description
-`Wallet의 잠금 타입을 조회한다.`
-
-### Declaration
-
-```java
-public boolean isLock() throws Exception
-```
-
-### Parameters
- Void
-
-### Returns
-
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| boolean | Wallet 잠금 타입을 반환한다. | M       |          |
-
-### Usage
-
-```java
-boolean isLocked = walletApi.isLock();
-```
-
-<br>
-
-## 15. getSignedWalletInfo
-
-### Description
-`서명된 Wallet 정보를 조회한다.`
-
-### Declaration
-
-```java
-public SignedWalletInfo getSignedWalletInfo() throws Exception
-```
-
-### Parameters
-
-Void
-
-### Returns
-
-| Type             | Description                    | **M/O** | **Note** |
-|------------------|-------------------------|---------|----------|
-| SignedWalletInfo | 서명된 WalletInfo 객체       | M       |[SignedWalletInfo](#5-signedwalletinfo)          |
-
-### Usage
-
-```java
-SignedWalletInfo signedInfo = walletApi.getSignedWalletInfo();
-```
-
-<br>
-
-## 16. requestRegisterUser
+### 2.8. requestRegisterUser
 
 ### Description
 `사용자 등록을 요청한다.`
@@ -609,7 +380,163 @@ String _M132_RequestRegisterUser = walletApi.requestRegisterUser("hWalletToken",
 
 <br>
 
-## 17. getSignedDIDAuth
+
+### 2.9. getSignedWalletInfo
+
+### Description
+`서명된 Wallet 정보를 조회한다.`
+
+### Declaration
+
+```java
+public SignedWalletInfo getSignedWalletInfo() throws Exception
+```
+
+### Parameters
+
+Void
+
+### Returns
+
+| Type             | Description                    | **M/O** | **Note** |
+|------------------|-------------------------|---------|----------|
+| SignedWalletInfo | 서명된 WalletInfo 객체       | M       |[SignedWalletInfo](#5-signedwalletinfo)          |
+
+### Usage
+
+```java
+SignedWalletInfo signedInfo = walletApi.getSignedWalletInfo();
+```
+
+<br>
+
+
+## 3. DIDKey
+
+### 3.1. createHolderDIDDoc
+
+### Description
+`사용자 DID Document를 생성한다.`
+
+### Declaration
+
+```java
+public DIDDocument createHolderDIDDoc(String hWalletToken) throws Exception
+```
+
+### Parameters
+
+| Name          | Type   | Description                       | **M/O** | **Note** |
+|---------------|--------|----------------------------|---------|----------|
+| hWalletToken  | String | 월렛토큰                  | M       |          |
+
+### Returns
+
+| Type         | Description                  | **M/O** | **Note** |
+|--------------|-----------------------|---------|----------|
+| DIDDocument  | 사용자 DID Document   | M       |          |
+
+### Usage
+
+```java
+DIDDocument didDoc = walletApi.createHolderDIDDoc("hWalletToken");
+```
+
+<br>
+
+### 3.2. createSignedDIDDoc
+
+### Description
+`서명된 사용자 DID Document 객체를 생성한다.`
+
+### Declaration
+
+```java
+public SignedDidDoc createSignedDIDDoc(DIDDocument ownerDIDDoc) throws Exception
+```
+
+### Parameters
+
+| Name          | Type   | Description                       | **M/O** | **Note** |
+|---------------|--------|----------------------------|---------|----------|
+| ownerDIDDoc  | DIDDocument | 소유자의 DID Document 객체                 | M       |          |
+
+### Returns
+
+| Type            | Description                  | **M/O** | **Note** |
+|-----------------|-----------------------|---------|----------|
+| SignedDidDoc | 서명된 DID Document 객체   | M       |[SignedDIDDoc](#4-signeddiddoc)          |
+
+### Usage
+
+```java
+SignedDidDoc signedDidDoc = walletApi.createSignedDIDDoc(ownerDIDDoc);
+```
+
+<br>
+
+### 3.3. getDIDDocument
+
+### Description
+`DID Document를 조회한다.`
+
+### Declaration
+
+```java
+public DIDDocument getDIDDocument(int type) throws Exception
+```
+
+### Parameters
+
+| Name          | Type   | Description                       | **M/O** | **Note** |
+|---------------|--------|----------------------------|---------|----------|
+| type  | int | 1 : deviceKey DID Document, 2: holder DID document                  | M       |          |
+
+### Returns
+
+| Type         | Description                  | **M/O** | **Note** |
+|--------------|-----------------------|---------|----------|
+| DIDDocument  | DID Document       | M       |          |
+
+### Usage
+
+```java
+DIDDocument didDoc = walletApi.getDIDDocument("hWalletToken", 1);
+```
+
+<br>
+
+### 3.4. generateKeyPair
+
+### Description
+`서명을 위한 PIN 키 쌍을 생성하여 Wallet에 저장한다.`
+
+### Declaration
+
+```java
+public void generateKeyPair(String hWalletToken, String passcode) throws Exception
+```
+
+### Parameters
+
+| Name         | Type   | Description                        | **M/O** | **Note** |
+|--------------|--------|-----------------------------|---------|----------|
+| hWalletToken | String |월렛토큰                   | M       |          |
+| passCode     | String |서명용 PIN               | M       | PIN 서명용 키 생성 시        | 
+
+### Returns
+
+Void
+
+### Usage
+
+```java
+walletApi.generateKeyPair("hWalletToken", "123456");
+```
+
+<br>
+
+### 3.5. getSignedDIDAuth
 
 ### Description
 `DIDAuth 서명을 수행한다.`
@@ -641,7 +568,171 @@ DIDAuth signedDIDAuth = walletApi.getSignedDIDAuth("authNonce", "123456");
 
 <br>
 
-## 18. requestIssueVc
+
+### 3.6. updateHolderDIDDoc
+
+### Description
+`제공된 지갑 토큰을 사용하여 사용자의 기존 DID 문서를 업데이트합니다.`
+
+### Declaration
+
+```java
+public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+```
+
+### Parameters
+
+| Name         | Type   | Description | **M/O** | **Note** |
+| ------------ | ------ | ----------- | ------- | -------- |
+| hWalletToken | String | 월렛 토큰     | M       |          |
+
+### Returns
+
+| Type        | Description  | **M/O** | **Note** |
+| ----------- | ------------ | ------- | -------- |
+| DIDDocument | DID 도큐먼트 | M       |          |
+
+
+### Usage
+
+```java
+walletApi.updateHolderDIDDoc(hWalletToken);
+```
+
+<br>
+
+
+
+### 3.7. saveDocument
+
+### Description
+`사용자의 DID 문서를 영구 저장소에 저장합니다.`
+
+### Declaration
+
+```java
+public void saveDocument() throws WalletException, WalletCoreException, UtilityException
+
+```
+
+### Parameters
+N/A
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.saveDocument()
+```
+
+<br>
+
+### 3.8. deleteKey
+
+### Description
+`제공된 지갑 토큰에 필요한 권한이 있는지 확인한 후, 사용자의 DID(탈중앙화 식별자) 문서와 연결된 지정된 키를 삭제합니다.`
+
+### Declaration
+
+```java
+public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+```
+
+### Parameters
+
+| Name         | Type         | Description | **M/O** | **Note** |
+| ------------ | ------------ | ----------- | ------- | -------- |
+| hWalletToken | String       | 월렛토큰    | M       |          |
+| keyIds       | List<String> | 키 IDs      | M       |          |
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+```
+
+<br>
+
+
+### 3.9. requestUpdateUser
+
+### Description
+`지정된 지갑 토큰, 서버 토큰, 서명된 DID 인증 및 거래 ID를 사용하여 사용자 DID 업데이트를 요청합니다.`
+
+### Declaration
+
+```java
+CompletableFuture<String> requestUpdateUser(String hWalletToken, String tasUrl, String serverToken, DIDAuth signedDIDAuth, SignedDidDoc signedDIDDoc, String txId) throws Exception
+```
+
+### Parameters
+
+| Name          | Type         | Description              | **M/O** | **Note** |
+| ------------- | ------------ | ------------------------ | ------- | -------- |
+| hWalletToken  | String       | 월렛 토큰                | M       |          |
+| tasUrl        | String       | TAS url                  | M       |          |
+| serverToken   | String       | 서버 토큰                | M       |          |
+| signedDIDAuth | DIDAuth      | 서명된 DID 인증 객체     | M       |          |
+| signedDIDDoc  | SignedDidDoc | 서명된 DID Document 객체 | M       |          |
+| txId          | String       | 트랜젝션 ID              | M       |          |
+
+### Returns
+
+| Type   | Description | **M/O** | **Note** |
+| ------ | ----------- | ------- | -------- |
+| String | txId        | M       |          |
+
+### Usage
+
+```java
+walletApi.requestUpdateUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAuth, signedDidDoc, txId).get();
+```
+
+<br>
+
+### 3.10. requestRestoreUser
+
+### Description
+`제공된 지갑 토큰, 서버 토큰, 서명된 DID 인증 및 거래 ID를 사용하여 사용자 복원을 요청합니다.`
+
+### Declaration
+
+```java
+CompletableFuture<String> requestRestoreUser(String hWalletToken, String tasUrl, String serverToken, DIDAuth signedDIDAuth, String txId) throws Exception
+```
+
+### Parameters
+
+| Name          | Type    | Description          | **M/O** | **Note** |
+| ------------- | ------- | -------------------- | ------- | -------- |
+| hWalletToken  | String  | 월렛 토큰              | M       |          |
+| tasUrl        | String  | TAS url              | M       |          |
+| serverToken   | String  | 서버 토큰              | M       |          |
+| signedDIDAuth | DIDAuth | 서명된 DID 인증 객체      | M       |          |
+| txId          | String  | 트랜젝션 ID            | M       |          |
+
+### Returns
+
+| Type   | Description | **M/O** | **Note** |
+| ------ | ----------- | ------- | -------- |
+| String | txId        | M       |          |
+
+### Usage
+
+```java
+walletApi.requestRestoreUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAuth, txId).get();
+```
+
+<br>
+
+## 4. Credential
+
+### 4.1. requestIssueVc
 
 ### Description
 `VC 발급을 요청한다.`
@@ -662,7 +753,7 @@ public CompletableFuture<String> requestIssueVc(String hWalletToken, String txId
 | serverToken     | String       | 서버토큰                | M       |          |
 | refId     | String       | 참조번호                | M       |          |
 | profile|IssueProfile | Issue Profile   | M       |[데이터모델 참조]          |
-| signedDIDAuth|DIDAuth | 서명된 DID Document 객체   | M       |[DIDAuth](#6-didauth)         |
+| signedDIDAuth|DIDAuth | 서명된 DID 인증 객체   | M       |[DIDAuth](#6-didauth)         |
 
 ### Returns
 
@@ -678,7 +769,7 @@ String vcId = walletApi.requestIssueVc("hWalletToken", "txId", "hServerToken", "
 
 <br>
 
-## 19. requestRevokeVc
+### 4.2. requestRevokeVc
 
 ### Description
 `VC 폐기를 요청한다.`
@@ -717,7 +808,7 @@ String result = walletApi.requestRevokeVc("hWalletToken", "hServerToken", "txId"
 
 <br>
 
-## 20. getAllCredentials
+### 4.3. getAllCredentials
 
 ### Description
 `Wallet에 저장된 모든 VC를 조회한다.`
@@ -748,7 +839,7 @@ List<VerifiableCredential> vcList = walletApi.getAllCredentials("hWalletToken");
 
 <br>
 
-## 21. getCredentials
+### 4.4. getCredentials
 
 ### Description
 `특정 VC를 조회한다.`
@@ -780,7 +871,7 @@ List<VerifiableCredential> vcList = walletApi.getCredentials("hWalletToken", Lis
 
 <br>
 
-## 22. deleteCredentials
+### 4.5. deleteCredentials
 
 ### Description
 `특정 VC를 삭제한다.`
@@ -809,7 +900,7 @@ walletApi.deleteCredentials("hWalletToken", "vcId");
 
 <br>
 
-## 23. createEncVp
+### 4.6. createEncVp
 
 ### Description
 `암호화된 VP를 생성한다.`
@@ -847,66 +938,8 @@ EncVP encVp = walletApi.createEncVp("hWalletToken", "vcId", List.of("claim_code"
 
 <br>
 
-## 24. registerBioKey
 
-### Description
-`서명용 생체 인증 키를 등록한다.`
-
-### Declaration
-
-```java
-public void registerBioKey(Context context)
-```
-
-### Parameters
-
-| Name         | Type     | Description                        | **M/O** | **Note** |
-|--------------|----------|-----------------------------|---------|----------|
-| context       | Context   |        | M       |          |
-
-### Returns
-N/A
-
-### Usage
-
-```java
-walletApi.registerBioKey("hWalletToken", context);
-```
-
-<br>
-
-## 25. authenticateBioKey
-
-### Description
-`서명을 위한 생체 인증 키를 사용하기 위하여 인증을 수행한다.`
-
-### Declaration
-
-```java
-public void authenticateBioKey(Fragment fragment, Context context) throws Exception
-```
-
-### Parameters
-
-| Name         | Type     | Description                        | **M/O** | **Note** |
-|--------------|----------|-----------------------------|---------|----------|
-| hWalletToken | String   | 월렛토큰                   | M       |          |
-| fragment       | Fragment   |       | M       |          |
-| context       | Context   |        | M       |          |
-
-### Returns
-
-N/A
-
-### Usage
-
-```java
-walletApi.authenticateBioKey(fragment.this, context);
-```
-
-<br>
-
-## 26. addProofsToDocument
+### 4.7. addProofsToDocument
 
 ### Description
 `서명이 필요한 객체에 Proof객체를 추가한다.`
@@ -942,100 +975,38 @@ DIDDocument signedDIDDoc = (DIDDocument) walletApi.addProofsToDocument(didDocume
 
 <br>
 
-
-## 27. isSavedBioKey
+### 4.8. isAnyCredentialsSaved
 
 ### Description
-`저장된 생체 인증 키가 있는지 확인한다.`
+`사용자의 지갑에 증명서가 저장되어 있는지 확인합니다.`
 
 ### Declaration
 
 ```java
-public boolean isSavedBioKey() throws Exception
+public void isAnyCredentialsSaved() throws WalletException
 ```
 
 ### Parameters
 
-Void
+N/A
 
 ### Returns
-
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| boolean | 생체 인증 키 존재 여부를 반환한다. | M       |          |
+boolean
 
 ### Usage
 
 ```java
-boolean hasBioKey = walletApi.isSavedBioKey();
+
+if (!walletApi.isAnyCredentialsSaved()) {
+    ...
+}
 ```
 
 <br>
 
-## 28. changePin
+## 5. ZKP
 
-### Description
-`서명용 PIN 변경`
-
-### Declaration
-
-```java
-public void changePin(String keyId, String oldPin, String newPin) throws Exception
-```
-
-### Parameters
-
-| Name   | Type   | Description   | **M/O** | **Note** |
-| ------ | ------ | ------------- | ------- | -------- |
-| keyId     | String | 서명용 키아이디 | M       |          |
-| oldPIN | String | 현재 PIN      | M       |          |
-| newPIN | String | 변경할 PIN    | M       |          |
-
-### Returns
-
-
-### Usage
-
-```java
-String oldPin = "123456";
-String newPin = "654321";
-walletApi.changePin(Constants.KEY_ID_PIN, oldPin, newPin);
-```
-
-<br>
-
-## 29. changeLock
-
-### Description
-`Unlock PIN 변경`
-
-### Declaration
-
-```java
-public void changeLock(String oldPin, String newPin) throws Exception
-```
-
-### Parameters
-
-| Name   | Type   | Description   | **M/O** | **Note** |
-| ------ | ------ | ------------- | ------- | -------- |
-| oldPIN | String | 현재 PIN      | M       |          |
-| newPIN | String | 변경할 PIN    | M       |          |
-
-### Returns
-
-
-### Usage
-
-```java
-String oldPin = "123456";
-String newPin = "654321";
-walletApi.changeLock(oldPin, newPin);
-```
-
-<br>
-
-## 30. createZkpReferent
+### 5.1. createZkpReferent
 
 ### Description
 `사용자가 선택한 참조 대상 정보를 기반으로 각 자격 증명에 대한 참조 대상을 생성`
@@ -1067,7 +1038,7 @@ ReferentInfo referentInfo = WalletApi.getInstance(getContext()).createZkpReferen
 
 <br>
 
-## 31. createEncZkpProof
+### 5.2. createEncZkpProof
 
 ### Description
 `사용자의 자격 증명과 참조 정보를 기반으로 ZKP 증명을 생성`
@@ -1103,7 +1074,7 @@ P311RequestVo requestVo = walletApi.createEncZkpProof(hWalletToken, vpProfile, p
 
 <br>
 
-## 32. searchZkpCredentials
+### 5.3. searchZkpCredentials
 
 ### Description
 `ProofRequest와 일치하는 자격 증명을 검색하고 사용 가능한 참조 대상 목록을 생성`
@@ -1136,7 +1107,7 @@ AvailableReferent availableReferent = walletApi.searchZkpCredentials(VerifyProof
 
 <br>
 
-## 33. getAllZkpCredentials
+### 5.4. getAllZkpCredentials
 
 ### Description
 `저장된 모든 자격 증명을 검색`
@@ -1168,7 +1139,7 @@ List<Credential> zkpVcList = walletApi.getAllZkpCredentials(hWalletToken);
 
 <br>
 
-## 34. isAnyZkpCredentialsSaved
+### 5.5. isAnyZkpCredentialsSaved
 
 ### Description
 `자격 증명이 저장되었는지 확인`
@@ -1199,7 +1170,7 @@ if (walletApi.isAnyZkpCredentialsSaved()) {
 
 <br>
 
-## 35. getZkpCredentials
+### 5.6. getZkpCredentials
 
 ### Description
 `주어진 자격 증명 ID를 기반으로 자격 증명을 검색`
@@ -1231,22 +1202,180 @@ List<Credential> credentialList = walletApi.getZkpCredentials(hWalletToken, List
 
 <br>
 
-## 36. updateHolderDIDDoc
+
+
+## 6. SecurityAuth
+
+### 6.1. registerLock
 
 ### Description
-`제공된 지갑 토큰을 사용하여 사용자의 기존 DID 문서를 업데이트합니다.`
+`Wallet의 잠금 상태를 설정한다.`
 
 ### Declaration
 
 ```java
-public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletException, UtilityException, WalletCoreException
+public boolean registerLock(String hWalletToken, String passCode, boolean isLock) throws Exception
 ```
 
 ### Parameters
 
-| Name         | Type   | Description | **M/O** | **Note** |
-| ------------ | ------ | ----------- | ------- | -------- |
-| hWalletToken | String | 월렛 토큰     | M       |          |
+| Name         | Type   | Description                        | **M/O** | **Note** |
+|--------------|--------|-----------------------------|---------|----------|
+| hWalletToken | String | 월렛토큰                   | M       |          |
+| passCode     | String | Unlock PIN               | M       |          |
+| isLock       | boolean | 잠금 활성화 여부            | M       |          |
+
+### Returns
+
+| Type    | Description                | **M/O** | **Note** |
+|---------|---------------------|---------|----------|
+| boolean | 잠금 설정 성공 여부를 반환한다. | M       |          |
+
+### Usage
+
+```java
+boolean success = walletApi.registerLock("hWalletToken", "123456", true);
+```
+
+<br>
+
+### 6.2. authenticateLock
+
+### Description
+`Wallet의 Unlock을 위한 인증을 수행한다.`
+
+### Declaration
+
+```java
+public void authenticateLock(String passCode) throws Exception
+```
+
+### Parameters
+
+| Name         | Type   | Description                        | **M/O** | **Note** |
+|--------------|--------|-----------------------------|---------|----------|
+| passCode     | String |Unlock PIN               | M       | registerLock 시 설정한 PIN          | 
+
+### Returns
+
+Void
+
+### Usage
+
+```java
+walletApi.authenticateLock("hWalletToken", "123456");
+```
+
+<br>
+
+
+### 6.3. isLock
+
+### Description
+`Wallet의 잠금 타입을 조회한다.`
+
+### Declaration
+
+```java
+public boolean isLock() throws Exception
+```
+
+### Parameters
+ Void
+
+### Returns
+
+| Type    | Description                | **M/O** | **Note** |
+|---------|---------------------|---------|----------|
+| boolean | Wallet 잠금 타입을 반환한다. | M       |          |
+
+### Usage
+
+```java
+boolean isLocked = walletApi.isLock();
+```
+
+<br>
+
+
+### 6.4. registerBioKey
+
+### Description
+`서명용 생체 인증 키를 등록한다.`
+
+### Declaration
+
+```java
+public void registerBioKey(Context context)
+```
+
+### Parameters
+
+| Name         | Type     | Description                        | **M/O** | **Note** |
+|--------------|----------|-----------------------------|---------|----------|
+| context       | Context   |        | M       |          |
+
+### Returns
+N/A
+
+### Usage
+
+```java
+walletApi.registerBioKey("hWalletToken", context);
+```
+
+<br>
+
+### 6.5. authenticateBioKey
+
+### Description
+`서명을 위한 생체 인증 키를 사용하기 위하여 인증을 수행한다.`
+
+### Declaration
+
+```java
+public void authenticateBioKey(Fragment fragment, Context context) throws Exception
+```
+
+### Parameters
+
+| Name         | Type     | Description                        | **M/O** | **Note** |
+|--------------|----------|-----------------------------|---------|----------|
+| hWalletToken | String   | 월렛토큰                   | M       |          |
+| fragment       | Fragment   |       | M       |          |
+| context       | Context   |        | M       |          |
+
+### Returns
+
+N/A
+
+### Usage
+
+```java
+walletApi.authenticateBioKey(fragment.this, context);
+```
+
+<br>
+
+
+### 6.6. changePin
+
+### Description
+`서명용 PIN 변경`
+
+### Declaration
+
+```java
+public void changePin(String keyId, String oldPin, String newPin) throws Exception
+```
+
+### Parameters
+
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| keyId     | String | 서명용 키아이디 | M       |          |
+| oldPIN | String | 현재 PIN      | M       |          |
+| newPIN | String | 변경할 PIN    | M       |          |
 
 ### Returns
 
@@ -1254,96 +1383,45 @@ public DIDDocument updateHolderDIDDoc(String hWalletToken) throws WalletExceptio
 ### Usage
 
 ```java
-walletApi.updateHolderDIDDoc(hWalletToken);
+String oldPin = "123456";
+String newPin = "654321";
+walletApi.changePin(Constants.KEY_ID_PIN, oldPin, newPin);
 ```
 
 <br>
 
-## 37. saveDocument
+### 6.7. changeLock
 
 ### Description
-`사용자의 DID 문서를 영구 저장소에 저장합니다.`
+`Unlock PIN 변경`
 
 ### Declaration
 
 ```java
-public void saveDocument() throws WalletException, WalletCoreException, UtilityException
-
-```
-
-### Parameters
-N/A
-
-### Returns
-N/A
-
-### Usage
-
-```java
-walletApi.saveDocument()
-```
-
-<br>
-
-## 38. deleteKey
-
-### Description
-`제공된 지갑 토큰에 필요한 권한이 있는지 확인한 후, 사용자의 DID(탈중앙화 식별자) 문서와 연결된 지정된 키를 삭제합니다.`
-
-### Declaration
-
-```java
-public void deleteKey(String hWalletToken, List<String> keyIds) throws WalletCoreException, UtilityException, WalletException
+public void changeLock(String oldPin, String newPin) throws Exception
 ```
 
 ### Parameters
 
-| Name         | Type         | Description | **M/O** | **Note** |
-| ------------ | ------------ | ----------- | ------- | -------- |
-| hWalletToken | String       | 월렛토큰    | M       |          |
-| keyIds       | List<String> | 키 IDs      | M       |          |
+| Name   | Type   | Description   | **M/O** | **Note** |
+| ------ | ------ | ------------- | ------- | -------- |
+| oldPIN | String | 현재 PIN      | M       |          |
+| newPIN | String | 변경할 PIN    | M       |          |
 
 ### Returns
-N/A
+
 
 ### Usage
 
 ```java
-walletApi.deleteKey(ProtocolData.getInstance(context).gethWalletToken(), List.of("bio"));
+String oldPin = "123456";
+String newPin = "654321";
+walletApi.changeLock(oldPin, newPin);
 ```
 
 <br>
 
-## 39. isAnyCredentialsSaved
-
-### Description
-`사용자의 지갑에 증명서가 저장되어 있는지 확인합니다.`
-
-### Declaration
-
-```java
-public void isAnyCredentialsSaved() throws WalletException
-```
-
-### Parameters
-
-N/A
-
-### Returns
-boolean
-
-### Usage
-
-```java
-
-if (!walletApi.isAnyCredentialsSaved()) {
-    ...
-}
-```
-
-<br>
-
-## 40. authenticatePin
+### 6.8. authenticatePin
 
 ### Description
 `핀 인증을 진행`
@@ -1374,6 +1452,8 @@ try {
 ```
 
 <br>
+
+
 
 # Enumerators
 ## 1. WALLET_TOKEN_PURPOSE
