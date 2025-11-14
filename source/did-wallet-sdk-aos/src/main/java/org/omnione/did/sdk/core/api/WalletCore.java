@@ -19,6 +19,7 @@ package org.omnione.did.sdk.core.api;
 import android.content.Context;
 
 import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
+import org.omnione.did.sdk.core.common.KeystoreManager;
 import org.omnione.did.sdk.core.didmanager.datamodel.DIDKeyInfo;
 import org.omnione.did.sdk.core.didmanager.datamodel.DIDMethodType;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
@@ -72,8 +73,8 @@ class WalletCore implements WalletCoreInterface {
     VCManager<VerifiableCredential> vcManager;
     BioPromptHelper bioPromptHelper;
     WalletLogger walletLogger;
-
     ZKPManager<ZKPInfo> zkpManager;
+    private final String SIGNATURE_MANAGER_ALIAS_PREFIX = "opendid_wallet_signature_";
 
     public void setBioPromptListener(BioPromptHelper.BioPromptInterface bioPromptInterface){
         this.bioPromptInterface = bioPromptInterface;
@@ -363,6 +364,9 @@ class WalletCore implements WalletCoreInterface {
             @Override
             public void onSuccess(String result) {
                 try {
+                    if(KeystoreManager.isKeySaved(SIGNATURE_MANAGER_ALIAS_PREFIX, Constants.KEY_ID_BIO))
+                        KeystoreManager.deleteKey(SIGNATURE_MANAGER_ALIAS_PREFIX, Constants.KEY_ID_BIO);
+
                     SecureKeyGenRequest keyGenInfo = new SecureKeyGenRequest();
                     keyGenInfo.setId(Constants.KEY_ID_BIO);
                     keyGenInfo.setAlgorithmType(AlgorithmType.ALGORITHM_TYPE.SECP256R1);
