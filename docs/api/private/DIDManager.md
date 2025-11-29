@@ -19,13 +19,14 @@ Android DIDManager API
 ==
 
 - Topic: DIDManager
-- Author: Sangjun Kim
-- Date: 2024-07-10
-- Version: v1.0.0
+- Author: Dongjun Park
+- Date: 2025-10-15
+- Version: v1.0.10
 
-| Version | Date       | Changes                  |
-| ------- | ---------- | ------------------------ |
-| v1.0.0  | 2024-07-10 | Initial version          |
+| Version | Date       | Changes           |
+| ------- | ---------- | ----------------- |
+| v1.0.1  | 2025-10-15 | Add DIDDoc Update |
+| v1.0.0  | 2024-07-10 | Initial version   |
 
 
 <div style="page-break-after: always;"></div>
@@ -45,6 +46,7 @@ Android DIDManager API
     - [11. addService](#11-addservice)
     - [12. removeService](#12-removeservice)
     - [13. resetChanges](#13-resetchanges)
+    - [14. updateDocument](#14-updatedocument)
 - [Enumerators](#enumerators)
     - [1. DID_METHOD_TYPE](#1-did_method_type)
     - [2. DID_KEY_TYPE](#2-did_key_type)
@@ -469,6 +471,38 @@ void
 DIDManager<DIDDocument> didManager = new DIDManager<>("MyWallet", this);
 
 didManager.resetChanges();
+```
+
+<br>
+
+## 14. updateDocument
+
+### Description
+`Updates a "DIDDocument object" and manages it as an internal variable.`
+
+### Declaration
+
+```java
+void updateDocument(List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws Exception
+```
+
+### Parameters
+
+| Parameter  | Type             | Description                                                                                 | **M/O** | **Notes**                            |
+| ---------- | ---------------- | ------------------------------------------------------------------------------------------- | ------- | ------------------------------------ |
+| keyInfos   | List<DIDKeyInfo> | Array of public key information objects to register in DID document                         | M       | Refer to [DIDKeyInfo](#2-didkeyinfo) |
+| controller | String           | DID to register as controller in the DID document.<br>If null, the `did` parameter is used. | M       |                                      |
+| services   | List<Service>    | Service information objects to specify in the DID document                                  | M       | Refer to [Service](#4-service)       |
+
+### Returns
+
+void
+
+### Usage
+```java
+DIDManager<DIDDocument> didManager = new DIDManager<>("MyWallet", this);
+
+didManager.updateDIDDoc(didKeyInfos, controller, null);
 ```
 
 <br>

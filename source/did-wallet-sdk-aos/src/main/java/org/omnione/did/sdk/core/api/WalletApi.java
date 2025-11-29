@@ -53,7 +53,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class WalletApi {
+public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredentialService, IWalletApi.IDIDKeyService, IWalletApi.IZKPService, IWalletApi.ISecurityAuthService {
     private Context context;
     private static WalletApi instance;
     public static boolean isLock = true;
@@ -133,7 +133,6 @@ public class WalletApi {
         walletService.createDeviceDocument(walletUrl, tasUrl);
         return isExistWallet();
     }
-
 
     //
     /**
@@ -341,7 +340,7 @@ public class WalletApi {
      * @return CompletableFuture<String> - A `CompletableFuture` representing the result of the user restoration request.
      * @throws Exception - Any error that occurs during wallet token verification, user restoration request, or related processes.
      */
-    public CompletableFuture<String> requestRestoreUser(String hWalletToken, String tasUrl, String serverToken, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestRestoreUser(String hWalletToken, String tasUrl, String serverToken, DIDAuth signedDIDAuth, String txId) throws WalletException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.RESTORE_DID));
         return walletService.requestRestoreUser(tasUrl, serverToken, signedDIDAuth, txId);
     }

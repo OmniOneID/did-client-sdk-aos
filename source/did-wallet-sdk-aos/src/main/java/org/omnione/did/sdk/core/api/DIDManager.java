@@ -101,7 +101,22 @@ class DIDManager<E extends BaseObject> {
         addMethodType(keyInfos);
     }
 
-    public void updateDIDDoc(List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws WalletCoreException, UtilityException {
+    /**
+     * Updates the existing DID (Decentralized Identifier) Document with new key information, controller, and services.
+     * This method retrieves the current document, rebuilds the verification methods based on the provided key information,
+     * and replaces the existing document with the updated version.
+     *
+     * @param keyInfos   A list of {@link DIDKeyInfo} objects containing the new key information to be included in the
+     *                   updated document. Each key info is used to create a new {@link VerificationMethod}.
+     * @param controller The identifier of the controller for the new verification methods.
+     * @param service    A list of {@link Service} objects to be included in the document.
+     *                   (Note: This parameter is accepted but not directly used in the current implementation shown.
+     *                   It might be used in other methods called internally or intended for future use.)
+     * @throws WalletCoreException If an error occurs within the wallet core during document retrieval or replacement,
+     *                             such as if the original document does not exist.
+     * @throws UtilityException If a utility-related error occurs, for instance during data processing or conversion.
+     */
+    public void updateDocument(List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws WalletCoreException, UtilityException {
 
         DIDDocument didDoc = getDocument();
         ArrayList<VerificationMethod> verificationMethod = new ArrayList<VerificationMethod>();
