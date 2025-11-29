@@ -196,9 +196,6 @@ public class IssueProfile implements ProofContainer {
                 .registerTypeAdapterFactory(new StringEnumAdapterFactory())
                 .create();
 
-        String json = gson.toJson(this);
-        return json;
-        //return ODIJsonSortUtil.sortJsonString(gson, json);
+        return  gson.toJson(this);
     }
-
 }

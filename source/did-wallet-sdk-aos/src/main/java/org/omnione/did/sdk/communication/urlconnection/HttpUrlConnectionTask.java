@@ -32,7 +32,7 @@ public class HttpUrlConnectionTask {
     public HttpUrlConnectionTask(){
 
     }
-    public String makeHttpRequest(String urlString, String method, String payload) throws CommunicationException {
+    public String makeHttpRequest(String urlString, String method, String payload, String accessToken) throws CommunicationException {
         WalletLogger.getInstance().d("request : " + payload + " / " + urlString + " / [" + method + "]");
         if(urlString.isEmpty()){
             throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_INVALID_PARAMETER, "urlString");
@@ -52,6 +52,9 @@ public class HttpUrlConnectionTask {
             urlConnection.setRequestMethod(method);
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
+            if (accessToken != null) {
+                urlConnection.setRequestProperty("Authorization", "Bearer " +accessToken);
+            }
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept", "application/json");
 
@@ -77,6 +80,10 @@ public class HttpUrlConnectionTask {
                 in.close();
                 WalletLogger.getInstance().d("response : " + response.toString() + " / " + responseCode);
                 return response.toString();
+            } else if( responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                WalletLogger.getInstance().d("response : unauthorized " + " / " + responseCode);
+                throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_UNAUTHORIZED , accessToken);
+
             } else if( responseCode == HttpURLConnection.HTTP_BAD_REQUEST
                     || responseCode == HttpURLConnection.HTTP_SERVER_ERROR) {
                 in = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));
@@ -86,6 +93,7 @@ public class HttpUrlConnectionTask {
                     error.append(inputLine);
                 }
                 in.close();
+                WalletLogger.getInstance().d("response : " + error.toString() + " / " + responseCode);
                 throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_SERVER_FAIL , error.toString());
             } else {
                 in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -95,6 +103,7 @@ public class HttpUrlConnectionTask {
                     error.append(inputLine);
                 }
                 in.close();
+                WalletLogger.getInstance().d("response : " + error.toString() + " / " + responseCode);
                 throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_INCORRECT_URL_CONNECTION , urlString);
             }
         } catch (IOException e) {

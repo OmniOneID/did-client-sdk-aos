@@ -69,7 +69,7 @@ public class KeyManagerTest {
 
         KeyManager<DetailKeyInfo> keyManager = new KeyManager<>("walletTest", appContext);
         if(keyManager.isAnyKeySaved())
-            keyManager.deleteAllKeys();
+            keyManager.deleteAllKeys(true);
 
         // NONE KEY generation
         WalletKeyGenRequest keyGenInfo = new WalletKeyGenRequest();
@@ -233,7 +233,7 @@ public class KeyManagerTest {
             Log.d("KeyManagerTest","BIO 삭제 후 alias : " + alias);
         }
 
-        keyManager.deleteAllKeys();
+        keyManager.deleteAllKeys(true);
 
         for(String alias : KeystoreManager.getKeystoreAliasList()){
             Log.d("KeyManagerTest","전부삭제 후 alias : " + alias);

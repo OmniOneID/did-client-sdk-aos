@@ -320,7 +320,7 @@ public class VCManagerTest {
 
         KeyManager<DetailKeyInfo> keyManager = new KeyManager<>("vcTest", appContext);
         if(keyManager.isAnyKeySaved())
-            keyManager.deleteAllKeys();
+            keyManager.deleteAllKeys(true);
         WalletKeyGenRequest keyGenInfo = new WalletKeyGenRequest();
 
         if(!keyManager.isKeySaved("FREE")) {

@@ -19,13 +19,14 @@ Android KeyManager API
 ==
 
 - 주제: KeyManager
-- 작성: Sangjun Kim
-- 일자: 2024-07-08
-- 버전: v1.0.0
+- 작성: Dongjun Park
+- 일자: 2025-10-15
+- 버전: v1.0.1
 
-| 버전   | 일자       | 변경 내용                 |
-| ------ | ---------- | -------------------------|
-| v1.0.0 | 2024-07-08 | 초기 작성                 |
+| 버전   | 일자       | 변경 내용         |
+| ------ | ---------- | ----------------- |
+| v1.0.1 | 2025-10-15 | 핀 인증 기능 추가 |
+| v1.0.0 | 2024-07-08 | 초기 작성         |
 
 
 <div style="page-break-after: always;"></div>
@@ -43,6 +44,7 @@ Android KeyManager API
     - [9. deleteAllKeys](#9-deleteallkeys)
     - [10. sign](#10-sign)
     - [11. verify](#11-verify)
+    - [12. authenticatePin](#12-authenticatepin)
 - [Enumerators](#enumerators)
     - [1. ALGORITH_TYPE](#1-algorithm_type)
     - [2. WALLET_METHOD_TYPE](#2-wallet_method_type)
@@ -489,6 +491,42 @@ byte[] signature = MultibaseUtils.decode("f1f86c9060978bb9dd96b2cc969177fcbb1f79
 
 keyManager.verify(AlgorithmType.ALGORITHM_TYPE.SECP256R1, publicKey, digest, signature);
 ```
+
+<br>
+
+## 12. authenticatePin
+
+### Description
+`사용자가 입력한 PIN 키를 인증`
+
+### Declaration
+
+```java
+void authetncatePin(String id, byte[] pin) throws Exception
+```
+
+### Parameters
+
+| Parameter | Type   | Description         | **M/O** | **비고** |
+| --------- | ------ | ------------------- | ------- | -------- |
+| id        | string | 키아이디            | M       |          |
+| pin       | byte[] | 사용자가 입력한 PIN | M       |          |
+
+
+
+### Returns
+
+void
+
+
+### Usage
+```java
+KeyManager<DetailKeyInfo> keyManager = new KeyManager<>("MyWallet", this);
+
+keyManager.authenticatePin("PIN", "password".getBytes());
+```
+
+<br>
 
 # Enumerators
 ## 1. ALGORITHM_TYPE

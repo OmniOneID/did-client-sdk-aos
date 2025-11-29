@@ -82,7 +82,9 @@ public class BioPromptHelper {
                     .setNegativeButtonText("Cancel")
                     .build();
 
-            biometricPrompt.authenticate(promptInfo);
+            ContextCompat.getMainExecutor(context).execute(()  -> {
+                biometricPrompt.authenticate(promptInfo);
+            });
         }
     }
 
@@ -91,10 +93,10 @@ public class BioPromptHelper {
      * @param fragment
      * @param ctx
      */
-    public void authenticateBioKey(Fragment fragment, Context ctx, String Message) {
+    public void authenticateBioKey(Context ctx, String Message) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             Executor executor = ContextCompat.getMainExecutor(ctx);
-            BiometricPrompt biometricPrompt = new BiometricPrompt(fragment, executor, new BiometricPrompt.AuthenticationCallback() {
+            BiometricPrompt biometricPrompt = new BiometricPrompt((androidx.fragment.app.FragmentActivity) ctx, executor, new BiometricPrompt.AuthenticationCallback() {
                 @Override
                 public void onAuthenticationError(int errorCode, CharSequence errString) {
                     super.onAuthenticationError(errorCode, errString);

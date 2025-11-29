@@ -61,6 +61,82 @@ class KeyManager<E extends BaseObject>{
     }
 
     /**
+     * Authenticates a user's PIN by decrypting a stored private key and verifying it against the corresponding public key.
+     * This method orchestrates the entire process: fetching the key information from storage using the provided ID,
+     * deriving a symmetric key from the user's PIN and a stored salt, decrypting the private key,
+     * and finally checking if the decrypted private key matches the stored public key.
+     * It also securely clears sensitive byte arrays from memory after use.
+     *
+     * @param id The identifier for the key to be authenticated. It is used to retrieve key metadata
+     *           and the encrypted private key from secure storage. Cannot be an empty string.
+     * @param pin The user's PIN as a byte array, which is required to derive the decryption key.
+     *            This parameter must not be null for PIN-based authentication.
+     * @throws WalletCoreException If any part of the authentication process fails. This includes:
+     *                             <ul>
+     *                               <li>If the provided {@code id} or {@code pin} is invalid (e.g., empty or null).</li>
+     *                               <li>If the key information cannot be found in storage for the given {@code id}.</li>
+     *                               <li>If decoding of the private key, public key, or salt from Multibase format fails.</li>
+     *                               <li>If the key's access method is not supported (not {@code WALLET_PIN}).</li>
+     *                               <li>If the decrypted private key does not match the public key, indicating a PIN mismatch.</li>
+     *                             </ul>
+     * @throws UtilityException If a utility-related error occurs, such as during cryptographic operations
+     *                          or Multibase decoding, although many are wrapped in {@code WalletCoreException}.
+     */
+    public void authenticatePin(String id, byte[] pin) throws WalletCoreException, UtilityException {
+
+        if(id.length() == 0) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_INVALID_PARAMETER, "id");
+        }
+
+        List<String> identifiers = new ArrayList<>();
+        identifiers.add(id);
+        List<UsableInnerWalletItem<KeyInfo, DetailKeyInfo>> walletItems = storageManager.getItems(identifiers);
+        KeyInfo signkeyInfo = walletItems.get(0).getMeta();
+        DetailKeyInfo signDetailKeyInfo = walletItems.get(0).getItem();
+
+        byte[] publicKey = MultibaseUtils.decode(signkeyInfo.getPublicKey());
+
+        switch (signkeyInfo.getAccessMethod()) {
+            case WALLET_PIN:
+                if (pin == null) {
+                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_INVALID_PARAMETER, "pin");
+                }
+                byte[] multibaseDecoded = MultibaseUtils.decode(signDetailKeyInfo.getPrivateKey());
+                if (multibaseDecoded == null) {
+                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_FAILED_TO_DECODE, "Data(R)");
+
+                }
+                byte[] salt = MultibaseUtils.decode(signDetailKeyInfo.getSalt());
+                if (salt == null) {
+                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_FAILED_TO_DECODE, "Data(A)");
+
+                }
+
+                int iteration = 2048;
+                byte[] symmetricKey = CryptoUtils.pbkdf2(pin, salt, iteration, 48);
+                byte[] key = Arrays.copyOfRange(symmetricKey, 0, 32);
+                byte[] iv = Arrays.copyOfRange(symmetricKey, 32, symmetricKey.length);
+                byte[] PINDecoded = CryptoUtils.decrypt(
+                        multibaseDecoded,
+                        new CipherInfo(CipherInfo.ENCRYPTION_TYPE.AES, CipherInfo.ENCRYPTION_MODE.CBC, CipherInfo.SYMMETRIC_KEY_SIZE.AES_256, CipherInfo.SYMMETRIC_PADDING_TYPE.PKCS5),
+                        key,
+                        iv
+                );
+
+                Secp256R1Manager keyAlgorithm = new Secp256R1Manager();
+                keyAlgorithm.checkKeyPairMatch(PINDecoded, publicKey);
+                Arrays.fill(pin, (byte) 0x00);
+                Arrays.fill(multibaseDecoded, (byte) 0x00);
+                Arrays.fill(salt, (byte) 0x00);
+                Arrays.fill(symmetricKey, (byte) 0x00);
+                Arrays.fill(PINDecoded, (byte) 0x00);
+                break;
+            default:
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_KEY_MANAGER_UNSUPPORTED_ALGORITHM);
+
+        }
+    }
+    /**
      * isKeySaved: Checks if a key with the given ID is saved.
      *
      * This method verifies if a key with the specified ID is stored. It first checks if the ID is valid,
@@ -409,9 +485,9 @@ class KeyManager<E extends BaseObject>{
      *
      * @throws Exception If an error occurs during the deletion of all keys from storage or keystore.
      */
-    public void deleteAllKeys() throws WalletCoreException {
+    public void deleteAllKeys(boolean isKeystore) throws WalletCoreException {
         storageManager.removeAllItems();
-        if(KeystoreManager.isKeySaved(SIGNATURE_MANAGER_ALIAS_PREFIX, null)){
+        if(isKeystore && KeystoreManager.isKeySaved(SIGNATURE_MANAGER_ALIAS_PREFIX, null)){
             KeystoreManager.deleteKey(SIGNATURE_MANAGER_ALIAS_PREFIX, null);
         }
     }

@@ -19,6 +19,7 @@ package org.omnione.did.sdk.wallet.walletservice.network.protocol;
 import android.content.Context;
 
 import org.omnione.did.sdk.communication.exception.CommunicationException;
+import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
 import org.omnione.did.sdk.datamodel.protocol.P141RequestVo;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
 import org.omnione.did.sdk.wallet.walletservice.network.HttpUrlConnection;
@@ -33,14 +34,14 @@ public class UpdateUser {
     public UpdateUser(Context context){
         this.context = context;
     }
-    public CompletableFuture<String> updateUser(String tasUrl, String txId, String serverToken, DIDAuth didAuth) {
+    public CompletableFuture<String> updateUser(String tasUrl, String txId, String serverToken, DIDAuth didAuth, SignedDidDoc signedDidDoc) {
         String api5 = "/tas/api/v1/request-update-diddoc"; //user update
 
         HttpUrlConnection httpUrlConnection = new HttpUrlConnection();
 
         return CompletableFuture.supplyAsync(() -> {
                     try {
-                        return httpUrlConnection.send(tasUrl + api5, "POST", M141_RequestUpdateDidDocByWallet(txId, serverToken, didAuth));
+                        return httpUrlConnection.send(tasUrl + api5, "POST", M141_RequestUpdateDidDocByWallet(txId, serverToken, didAuth, signedDidDoc));
                     } catch (CommunicationException e) {
                         throw new CompletionException(e);
                     }
@@ -51,11 +52,11 @@ public class UpdateUser {
                 });
     }
 
-    private String M141_RequestUpdateDidDocByWallet(String txId, String serverToken, DIDAuth didAuth) {
+    private String M141_RequestUpdateDidDocByWallet(String txId, String serverToken, DIDAuth didAuth, SignedDidDoc signedDidDoc) {
         P141RequestVo requestVo = new P141RequestVo(WalletUtil.createMessageId(), txId);
         requestVo.setServerToken(serverToken);
         requestVo.setDidAuth(didAuth);
-        String request = requestVo.toJson();
-        return request;
+        requestVo.setSignedDidDoc(signedDidDoc);
+        return requestVo.toJson();
     }
 }

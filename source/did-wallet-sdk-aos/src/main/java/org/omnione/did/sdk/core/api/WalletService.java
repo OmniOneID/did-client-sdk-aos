@@ -269,24 +269,29 @@ public class WalletService implements WalletServiceInterface {
         return true;
     }
     @Override
-    public void deleteWallet() throws WalletCoreException {
+    public void deleteWallet(boolean deleteAll) throws WalletCoreException {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 DBManager walletDB = DBManager.getDatabases(context);
-                walletDB.caPkgDao().deleteAll();
+                if (deleteAll) {
+                    walletDB.caPkgDao().deleteAll();
+                }
                 walletDB.userDao().deleteAll();
                 walletDB.tokenDao().deleteAll();
             }
         }).start();
-        walletCore.deleteWallet();
+        walletCore.deleteWallet(deleteAll);
     }
     @Override
     public DIDDocument createHolderDIDDoc() throws UtilityException, WalletCoreException, WalletException {
-        DIDDocument holderDIDDoc = walletCore.createHolderDIDDoc();
-        walletCore.saveDocument(Constants.DID_DOC_TYPE_HOLDER);
-        return holderDIDDoc;
+        return walletCore.createHolderDIDDoc();
     }
+
+    public DIDDocument updateHolderDIDDoc() throws UtilityException, WalletCoreException, WalletException {
+        return walletCore.updateHolderDIDDoc();
+    }
+
     @Override
     public SignedDidDoc createSignedDIDDoc(DIDDocument ownerDIDDoc) throws WalletException, WalletCoreException, UtilityException{
         if(ownerDIDDoc == null)
@@ -331,9 +336,9 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
-    public CompletableFuture<String> requestUpdateUser(String tasUrl, String serverToken, DIDAuth signedDIDAuth, String txId) throws WalletException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestUpdateUser(String tasUrl, String serverToken, DIDAuth signedDIDAuth, SignedDidDoc signedDIDDoc, String txId) throws WalletException, ExecutionException, InterruptedException {
         UpdateUser updateUser = new UpdateUser(context);
-        String result = updateUser.updateUser(tasUrl, txId, serverToken, signedDIDAuth).get();
+        String result = updateUser.updateUser(tasUrl, txId, serverToken, signedDIDAuth, signedDIDDoc).get();
         if (result == null)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_UPDATE_USER_FAIL);
         return CompletableFuture.completedFuture(result);
@@ -607,6 +612,7 @@ public class WalletService implements WalletServiceInterface {
                 signedVp = (VerifiablePresentation) addProofsToDocument(vp, List.of(Constants.KEY_ID_BIO), walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER).getId(), Constants.DID_DOC_TYPE_HOLDER, "", false);
             }
         }
+        // and 처리로직 필요
         byte[] encVp = CryptoUtils.encrypt(
                 signedVp.toJson().getBytes(),
                 info,
@@ -644,7 +650,7 @@ public class WalletService implements WalletServiceInterface {
             bioPromptHelper.registerBioKey(ctx, null);
     }
 
-    public void authenticateUnlockBioKey(Fragment fragment, Context ctx) {
+    public void authenticateUnlockBioKey(Context ctx) {
             bioPromptHelper.setBioPromptListener(new BioPromptHelper.BioPromptInterface() {
                 @Override
                 public void onSuccess(String result) {
@@ -663,7 +669,7 @@ public class WalletService implements WalletServiceInterface {
                     bioPromptInterface.onFail(result);
                 }
             });
-            bioPromptHelper.authenticateBioKey(fragment, ctx, null);
+            bioPromptHelper.authenticateBioKey(ctx, null);
     }
 
     private byte[] mergeSharedSecretAndNonce(byte[] sharedSecret, byte[] nonce, SymmetricCipherType.SYMMETRIC_CIPHER_TYPE cipherType) throws UtilityException {

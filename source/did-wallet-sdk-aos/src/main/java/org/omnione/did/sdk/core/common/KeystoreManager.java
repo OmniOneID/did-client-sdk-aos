@@ -217,6 +217,7 @@ public class KeystoreManager {
             keyGenParameterSpec = new KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
                     .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                     .setDigests(KeyProperties.DIGEST_NONE)
+                    .setInvalidatedByBiometricEnrollment(false)
                     // Provides an option to allow keystore access only via biometric authentication.
                     //.setUserAuthenticationRequired(true)
                     //.setUserAuthenticationValidityDurationSeconds(KEYSTORE_KEY_VALID_SECONDS)
@@ -226,6 +227,7 @@ public class KeystoreManager {
             keyGenParameterSpec = new KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
                     .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                     .setDigests(KeyProperties.DIGEST_NONE)
+                    .setInvalidatedByBiometricEnrollment(false)
                     // If keyOption is R1_KEYSTORE_ACCESS, it provides an option to allow access to the keystore only through biometric authentication.
                     //.setUserAuthenticationRequired((true))
                     //.setUserAuthenticationValidityDurationSeconds(KEYSTORE_KEY_VALID_SECONDS)
@@ -370,6 +372,7 @@ public class KeystoreManager {
                             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                             .setRandomizedEncryptionRequired(false)
                             .setIsStrongBoxBacked(true)
+                            .setInvalidatedByBiometricEnrollment(false)
                             .build();
 
                 } else {
@@ -377,6 +380,7 @@ public class KeystoreManager {
                             .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                             .setRandomizedEncryptionRequired(false)
+                            .setInvalidatedByBiometricEnrollment(false)
                             .build();
                 }
 

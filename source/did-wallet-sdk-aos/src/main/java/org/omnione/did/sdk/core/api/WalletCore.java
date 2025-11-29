@@ -18,21 +18,36 @@ package org.omnione.did.sdk.core.api;
 
 import android.content.Context;
 
-import androidx.fragment.app.Fragment;
-
+import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
+import org.omnione.did.sdk.core.common.KeystoreManager;
+import org.omnione.did.sdk.core.didmanager.datamodel.DIDKeyInfo;
+import org.omnione.did.sdk.core.didmanager.datamodel.DIDMethodType;
+import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.keymanager.datamodel.DetailKeyInfo;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyGenWalletMethodType;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyInfo;
+import org.omnione.did.sdk.core.keymanager.datamodel.KeyStoreAccessMethod;
+import org.omnione.did.sdk.core.keymanager.datamodel.SecureKeyGenRequest;
+import org.omnione.did.sdk.core.keymanager.datamodel.StorageOption;
+import org.omnione.did.sdk.core.keymanager.datamodel.WalletKeyGenRequest;
+import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
+import org.omnione.did.sdk.core.vcmanager.datamodel.PresentationInfo;
 import org.omnione.did.sdk.core.zkp.datamodel.ZKPInfo;
+import org.omnione.did.sdk.datamodel.common.enums.AlgorithmType;
+import org.omnione.did.sdk.datamodel.did.DIDDocument;
+import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
 import org.omnione.did.sdk.datamodel.zkp.CredentialOffer;
 import org.omnione.did.sdk.datamodel.zkp.CredentialPrimaryPublicKey;
+import org.omnione.did.sdk.datamodel.zkp.CredentialRequestContainer;
 import org.omnione.did.sdk.datamodel.zkp.CredentialRequestMeta;
 import org.omnione.did.sdk.datamodel.zkp.Proof;
 import org.omnione.did.sdk.datamodel.zkp.ProofParam;
 import org.omnione.did.sdk.datamodel.zkp.ProofRequest;
 import org.omnione.did.sdk.datamodel.zkp.ReferentInfo;
 import org.omnione.did.sdk.datamodel.zkp.UserReferent;
-import org.omnione.did.sdk.datamodel.zkp.CredentialRequestContainer;
 import org.omnione.did.sdk.utility.DataModels.DigestEnum;
 import org.omnione.did.sdk.utility.DataModels.MultibaseType;
 import org.omnione.did.sdk.utility.DigestUtils;
@@ -41,22 +56,6 @@ import org.omnione.did.sdk.utility.MultibaseUtils;
 import org.omnione.did.sdk.wallet.WalletCoreInterface;
 import org.omnione.did.sdk.wallet.walletservice.config.Config;
 import org.omnione.did.sdk.wallet.walletservice.config.Constants;
-import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
-import org.omnione.did.sdk.core.didmanager.datamodel.DIDMethodType;
-import org.omnione.did.sdk.core.exception.WalletCoreException;
-import org.omnione.did.sdk.core.keymanager.datamodel.DetailKeyInfo;
-import org.omnione.did.sdk.core.keymanager.datamodel.KeyGenWalletMethodType;
-import org.omnione.did.sdk.core.keymanager.datamodel.KeyStoreAccessMethod;
-import org.omnione.did.sdk.core.keymanager.datamodel.SecureKeyGenRequest;
-import org.omnione.did.sdk.core.keymanager.datamodel.WalletKeyGenRequest;
-import org.omnione.did.sdk.datamodel.did.DIDDocument;
-import org.omnione.did.sdk.core.didmanager.datamodel.DIDKeyInfo;
-import org.omnione.did.sdk.datamodel.common.enums.AlgorithmType;
-import org.omnione.did.sdk.core.keymanager.datamodel.StorageOption;
-import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
-import org.omnione.did.sdk.core.keymanager.datamodel.KeyInfo;
-import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
-import org.omnione.did.sdk.core.vcmanager.datamodel.PresentationInfo;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletErrorCode;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
 import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
@@ -74,8 +73,8 @@ class WalletCore implements WalletCoreInterface {
     VCManager<VerifiableCredential> vcManager;
     BioPromptHelper bioPromptHelper;
     WalletLogger walletLogger;
-
     ZKPManager<ZKPInfo> zkpManager;
+    private final String SIGNATURE_MANAGER_ALIAS_PREFIX = "opendid_wallet_signature_";
 
     public void setBioPromptListener(BioPromptHelper.BioPromptInterface bioPromptInterface){
         this.bioPromptInterface = bioPromptInterface;
@@ -103,6 +102,44 @@ class WalletCore implements WalletCoreInterface {
         bioPromptHelper = new BioPromptHelper(context);
         walletLogger = WalletLogger.getInstance();
     }
+
+    public void authenticatePin(String id, byte[] pin) throws WalletCoreException, UtilityException {
+        keyManager.authenticatePin(id, pin);
+    }
+
+    public DIDDocument updateHolderDIDDoc() throws WalletCoreException, UtilityException, WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+
+//        KeyGenWalletMethodType keyGenWalletMethodType = new KeyGenWalletMethodType();
+//        WalletKeyGenRequest keyGenInfo = new WalletKeyGenRequest(
+//                Constants.KEY_ID_KEY_AGREE,
+//                AlgorithmType.ALGORITHM_TYPE.SECP256R1,
+//                StorageOption.STORAGE_OPTION.WALLET,
+//                keyGenWalletMethodType
+//        );
+//        keyManager.generateKey(keyGenInfo);
+
+        String controller = Config.DID_CONTROLLER;
+        List<KeyInfo> keyInfos = keyManager.getKeyInfos(List.of(Constants.KEY_ID_PIN, Constants.KEY_ID_BIO, Constants.KEY_ID_KEY_AGREE));
+        List<DIDKeyInfo> didKeyInfos = new ArrayList<>();
+        for(KeyInfo keyInfo : keyInfos){
+            DIDKeyInfo didKeyInfo = new DIDKeyInfo();
+            if(keyInfo.getId().equals(Constants.KEY_ID_PIN)) {
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+            }
+            if(keyInfo.getId().equals(Constants.KEY_ID_BIO)) {
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+            }
+            if(keyInfo.getId().equals(Constants.KEY_ID_KEY_AGREE))
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), controller);
+            didKeyInfos.add(didKeyInfo);
+        }
+        didManager.updateDocument(didKeyInfos, controller, null);
+        return didManager.getDocument();
+
+    }
+
     @Override
     public DIDDocument createDeviceDIDDoc() throws WalletCoreException, UtilityException {
         if(!deviceKeyManager.isAnyKeySaved()) {
@@ -222,7 +259,7 @@ class WalletCore implements WalletCoreInterface {
     public void saveDocument(int type) throws WalletCoreException, UtilityException, WalletException {
         if(WalletApi.isLock)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
-
+        
         if(type == Constants.DID_DOC_TYPE_DEVICE){
             deviceDIDManager.saveDocument();
         } else {
@@ -237,18 +274,31 @@ class WalletCore implements WalletCoreInterface {
         return deviceKeyManager.isAnyKeySaved() && deviceDIDManager.isSaved();
     }
 
+    public void deleteKey(List<String> keyId) throws WalletCoreException, UtilityException {
+        keyManager.deleteKeys(keyId);
+    }
+
     @Override
-    public void deleteWallet() throws WalletCoreException {
-        if(deviceKeyManager.isAnyKeySaved())
-            deviceKeyManager.deleteAllKeys();
-        if(deviceDIDManager.isSaved())
-            deviceDIDManager.deleteDocument();
-//        if(keyManager.isAnyKeySaved())
-//            keyManager.deleteAllKeys();
-        if(didManager.isSaved())
+    public void deleteWallet(boolean deleteAll) throws WalletCoreException {
+
+        if (didManager.isSaved()) {
             didManager.deleteDocument();
-        if(vcManager.isAnyCredentialsSaved())
+        }
+        if (vcManager.isAnyCredentialsSaved()) {
             vcManager.deleteAllCredentials();
+        }
+        if (keyManager.isAnyKeySaved()) {
+            keyManager.deleteAllKeys(deleteAll);
+        }
+
+        if (deleteAll) {
+            if (deviceKeyManager.isAnyKeySaved()) {
+                deviceKeyManager.deleteAllKeys(deleteAll);
+            }
+            if (deviceDIDManager.isSaved()) {
+                deviceDIDManager.deleteDocument();
+            }
+        }
     }
     @Override
     public boolean isAnyCredentialsSaved() throws WalletException {
@@ -314,6 +364,9 @@ class WalletCore implements WalletCoreInterface {
             @Override
             public void onSuccess(String result) {
                 try {
+                    if(KeystoreManager.isKeySaved(SIGNATURE_MANAGER_ALIAS_PREFIX, Constants.KEY_ID_BIO))
+                        KeystoreManager.deleteKey(SIGNATURE_MANAGER_ALIAS_PREFIX, Constants.KEY_ID_BIO);
+
                     SecureKeyGenRequest keyGenInfo = new SecureKeyGenRequest();
                     keyGenInfo.setId(Constants.KEY_ID_BIO);
                     keyGenInfo.setAlgorithmType(AlgorithmType.ALGORITHM_TYPE.SECP256R1);
@@ -341,7 +394,7 @@ class WalletCore implements WalletCoreInterface {
         bioPromptHelper.registerBioKey(ctx, null);
     }
     @Override
-    public void authenticateBioKey(Fragment fragment, Context ctx) throws WalletCoreException, WalletException {
+    public void authenticateBioKey(Context ctx) throws WalletCoreException, WalletException {
         if(WalletApi.isLock)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
 
@@ -363,7 +416,7 @@ class WalletCore implements WalletCoreInterface {
                 bioPromptInterface.onFail(result);
             }
         });
-        bioPromptHelper.authenticateBioKey(fragment, ctx, null);
+        bioPromptHelper.authenticateBioKey(ctx, null);
 
     }
     @Override

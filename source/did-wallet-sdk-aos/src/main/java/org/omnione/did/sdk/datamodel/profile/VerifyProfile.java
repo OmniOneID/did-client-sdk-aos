@@ -26,6 +26,7 @@ import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.CredentialSchemaType;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
 import org.omnione.did.sdk.datamodel.util.IntEnumAdapterFactory;
+import org.omnione.did.sdk.datamodel.util.StringEnumAdapterFactory;
 
 import java.util.List;
 
@@ -321,7 +322,7 @@ public class VerifyProfile implements ProofContainer {
     public String toJson() {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new IntEnumAdapterFactory())
-                //.registerTypeAdapterFactory(new StringEnumAdapterFactory())
+                .registerTypeAdapterFactory(new StringEnumAdapterFactory())
                 .create();
 
         String json = gson.toJson(this);
