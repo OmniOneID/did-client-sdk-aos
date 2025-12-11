@@ -70,8 +70,8 @@ After QA approval, manage the complete version control of all modules in a separ
 
    | Repository         | Version         | Changelog                   | Release                    |
    | ------------------ | --------------- | --------------------------- | --------------------------- |
-   | did-ca-aos         | V2.0.0          | [Changelog](https://github.com/OmniOneID/did-ca-aos/blob/main/CHANGELOG.md) |
-   | did-client-sdk-aos | V2.0.0          | [Changelog](https://github.com/OmniOneID/did-client-sdk-aos/blob/main/CHANGELOG.md) |
+   | did-ca-aos         | V2.0.1          | [Changelog](https://github.com/OmniOneID/did-ca-aos/blob/main/CHANGELOG.md) |
+   | did-client-sdk-aos | V2.0.1          | [Changelog](https://github.com/OmniOneID/did-client-sdk-aos/blob/main/CHANGELOG.md) |
    | ..                 | ..              | ..                           |
 
 <br>
