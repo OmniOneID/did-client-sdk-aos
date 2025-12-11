@@ -1,5 +1,25 @@
 # Changelog
 
+## v2.0.1 (2025-11-29)
+
+### 🚀 New Features
+- Passcode Authentication
+    - Added passcode authentication function.
+    - Refactored terminology to use "passcode" instead of "pin" for consistency.
+    - Updated documentation for authenticatePin
+- Wallet and Key Management
+    - Added deletekey API and key token support.
+    - Implemented optional wallet deletion function and streamlined wallet deletion logic.
+    - Added isAnyCredentialSaved API to check for saved credentials.
+- DID and User Updates
+    - Added support for DID Update and UPDATE_DID in key generation.
+    - Integrated HTTP access token handling and user update parameters.
+- Biometric and Security Enhancements
+    - Modified biometric prompt and added connection access token.
+    - Improved logic to delete existing keys and keystore aliases during biometric re-registration.
+    - Added handling for HTTP 401 Unauthorized errors.
+
+
 ## v2.0.0 (2025-04-30)
 
 ### 🚀 New Features
