@@ -48,7 +48,7 @@ did-client-sdk-aos
 │           └── ZKP_DataModel.md
 └── source
     └── release
-    │   └── did-wallet-sdk-aos-2.0.0.jar
+    │   └── did-wallet-sdk-aos-2.0.1.jar
     └── did-wallet-sdk-aos
         ├── build.gradle
         ├── gradle
@@ -98,11 +98,11 @@ Libraries can be found in the [releases folder](./source/release).
 
 ### Wallet SDK
 
-1. Copy the `did-wallet-sdk-aos-2.0.0.jar` file to the libs of the app project.
+1. Copy the `did-wallet-sdk-aos-2.0.1.jar` file to the libs of the app project.
 2. Add the following dependencies to the build.gradle of the app project.
 
 ```groovy
-    implementation files('libs/did-wallet-sdk-aos-2.0.0.jar')
+    implementation files('libs/did-wallet-sdk-aos-2.0.1.jar')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

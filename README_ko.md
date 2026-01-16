@@ -47,7 +47,7 @@ did-client-sdk-aos
 │           └── ZKP_DataModel.md
 └── source
     └── release
-        └── did-wallet-sdk-aos-2.0.0.jar
+        └── did-wallet-sdk-aos-2.0.1.jar
     └── did-wallet-sdk-aos
         ├── build.gradle
         ├── gradle
@@ -95,11 +95,11 @@ did-client-sdk-aos
 
 ### Wallet SDK
 
-1. 앱 프로젝트의 libs에 `did-wallet-sdk-aos-2.0.0.jar` 파일을 복사한다.
+1. 앱 프로젝트의 libs에 `did-wallet-sdk-aos-2.0.1.jar` 파일을 복사한다.
 2. 앱 프로젝트의 build gradle에 아래 의존성을 추가한다.
 
 ```groovy
-    implementation files('libs/did-wallet-sdk-aos-2.0.0.jar')
+    implementation files('libs/did-wallet-sdk-aos-2.0.1.jar')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
