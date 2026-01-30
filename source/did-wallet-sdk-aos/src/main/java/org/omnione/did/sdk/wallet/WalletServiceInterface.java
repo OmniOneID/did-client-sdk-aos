@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public interface WalletServiceInterface {
     CompletableFuture<String> requestUpdateUser(String tasUrl, String serverToken, DIDAuth signedDIDAuth, SignedDidDoc signedDIDDoc, String txId) throws WalletException, ExecutionException, InterruptedException;
     DIDAuth getSignedDIDAuth(String authNonce, String pin) throws WalletException, WalletCoreException, UtilityException;
 
-    CompletableFuture<String> requestIssueVc(String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
+    CompletableFuture<String> requestIssueVc(String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
     CompletableFuture<String> requestRevokeVc(String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException;
     ReturnEncVP createEncVp(String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException;
     ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth) throws WalletException, WalletCoreException, UtilityException;

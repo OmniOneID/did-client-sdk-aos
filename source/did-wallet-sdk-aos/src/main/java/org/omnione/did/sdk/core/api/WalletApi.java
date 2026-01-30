@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -389,18 +389,24 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
      * Requests to issue a Verifiable Credential (VC) using the provided wallet token, server token, reference ID, profile, signed DID authentication, and transaction ID.
      *
      * @param hWalletToken  The wallet token used for VC issuance.
+     * @param url           The URL of the TAS or Proxy
+     * @param apiGateWayUrl The URL of the Gateway
      * @param serverToken   The server-issued token.
      * @param refId         The reference ID.
      * @param profile       The issuance profile.
      * @param signedDIDAuth The signed DID authentication object.
      * @param txId          The transaction ID.
-     * @return CompletableFuture<String> - A `CompletableFuture` representing the result of the VC issuance request.
-     * @throws Exception - Any error that occurs during wallet token verification or VC issuance request.
+     * @return
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    public CompletableFuture<String> requestIssueVc(String hWalletToken, String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestIssueVc(String hWalletToken, String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.ISSUE_VC,
                 WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID_AND_ISSUE_VC));
-        return walletService.requestIssueVc(tasUrl, apiGateWayUrl, serverToken, refId, profile, signedDIDAuth, txId);
+        return walletService.requestIssueVc(url, apiGateWayUrl, serverToken, refId, profile, signedDIDAuth, txId);
     }
 
     /**

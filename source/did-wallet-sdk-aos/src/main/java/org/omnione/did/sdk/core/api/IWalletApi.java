@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024-2026 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.omnione.did.sdk.core.api;
 
 import android.content.Context;
@@ -60,7 +76,7 @@ public interface IWalletApi {
     }
 
     interface ICredentialService {
-        CompletableFuture<String> requestIssueVc(String hWalletToken, String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException;
+        CompletableFuture<String> requestIssueVc(String hWalletToken, String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException;
         CompletableFuture<String> requestRevokeVc(String hWalletToken, String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException;
         List<VerifiableCredential> getAllCredentials(String hWalletToken) throws WalletException, UtilityException, WalletCoreException;
         List<VerifiableCredential> getCredentials(String hWalletToken, List<String> identifiers) throws WalletException, UtilityException, WalletCoreException;

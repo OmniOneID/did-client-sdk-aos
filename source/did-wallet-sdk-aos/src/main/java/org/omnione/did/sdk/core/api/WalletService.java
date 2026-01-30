@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -360,7 +360,7 @@ public class WalletService implements WalletServiceInterface {
         return signedDIDAuth;
     }
     @Override
-    public CompletableFuture<String> requestIssueVc(String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestIssueVc(String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
 
         verifyCertVc(RoleType.ROLE_TYPE.ISSUER, profile.getProfile().issuer.getDID(), profile.getProfile().issuer.getCertVcRef(), apiGateWayUrl);
 
@@ -407,7 +407,7 @@ public class WalletService implements WalletServiceInterface {
         String encReqVcStr = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, encReqVc);
 
         IssueVc issueVc = new IssueVc(context);
-        String result = issueVc.issueVc(tasUrl, txId, serverToken, signedDIDAuth, accE2e, encReqVcStr).get();
+        String result = issueVc.issueVc(url, txId, serverToken, signedDIDAuth, accE2e, encReqVcStr).get();
         if (result == null)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_ISSUE_CREDENTIAL_FAIL);
 
