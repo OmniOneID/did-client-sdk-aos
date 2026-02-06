@@ -20,6 +20,8 @@ import android.content.Context;
 
 import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
+import org.omnione.did.sdk.datamodel.common.OIDV4VPChallenge;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
 import org.omnione.did.sdk.datamodel.common.enums.WalletTokenPurpose;
@@ -35,6 +37,7 @@ import org.omnione.did.sdk.datamodel.token.WalletTokenData;
 import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
 import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
+import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
 import org.omnione.did.sdk.datamodel.zkp.ProofParam;
@@ -433,6 +436,25 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
      */
     public boolean isAnyCredentialsSaved() throws WalletException {
         return walletCore.isAnyCredentialsSaved();
+    }
+
+    /**
+     * Creates an Verifiable Presentation (VP).
+     * @param hWalletToken The wallet token used for VP creation.
+     * @param claimInfos A list of Claim Info with VC IDs and Claim Codes
+     * @param passcode The passcode used for VP creation.
+     * @param verifierNonce The nonce used for VP creation.
+     * @param challenge OID4VPChallenge that contains domain and challenge
+     * @return
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     */
+    @Override
+    public VerifiablePresentation createVp(String hWalletToken, List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        return walletService.createVp(claimInfos, passcode, verifierNonce, challenge);
     }
 
     /**

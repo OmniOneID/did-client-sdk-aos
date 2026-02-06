@@ -19,6 +19,8 @@ package org.omnione.did.sdk.core.api;
 import android.content.Context;
 
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
+import org.omnione.did.sdk.datamodel.common.OIDV4VPChallenge;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
 import org.omnione.did.sdk.datamodel.common.enums.WalletTokenPurpose;
@@ -34,6 +36,7 @@ import org.omnione.did.sdk.datamodel.token.WalletTokenData;
 import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
 import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
+import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
 import org.omnione.did.sdk.datamodel.zkp.ProofParam;
@@ -84,6 +87,7 @@ public interface IWalletApi {
         ReturnEncVP createEncVp(String hWalletToken, String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, UtilityException, WalletCoreException;
         ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth) throws WalletException, UtilityException, WalletCoreException;
         boolean isAnyCredentialsSaved() throws WalletException;
+        VerifiablePresentation createVp(String hWalletToken, List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws WalletException, UtilityException, WalletCoreException;
     }
 
     interface IZKPService {

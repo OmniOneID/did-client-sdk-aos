@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ public class Proof {
     String verificationMethod;
     ProofType.PROOF_TYPE type;
     String proofValue;
+    String domain;
+    String challenge;
+
     public Proof() {}
     public Proof(String created, ProofPurpose.PROOF_PURPOSE proofPurpose, String verificationMethod, ProofType.PROOF_TYPE type) {
         this.created = created;
@@ -76,6 +79,22 @@ public class Proof {
 
     public void setProofValue(String proofValue) {
         this.proofValue = proofValue;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    public String getChallenge() {
+        return challenge;
+    }
+
+    public void setChallenge(String challenge) {
+        this.challenge = challenge;
     }
 
     public String toJson() {
