@@ -471,7 +471,7 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
-    public CompletableFuture<String> requestRevokeVc(String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestRevokeVc(String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException {
         ReqRevokeVC reqRevokeVc = new ReqRevokeVC();
         reqRevokeVc.setVcId(vcId);
         reqRevokeVc.setIssuerNonce(issuerNonce);
@@ -485,7 +485,7 @@ public class WalletService implements WalletServiceInterface {
             }
         }
         RevokeVc revokeVc = new RevokeVc(context);
-        String result = revokeVc.revokeVc(tasUrl, txId, serverToken, reqRevokeVc).get();
+        String result = revokeVc.revokeVc(url, txId, serverToken, reqRevokeVc).get();
         P220ResponseVo responseVo = MessageUtil.deserialize(result, P220ResponseVo.class);
         return CompletableFuture.completedFuture(result);
     }

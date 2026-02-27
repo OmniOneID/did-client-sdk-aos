@@ -416,18 +416,26 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
      * Requests to revoke a Verifiable Credential (VC) using the provided wallet token, server token, transaction ID, VC ID, issuer nonce, and passcode.
      *
      * @param hWalletToken The wallet token used for VC revocation.
-     * @param serverToken  The server-issued token.
-     * @param txId         The transaction ID.
-     * @param vcId         The ID of the VC to be revoked.
-     * @param issuerNonce  The issuer nonce.
-     * @param passcode     The passcode.
-     * @return CompletableFuture<String> - A `CompletableFuture` representing the result of the VC revocation request.
-     * @throws Exception - Any error that occurs during wallet token verification or VC revocation request.
+     * @param url The URL of the TAS or Proxy
+     * @param serverToken The server-issued token.
+     * @param txId The transaction ID.
+     * @param vcId The ID of the VC to be revoked.
+     * @param issuerNonce The issuer nonce.
+     * @param passcode The passcode.
+     * @param authType The authentication type.
+     * @return
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    public CompletableFuture<String> requestRevokeVc(String hWalletToken, String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
+    @Override
+    public CompletableFuture<String> requestRevokeVc(String hWalletToken, String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.REMOVE_VC));
-        return walletService.requestRevokeVc(tasUrl, serverToken, txId, vcId, issuerNonce, passcode, authType);
+        return walletService.requestRevokeVc(url, serverToken, txId, vcId, issuerNonce, passcode, authType);
     }
+
 
     /**
      Checks whether any credentials are saved in the holder’s wallet.
