@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package org.omnione.did.sdk.communication.urlconnection;
 
+import android.content.res.Resources;
+
 import org.omnione.did.sdk.communication.exception.CommunicationErrorCode;
 import org.omnione.did.sdk.communication.exception.CommunicationException;
-import org.omnione.did.sdk.communication.logger.CommunicationLogger;
 import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 
 import java.io.BufferedReader;
@@ -27,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Locale;
 
 public class HttpUrlConnectionTask {
     public HttpUrlConnectionTask(){
@@ -57,6 +59,7 @@ public class HttpUrlConnectionTask {
             }
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept", "application/json");
+            urlConnection.setRequestProperty("Accept-Language", getSystemLanguageTag());
 
             if ("POST".equalsIgnoreCase(method)) {
                 urlConnection.setDoOutput(true);
@@ -120,6 +123,17 @@ public class HttpUrlConnectionTask {
                 }
             }
         }
+    }
+
+    private static String getSystemLanguageTag() {
+        Locale locale = Resources.getSystem()
+                .getConfiguration()
+                .getLocales()
+                .get(0);
+
+        String langTag = locale.toLanguageTag();
+        WalletLogger.getInstance().d("langTag : " + langTag);
+        return langTag;
     }
 }
 
