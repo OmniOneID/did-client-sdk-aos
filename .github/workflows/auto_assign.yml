@@ -37,7 +37,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const assignees = ['JoshuaLeeshock', 'ejkim4619', 'mikyung-lee']; // assignees
+            const assignees = ['mikyung-lee']; // assignees
             
             await github.rest.issues.addAssignees({
               owner: context.repo.owner,
