@@ -17,7 +17,7 @@ jobs:
         with:
           script: |
             const author = context.payload.pull_request.user.login;
-            let reviewers = ['k3255','djpark0402'];
+            let reviewers = ['JoshuaLeeshock', 'ejkim4619'];
             
             if (reviewers.includes(author)) {
               if(reviewers.length === 1)
@@ -37,7 +37,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const assignees = ['k3255', 'mikyung-lee']; // assignees
+            const assignees = ['JoshuaLeeshock', 'ejkim4619', 'mikyung-lee']; // assignees
             
             await github.rest.issues.addAssignees({
               owner: context.repo.owner,
