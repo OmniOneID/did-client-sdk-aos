@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,12 @@ package org.omnione.did.sdk.core.api;
 
 import android.content.Context;
 
-import androidx.fragment.app.Fragment;
-
+import org.omnione.did.sdk.datamodel.common.OIDV4VPChallenge;
 import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
 import org.omnione.did.sdk.datamodel.protocol.P210ResponseVo;
 import org.omnione.did.sdk.datamodel.protocol.P220ResponseVo;
 import org.omnione.did.sdk.datamodel.did.DidDocVo;
 import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
-import org.omnione.did.sdk.datamodel.protocol.P311ResponseVo;
 import org.omnione.did.sdk.datamodel.security.AccE2e;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
@@ -360,7 +358,7 @@ public class WalletService implements WalletServiceInterface {
         return signedDIDAuth;
     }
     @Override
-    public CompletableFuture<String> requestIssueVc(String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestIssueVc(String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
 
         verifyCertVc(RoleType.ROLE_TYPE.ISSUER, profile.getProfile().issuer.getDID(), profile.getProfile().issuer.getCertVcRef(), apiGateWayUrl);
 
@@ -407,7 +405,7 @@ public class WalletService implements WalletServiceInterface {
         String encReqVcStr = MultibaseUtils.encode(MultibaseType.MULTIBASE_TYPE.BASE_64, encReqVc);
 
         IssueVc issueVc = new IssueVc(context);
-        String result = issueVc.issueVc(tasUrl, txId, serverToken, signedDIDAuth, accE2e, encReqVcStr).get();
+        String result = issueVc.issueVc(url, txId, serverToken, signedDIDAuth, accE2e, encReqVcStr).get();
         if (result == null)
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_ISSUE_CREDENTIAL_FAIL);
 
@@ -473,7 +471,7 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
-    public CompletableFuture<String> requestRevokeVc(String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestRevokeVc(String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException {
         ReqRevokeVC reqRevokeVc = new ReqRevokeVC();
         reqRevokeVc.setVcId(vcId);
         reqRevokeVc.setIssuerNonce(issuerNonce);
@@ -487,7 +485,7 @@ public class WalletService implements WalletServiceInterface {
             }
         }
         RevokeVc revokeVc = new RevokeVc(context);
-        String result = revokeVc.revokeVc(tasUrl, txId, serverToken, reqRevokeVc).get();
+        String result = revokeVc.revokeVc(url, txId, serverToken, reqRevokeVc).get();
         P220ResponseVo responseVo = MessageUtil.deserialize(result, P220ResponseVo.class);
         return CompletableFuture.completedFuture(result);
     }
@@ -505,6 +503,11 @@ public class WalletService implements WalletServiceInterface {
 
     @Override
     public ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth) throws WalletException, WalletCoreException, UtilityException {
+        return addProofsToDocument(document, keyIds, did, type, passcode, isDIDAuth, null);
+    }
+
+    @Override
+    public ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth, OIDV4VPChallenge challenge) throws WalletException, WalletCoreException, UtilityException {
         List<Proof> proofs = new ArrayList<>();
         for(String keyId : keyIds) {
             Proof proof = new Proof();
@@ -525,6 +528,13 @@ public class WalletService implements WalletServiceInterface {
                 default:
                     throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_CREATE_PROOF_FAIL);
             }
+
+            if (challenge != null) {
+                WalletLogger.getInstance().d(String.format("challenge : %s, domain : %s ", challenge.getChallenge(), challenge.getDomain()));
+                proof.setChallenge(challenge.getChallenge());
+                proof.setDomain(challenge.getDomain());
+            }
+
             document.setProof(proof);
             byte[] signature = null;
             if(keyId.equals(Constants.KEY_ID_PIN)) {
@@ -544,6 +554,30 @@ public class WalletService implements WalletServiceInterface {
         }
         document.setProofs(proofs);
         return document;
+    }
+
+    @Override
+    public VerifiablePresentation createVp(List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws WalletException, UtilityException, WalletCoreException {
+        WalletLogger.getInstance().d("passcode: " + passcode);
+        WalletLogger.getInstance().d("verifierNonce: " + verifierNonce);
+
+        PresentationInfo presentationInfo = new PresentationInfo();
+        presentationInfo.setHolder(walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER).getId()); //holder did
+        presentationInfo.setValidFrom(WalletUtil.getDate());
+        presentationInfo.setValidUntil(WalletUtil.createValidUntil(600));
+        presentationInfo.setVerifierNonce(verifierNonce);
+        VerifiablePresentation vp = walletCore.makePresentation(claimInfos, presentationInfo);
+
+        WalletLogger.getInstance().d("vp: " + vp.toJson());
+        VerifiablePresentation signedVp = (VerifiablePresentation) addProofsToDocument(vp,
+                (passcode != null) ? List.of(Constants.KEY_ID_PIN) : List.of(Constants.KEY_ID_BIO),
+                walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER).getId(),
+                Constants.DID_DOC_TYPE_HOLDER,
+                passcode,
+                false,
+                challenge);
+
+        return signedVp;
     }
 
     private Proof createProof(String did, ProofPurpose.PROOF_PURPOSE proofPurpose, String keyId) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ public class WalletTest {
                 return CompletableFuture.completedFuture(txId);
             }
 
-            public CompletableFuture<String> requestIssueVc(String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletCoreException, UtilityException {
+            public CompletableFuture<String> requestIssueVc(String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletCoreException, UtilityException {
                 try {
                     String clientPrivKey = "mMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgNdy+e2T694f0QbSd/gdLvmdgUjti+RR6wQY4F+kMYfCgCgYIKoZIzj0DAQehRANCAAT7qjXANGpEQoAuWp7+n00BbLUMp6tlmYGIP/RIdEJAMt3uDVWWb54UkVN5RsN4PZ7mnM5ZL9fgEgZTf2nXNpaK";
                     byte[] privateKey = MultibaseUtils.decode(clientPrivKey);

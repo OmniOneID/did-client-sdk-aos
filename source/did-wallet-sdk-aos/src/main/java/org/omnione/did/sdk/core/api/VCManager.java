@@ -184,6 +184,15 @@ class VCManager<E extends BaseObject> {
             VerifiableCredential tempVc = vcByIds;
             List<String> tempProofValueList = new ArrayList<>();
 
+            List<String> claimCodes = claimInfoMap.get(vcByIds.getId());
+            if(claimCodes == null || claimCodes.isEmpty()) {
+                VCProof tempProof = vcByIds.getProof();
+                tempProof.setProofValueList(null);
+                vcByIds.setProof(tempProof);
+                filteredByRequestInfo.add(vcByIds);
+                continue;
+            }
+
             WalletLogger.getInstance().d("LOG_1: "+ GsonWrapper.getGson().toJson(vcByIds.getCredentialSubject().getClaims()));
 
             for(Claim claim : vcByIds.getCredentialSubject().getClaims()){

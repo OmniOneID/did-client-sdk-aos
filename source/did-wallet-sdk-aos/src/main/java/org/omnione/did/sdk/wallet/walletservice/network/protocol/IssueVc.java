@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 package org.omnione.did.sdk.wallet.walletservice.network.protocol;
 
 import android.content.Context;
-import android.util.Log;
 
+import org.omnione.did.sdk.communication.exception.CommunicationException;
 import org.omnione.did.sdk.datamodel.protocol.P210RequestVo;
 import org.omnione.did.sdk.datamodel.security.AccE2e;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
-import org.omnione.did.sdk.communication.exception.CommunicationException;
 import org.omnione.did.sdk.wallet.walletservice.network.HttpUrlConnection;
 import org.omnione.did.sdk.wallet.walletservice.util.WalletUtil;
 
@@ -35,14 +34,14 @@ public class IssueVc {
     public IssueVc(Context context){
         this.context = context;
     }
-    public CompletableFuture<String> issueVc(String tasUrl, String txId, String serverToken, DIDAuth didAuth, AccE2e accE2e, String encReqVc) {
-        String api5 = "/tas/api/v1/request-issue-vc"; //VC issuance
+    public CompletableFuture<String> issueVc(String url, String txId, String serverToken, DIDAuth didAuth, AccE2e accE2e, String encReqVc) {
+        String api5 = "/api/v1/request-issue-vc"; //VC issuance
 
         HttpUrlConnection httpUrlConnection = new HttpUrlConnection();
 
         return CompletableFuture.supplyAsync(() -> {
                     try {
-                        return httpUrlConnection.send(tasUrl + api5, "POST", M210_RequestIssueVcByWallet(txId, serverToken, didAuth, accE2e, encReqVc));
+                        return httpUrlConnection.send(url + api5, "POST", M210_RequestIssueVcByWallet(txId, serverToken, didAuth, accE2e, encReqVc));
                     } catch (CommunicationException e) {
                         throw new CompletionException(e);
                     }

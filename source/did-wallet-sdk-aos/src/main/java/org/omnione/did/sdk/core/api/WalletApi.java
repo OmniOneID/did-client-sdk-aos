@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import android.content.Context;
 
 import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
+import org.omnione.did.sdk.datamodel.common.OIDV4VPChallenge;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
 import org.omnione.did.sdk.datamodel.common.enums.WalletTokenPurpose;
@@ -35,6 +37,7 @@ import org.omnione.did.sdk.datamodel.token.WalletTokenData;
 import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
 import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
+import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
 import org.omnione.did.sdk.datamodel.zkp.ProofParam;
@@ -389,36 +392,50 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
      * Requests to issue a Verifiable Credential (VC) using the provided wallet token, server token, reference ID, profile, signed DID authentication, and transaction ID.
      *
      * @param hWalletToken  The wallet token used for VC issuance.
+     * @param url           The URL of the TAS or Proxy
+     * @param apiGateWayUrl The URL of the Gateway
      * @param serverToken   The server-issued token.
      * @param refId         The reference ID.
      * @param profile       The issuance profile.
      * @param signedDIDAuth The signed DID authentication object.
      * @param txId          The transaction ID.
-     * @return CompletableFuture<String> - A `CompletableFuture` representing the result of the VC issuance request.
-     * @throws Exception - Any error that occurs during wallet token verification or VC issuance request.
+     * @return
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    public CompletableFuture<String> requestIssueVc(String hWalletToken, String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
+    public CompletableFuture<String> requestIssueVc(String hWalletToken, String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.ISSUE_VC,
                 WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID_AND_ISSUE_VC));
-        return walletService.requestIssueVc(tasUrl, apiGateWayUrl, serverToken, refId, profile, signedDIDAuth, txId);
+        return walletService.requestIssueVc(url, apiGateWayUrl, serverToken, refId, profile, signedDIDAuth, txId);
     }
 
     /**
      * Requests to revoke a Verifiable Credential (VC) using the provided wallet token, server token, transaction ID, VC ID, issuer nonce, and passcode.
      *
      * @param hWalletToken The wallet token used for VC revocation.
-     * @param serverToken  The server-issued token.
-     * @param txId         The transaction ID.
-     * @param vcId         The ID of the VC to be revoked.
-     * @param issuerNonce  The issuer nonce.
-     * @param passcode     The passcode.
-     * @return CompletableFuture<String> - A `CompletableFuture` representing the result of the VC revocation request.
-     * @throws Exception - Any error that occurs during wallet token verification or VC revocation request.
+     * @param url The URL of the TAS or Proxy
+     * @param serverToken The server-issued token.
+     * @param txId The transaction ID.
+     * @param vcId The ID of the VC to be revoked.
+     * @param issuerNonce The issuer nonce.
+     * @param passcode The passcode.
+     * @param authType The authentication type.
+     * @return
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    public CompletableFuture<String> requestRevokeVc(String hWalletToken, String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
+    @Override
+    public CompletableFuture<String> requestRevokeVc(String hWalletToken, String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.REMOVE_VC));
-        return walletService.requestRevokeVc(tasUrl, serverToken, txId, vcId, issuerNonce, passcode, authType);
+        return walletService.requestRevokeVc(url, serverToken, txId, vcId, issuerNonce, passcode, authType);
     }
+
 
     /**
      Checks whether any credentials are saved in the holder’s wallet.
@@ -427,6 +444,25 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
      */
     public boolean isAnyCredentialsSaved() throws WalletException {
         return walletCore.isAnyCredentialsSaved();
+    }
+
+    /**
+     * Creates an Verifiable Presentation (VP).
+     * @param hWalletToken The wallet token used for VP creation.
+     * @param claimInfos A list of Claim Info with VC IDs and Claim Codes
+     * @param passcode The passcode used for VP creation.
+     * @param verifierNonce The nonce used for VP creation.
+     * @param challenge OID4VPChallenge that contains domain and challenge
+     * @return
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     */
+    @Override
+    public VerifiablePresentation createVp(String hWalletToken, List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        return walletService.createVp(claimInfos, passcode, verifierNonce, challenge);
     }
 
     /**

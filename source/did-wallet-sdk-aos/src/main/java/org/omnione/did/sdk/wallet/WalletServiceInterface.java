@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package org.omnione.did.sdk.wallet;
 
+import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
+import org.omnione.did.sdk.datamodel.common.OIDV4VPChallenge;
 import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
 import org.omnione.did.sdk.datamodel.token.SignedWalletInfo;
@@ -25,6 +27,7 @@ import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
 import org.omnione.did.sdk.datamodel.did.DIDDocument;
 import org.omnione.did.sdk.datamodel.profile.IssueProfile;
 import org.omnione.did.sdk.datamodel.profile.ReqE2e;
+import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.utility.Errors.UtilityException;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
@@ -47,8 +50,10 @@ public interface WalletServiceInterface {
     CompletableFuture<String> requestUpdateUser(String tasUrl, String serverToken, DIDAuth signedDIDAuth, SignedDidDoc signedDIDDoc, String txId) throws WalletException, ExecutionException, InterruptedException;
     DIDAuth getSignedDIDAuth(String authNonce, String pin) throws WalletException, WalletCoreException, UtilityException;
 
-    CompletableFuture<String> requestIssueVc(String tasUrl, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
-    CompletableFuture<String> requestRevokeVc(String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException;
+    CompletableFuture<String> requestIssueVc(String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
+    CompletableFuture<String> requestRevokeVc(String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException;
     ReturnEncVP createEncVp(String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException;
     ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth) throws WalletException, WalletCoreException, UtilityException;
+    ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth, OIDV4VPChallenge challenge) throws WalletException, WalletCoreException, UtilityException;
+    VerifiablePresentation createVp(List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws WalletException, UtilityException, WalletCoreException;
 }

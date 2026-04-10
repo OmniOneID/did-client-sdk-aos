@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,15 @@ public class VCPlan {
     @SerializedName("validUntil")
     @Expose
     private String validUntil;
+
+    @SerializedName("issuanceMode")
+    @Expose
+    private VcIssuanceMode issuanceMode;
+
+    @SerializedName("endpoints")
+    @Expose
+    private String[] endpoints;
+
     // private tags
 
     @SerializedName("credentialDefinition")
@@ -143,6 +152,22 @@ public class VCPlan {
 
     public void setValidUntil(String validUntil) {
         this.validUntil = validUntil;
+    }
+
+    public VcIssuanceMode getIssuanceMode() {
+        return issuanceMode;
+    }
+
+    public void setIssuanceMode(VcIssuanceMode issuanceMode) {
+        this.issuanceMode = issuanceMode;
+    }
+
+    public String[] getEndpoints() {
+        return endpoints;
+    }
+
+    public void setEndpoints(String[] endpoints) {
+        this.endpoints = endpoints;
     }
 
     public CredentialSchema getCredentialSchema() {
