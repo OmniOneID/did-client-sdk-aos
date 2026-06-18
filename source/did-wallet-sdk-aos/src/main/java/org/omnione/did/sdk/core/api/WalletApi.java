@@ -29,7 +29,7 @@ import org.omnione.did.sdk.datamodel.did.DIDDocument;
 import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
 import org.omnione.did.sdk.datamodel.profile.IssueProfile;
 import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
-import org.omnione.did.sdk.datamodel.profile.ReqE2e;
+import org.omnione.did.sdk.datamodel.profile.VerifyProfile;
 import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
 import org.omnione.did.sdk.datamodel.token.SignedWalletInfo;
@@ -504,22 +504,21 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
     }
 
     /**
-     * Creates an encrypted Verifiable Presentation (VP) using the provided wallet token, VC ID, claim codes, end-to-end request object, passcode, nonce, and authentication type.
+     * Creates an encrypted Verifiable Presentation (VP) using the provided wallet token, claim infos, verify profile, API gateway URL, and passcode.
+     * The verifier's certificate VC is verified before the VP is created.
      *
-     * @param hWalletToken The wallet token used for VP creation.
-     * @param vcId         The ID of the VC.
-     * @param claimCode    A list of claim codes to be included in the VP.
-     * @param reqE2e       The end-to-end request object.
-     * @param passcode     The passcode used for VP creation.
-     * @param nonce        The nonce used for VP creation.
-     * @param authType     The authentication type.
+     * @param hWalletToken  The wallet token used for VP creation.
+     * @param claimInfos    A list of claim infos to be included in the VP.
+     * @param verifyProfile The verify profile that contains the verifier information and the end-to-end request object.
+     * @param apiGateWayUrl The API gateway URL used to verify the verifier's certificate VC.
+     * @param passcode      The passcode used for VP creation.
      * @return ReturnEncVP - The created encrypted VP object.
      * @throws Exception - Any error that occurs during wallet token verification or VP creation.
      */
-    public ReturnEncVP createEncVp(String hWalletToken, String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, UtilityException, WalletCoreException {
+    public ReturnEncVP createEncVp(String hWalletToken, List<ClaimInfo> claimInfos, VerifyProfile verifyProfile, String apiGateWayUrl, String passcode) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
                 WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
-        return walletService.createEncVp(vcId, claimCode, reqE2e, passcode, nonce, authType);
+        return walletService.createEncVp(claimInfos, verifyProfile, apiGateWayUrl, passcode);
     }
 
     /**
@@ -651,20 +650,21 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
      * proof request profile, proof parameters, and self-attested attributes.
      *
      * @param hWalletToken A holder wallet token used to authenticate and authorize the VP generation.
-     * @param proofRequestProfile The profile containing verifier's requirements for proof, such as requested attributes and predicates.
      * @param proofParams A list of proof parameters including credentials, referents, and other necessary information for ZKP generation.
      * @param selfAttributes A map of self-attested attributes that are not backed by credentials but are asserted by the prover.
+     * @param proofRequestProfile The profile containing verifier's requirements for proof, such as requested attributes and predicates.
      * @param txId A transaction ID used for tracking or logging the proof creation process.
+     * @param apiGateWayUrl The API gateway URL used to verify the verifier's certificate VC.
      * @return P311RequestVo An object representing the generated ZKP, which will be used for verifiable presentation.
      * @throws WalletCoreException if a failure occurs within the wallet core system during the ZKP creation.
      * @throws UtilityException if any cryptographic or general utility-related issue arises during processing.
      * @throws WalletException if there is a problem related to the wallet such as invalid state or data.
      */
-    public P311RequestVo createEncZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile,
-                                        List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws WalletCoreException, UtilityException, WalletException {
+    public P311RequestVo createEncZkpProof(String hWalletToken, List<ProofParam> proofParams, Map<String, String> selfAttributes,
+                                        ProofRequestProfile proofRequestProfile, String txId, String apiGateWayUrl) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
                                                             WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
-        return walletService.createZkpProof(proofRequestProfile, proofParams, selfAttributes, txId);
+        return walletService.createZkpProof(proofParams, selfAttributes, proofRequestProfile, txId, apiGateWayUrl);
     }
 
     /**

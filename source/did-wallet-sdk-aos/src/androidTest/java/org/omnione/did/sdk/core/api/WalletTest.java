@@ -58,10 +58,12 @@ import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
 import org.omnione.did.sdk.wallet.walletservice.util.WalletUtil;
 import org.omnione.did.sdk.core.common.SecureEncryptor;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
 
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -386,14 +388,14 @@ public class WalletTest {
 
         VerifyProfile vpProfile = MessageUtil.deserialize(WalletTestData.TEST_VERIFY_PROFILE, VerifyProfile.class);
         List<String> claimCode = vpProfile.getProfile().filter.getCredentialSchemas().get(0).requiredClaims;
+        List<ClaimInfo> claimInfos = new ArrayList<>();
+        claimInfos.add(new ClaimInfo(vcId, claimCode));
         ReturnEncVP returnEncVP = testWalletApi.createEncVp(
                 hWalletToken,
-                vcId,
-                claimCode,
-                vpProfile.getProfile().process.reqE2e,
-                WalletTestData.TEST_PASSCODE,
-                vpProfile.getProfile().process.verifierNonce,
-                vpProfile.getProfile().process.authType
+                claimInfos,
+                vpProfile,
+                "apiGateWay",
+                WalletTestData.TEST_PASSCODE
         );
         Log.d("WalletTest", "enc VP : " + returnEncVP.getEncVp());
         Log.i("WalletTest", "===========================================================");

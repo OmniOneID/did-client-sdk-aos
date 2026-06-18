@@ -39,6 +39,7 @@ import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
 import org.omnione.did.sdk.datamodel.did.VerificationMethod;
 import org.omnione.did.sdk.datamodel.profile.IssueProfile;
 import org.omnione.did.sdk.datamodel.profile.ReqE2e;
+import org.omnione.did.sdk.datamodel.profile.VerifyProfile;
 import org.omnione.did.sdk.datamodel.util.MessageUtil;
 import org.omnione.did.sdk.datamodel.protocol.P131RequestVo;
 import org.omnione.did.sdk.datamodel.did.AttestedDidDoc;
@@ -114,7 +115,9 @@ public class WalletService implements WalletServiceInterface {
         this.bioPromptInterface = bioPromptInterface;
     }
 
-    public P311RequestVo createZkpProof(ProofRequestProfile proofRequestProfile, List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws WalletCoreException, UtilityException, WalletException {
+    public P311RequestVo createZkpProof(List<ProofParam> proofParams, Map<String, String> selfAttributes, ProofRequestProfile proofRequestProfile, String txId, String apiGateWayUrl) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException {
+
+        verifyCertVc(RoleType.ROLE_TYPE.VERIFIER, proofRequestProfile.getProfile().getVerifier().getDID(), proofRequestProfile.getProfile().getVerifier().getCertVcRef(), apiGateWayUrl);
 
         String serverPublicKey = proofRequestProfile.getProfile().getReqE2e().getPublicKey();
         EcKeyPair e2eKeyPair = CryptoUtils.generateECKeyPair(EcType.EC_TYPE.SECP256_R1);
@@ -590,14 +593,18 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
-    public ReturnEncVP createEncVp(String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException {
+    public ReturnEncVP createEncVp(List<ClaimInfo> claimInfos, VerifyProfile verifyProfile, String apiGateWayUrl, String passcode) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
 
-        WalletLogger.getInstance().d("vcId: "+vcId);
+        verifyCertVc(RoleType.ROLE_TYPE.VERIFIER, verifyProfile.getProfile().getVerifier().getDID(), verifyProfile.getProfile().getVerifier().getCertVcRef(), apiGateWayUrl);
+
+        ReqE2e reqE2e = verifyProfile.getProfile().getProcess().getReqE2e();
+        String nonce = verifyProfile.getProfile().getProcess().getVerifierNonce();
+        VerifyAuthType.VERIFY_AUTH_TYPE authType = verifyProfile.getProfile().getProcess().getAuthType();
+
         WalletLogger.getInstance().d("passcode: "+passcode);
         WalletLogger.getInstance().d("nonce: "+nonce);
         WalletLogger.getInstance().d("authType: "+authType);
 
-        WalletLogger.getInstance().d("claimCode: "+GsonWrapper.getGson().toJson(claimCode));
         WalletLogger.getInstance().d("reqE2e: "+GsonWrapper.getGson().toJson(reqE2e));
         String serverPublicKey = reqE2e.getPublicKey();
         EcKeyPair e2eKeyPair = CryptoUtils.generateECKeyPair(EcType.EC_TYPE.SECP256_R1);
@@ -619,13 +626,6 @@ public class WalletService implements WalletServiceInterface {
                         CipherInfo.SYMMETRIC_PADDING_TYPE.fromKey(reqE2e.getPadding().getValue()));
 
 //        List<VerifiableCredential> vcList = walletCore.getAllCredentials();
-
-        List<ClaimInfo> claimInfos = new ArrayList<>();
-        ClaimInfo claimInfo = new ClaimInfo(
-                vcId,
-                claimCode
-        );
-        claimInfos.add(claimInfo);
 
         PresentationInfo presentationInfo = new PresentationInfo();
         presentationInfo.setHolder(walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER).getId()); //holder did

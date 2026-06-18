@@ -28,7 +28,7 @@ import org.omnione.did.sdk.datamodel.did.DIDDocument;
 import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
 import org.omnione.did.sdk.datamodel.profile.IssueProfile;
 import org.omnione.did.sdk.datamodel.profile.ProofRequestProfile;
-import org.omnione.did.sdk.datamodel.profile.ReqE2e;
+import org.omnione.did.sdk.datamodel.profile.VerifyProfile;
 import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
 import org.omnione.did.sdk.datamodel.token.SignedWalletInfo;
@@ -84,7 +84,7 @@ public interface IWalletApi {
         List<VerifiableCredential> getAllCredentials(String hWalletToken) throws WalletException, UtilityException, WalletCoreException;
         List<VerifiableCredential> getCredentials(String hWalletToken, List<String> identifiers) throws WalletException, UtilityException, WalletCoreException;
         void deleteCredentials(String hWalletToken, String vcId) throws WalletException, UtilityException, WalletCoreException;
-        ReturnEncVP createEncVp(String hWalletToken, String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, UtilityException, WalletCoreException;
+        ReturnEncVP createEncVp(String hWalletToken, List<ClaimInfo> claimInfos, VerifyProfile verifyProfile, String apiGateWayUrl, String passcode) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException;
         ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth) throws WalletException, UtilityException, WalletCoreException;
         boolean isAnyCredentialsSaved() throws WalletException;
         VerifiablePresentation createVp(String hWalletToken, List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws WalletException, UtilityException, WalletCoreException;
@@ -92,7 +92,7 @@ public interface IWalletApi {
 
     interface IZKPService {
         ReferentInfo createZkpReferent(List<UserReferent> customReferents) throws WalletCoreException, UtilityException;
-        P311RequestVo createEncZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile, List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws WalletCoreException, UtilityException, WalletException;
+        P311RequestVo createEncZkpProof(String hWalletToken, List<ProofParam> proofParams, Map<String, String> selfAttributes, ProofRequestProfile proofRequestProfile, String txId, String apiGateWayUrl) throws WalletCoreException, UtilityException, WalletException, ExecutionException, InterruptedException;
         AvailableReferent searchZkpCredentials(String hWalletToken, ProofRequest proofRequest) throws WalletCoreException, UtilityException, WalletException;
         ArrayList<Credential> getAllZkpCredentials(String hWalletToken) throws WalletCoreException, UtilityException, WalletException;
         boolean isAnyZkpCredentialsSaved() throws WalletCoreException, UtilityException, WalletException;
