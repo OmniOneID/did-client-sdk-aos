@@ -32,6 +32,7 @@ public class P210RequestVo extends BaseRequestVo {
     private AccE2e accE2e;
     private String encReqVc;
     private String vcId;
+    private String userId;
 
     public P210RequestVo(String id) {
         super(id);
@@ -118,6 +119,14 @@ public class P210RequestVo extends BaseRequestVo {
 
     public void setVcId(String vcId) {
         this.vcId = vcId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
 //    public String toJson() {
