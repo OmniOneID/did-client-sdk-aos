@@ -100,12 +100,20 @@ public class WalletUtil {
     }
 
     public static CompletableFuture<String> getDidDoc(String apiGateWayUrl, String did) {
+        return getDidDoc(apiGateWayUrl, did, null);
+    }
+
+    public static CompletableFuture<String> getDidDoc(String apiGateWayUrl, String did, String versionId) {
         String api = Config.API_GATEWAY_GET_DID_DOC + did;
+        if (versionId != null) {
+            api += "&versionId=" + versionId;
+        }
+        final String requestUrl = apiGateWayUrl + api;
         HttpUrlConnection httpUrlConnection = new HttpUrlConnection();
 
         return CompletableFuture.supplyAsync(() -> {
                     try {
-                        return httpUrlConnection.send(apiGateWayUrl + api, "GET", "");
+                        return httpUrlConnection.send(requestUrl, "GET", "");
                     } catch (CommunicationException e) {
                         throw new CompletionException(e);
                     }
