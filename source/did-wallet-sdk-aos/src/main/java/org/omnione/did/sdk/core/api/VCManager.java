@@ -185,7 +185,16 @@ class VCManager<E extends BaseObject> {
             List<String> tempProofValueList = new ArrayList<>();
 
             List<String> claimCodes = claimInfoMap.get(vcByIds.getId());
-            if(claimCodes == null || claimCodes.isEmpty()) {
+
+            // Set of all claim codes contained in the credential
+            HashSet<String> codesInCredential = new HashSet<>();
+            for (Claim c : vcByIds.getCredentialSubject().getClaims()) {
+                codesInCredential.add(c.getCode());
+            }
+
+            // Present All: claim codes are empty, or equal to the full set of the credential's claim codes
+            if(claimCodes == null || claimCodes.isEmpty()
+                    || new HashSet<>(claimCodes).equals(codesInCredential)) {
                 VCProof tempProof = vcByIds.getProof();
                 tempProof.setProofValueList(null);
                 vcByIds.setProof(tempProof);
