@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ public class FileExtension {
         KEY("key"),
         DID("did"),
         VC("vc"),
-        ZKP("zkp");
+        ZKP("zkp"),
+        OID4VC("oid4vc");
 
         private String value;
 
@@ -53,6 +54,8 @@ public class FileExtension {
                     return "vc";
                 case ZKP:
                     return "zkp";
+                case OID4VC:
+                    return "oid4vc";
                 default:
                     return "Unknown";
             }

@@ -27,6 +27,39 @@ import org.omnione.did.sdk.datamodel.protocol.P311RequestVo;
 import org.omnione.did.sdk.datamodel.security.AccE2e;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
+import com.google.gson.JsonObject;
+import org.omnione.did.sdk.core.oid4vc.crypto.CredentialResponseDecryptor;
+import org.omnione.did.sdk.core.oid4vc.crypto.HolderJwkFactory;
+import org.omnione.did.sdk.core.oid4vc.crypto.ProofJwtBuilder;
+import org.omnione.did.sdk.core.oid4vc.format.sdjwt.SdJwtParser;
+import org.omnione.did.sdk.core.oid4vc.format.sdjwt.SdJwtValidator;
+import org.omnione.did.sdk.core.oid4vc.model.CredentialConfigDescriptor;
+import org.omnione.did.sdk.core.oid4vc.model.CredentialResponseEncryptionSpec;
+import org.omnione.did.sdk.core.oid4vc.model.IssuedCredential;
+import org.omnione.did.sdk.core.oid4vc.model.IssuerMetadataResponse;
+import org.omnione.did.sdk.core.oid4vc.model.TokenResponse;
+import org.omnione.did.sdk.datamodel.oid4vc.AuthorizationRequest;
+import org.omnione.did.sdk.datamodel.oid4vc.MatchedCredential;
+import org.omnione.did.sdk.datamodel.oid4vc.SdJwt;
+import org.omnione.did.sdk.datamodel.oid4vc.SdJwtCredentialItem;
+import org.omnione.did.sdk.datamodel.oid4vc.CredentialFormat;
+import org.omnione.did.sdk.datamodel.oid4vc.dcql.DCQLQuery;
+import org.omnione.did.sdk.datamodel.oid4vc.dcql.CredentialQuery;
+import org.omnione.did.sdk.core.oid4vc.presentation.DCQLCredentialMatcher;
+import org.omnione.did.sdk.core.oid4vc.presentation.OID4VPResponseUtil;
+import org.omnione.did.sdk.core.oid4vc.presentation.SDJWTPresenter;
+import com.google.gson.JsonParser;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import org.omnione.did.sdk.core.oid4vc.net.CredentialRequester;
+import org.omnione.did.sdk.core.oid4vc.net.NonceRequester;
+import org.omnione.did.sdk.communication.urlconnection.HttpUrlConnectionTask;
+import org.omnione.did.sdk.core.oid4vc.verify.IssuerSignatureVerifier;
+import org.omnione.did.sdk.datamodel.oid4vc.OID4VCICredential;
+import java.util.Arrays;
+import java.util.UUID;
 import org.omnione.did.sdk.datamodel.vc.issue.CredInfo;
 import org.omnione.did.sdk.datamodel.vc.issue.ReqRevokeVC;
 import org.omnione.did.sdk.datamodel.vc.issue.ReqVC;
@@ -94,6 +127,7 @@ import org.omnione.did.sdk.wallet.walletservice.network.protocol.UpdateUser;
 import org.omnione.did.sdk.wallet.walletservice.util.WalletUtil;
 import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
 import org.omnione.did.sdk.core.vcmanager.datamodel.PresentationInfo;
 
@@ -474,6 +508,77 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
+    public CompletableFuture<String> requestIssueOID4VC(IssuerMetadataResponse metadata, TokenResponse token, String passcode, String configurationId, String credentialIdentifier, String apiGatewayUrl) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
+        if (configurationId == null || configurationId.isEmpty()) {
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL, "configurationId");
+        }
+        if (apiGatewayUrl == null || apiGatewayUrl.isEmpty()) {
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL, "apiGatewayUrl");
+        }
+
+        CredentialConfigDescriptor config = metadata.configForId(configurationId);
+        if (config == null) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_UNSUPPORTED_ID, configurationId);
+        }
+
+        if (!config.isSdJwtVc()) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_UNSUPPORTED_FORMAT, config.getFormat());
+        }
+
+        boolean usePin = passcode != null && !passcode.isEmpty();
+        String keyId = usePin ? Constants.KEY_ID_PIN : Constants.KEY_ID_BIO;
+
+        DIDDocument holderDoc = walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER);
+        JsonObject holderJwk = HolderJwkFactory.fromHolderDocument(holderDoc, keyId);
+
+        String cNonce = token.getCNonce();
+        if (metadata.getNonceEndpoint() != null) {
+            cNonce = new NonceRequester(new HttpUrlConnectionTask()).request(metadata.getNonceEndpoint()).get();
+        }
+        long iat = System.currentTimeMillis() / 1000L;
+        String signingInput = ProofJwtBuilder.buildSigningInput(
+                holderJwk, metadata.getCredentialIssuer(), cNonce, iat);
+        byte[] pinBytes = usePin ? passcode.getBytes() : null;
+        byte[] sig65 = walletCore.sign(keyId, pinBytes,
+                signingInput.getBytes(StandardCharsets.UTF_8), Constants.DID_DOC_TYPE_HOLDER);
+        if (sig65 == null || sig65.length != 65) {
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_CREATE_PROOF_FAIL);
+        }
+        byte[] sig64 = Arrays.copyOfRange(sig65, 1, 65);
+        String proofJwt = ProofJwtBuilder.assemble(signingInput, sig64);
+
+        String selectedIdentifier = (credentialIdentifier != null && !credentialIdentifier.isEmpty())
+                ? credentialIdentifier
+                : null;
+
+        CredentialResponseEncryptionSpec encSpec = metadata.getResponseEncryption();
+        CredentialResponseDecryptor decryptor = null;
+        if (encSpec != null && encSpec.isRequired()) {
+            WalletLogger.getInstance().d("requestIssueOID4VC: response encryption required (alg="
+                    + encSpec.getFirstAlg() + ", enc=" + encSpec.getFirstEnc() + ")");
+            decryptor = CredentialResponseDecryptor.create(encSpec.getFirstAlg(), encSpec.getFirstEnc());
+        }
+
+        IssuedCredential credential = new CredentialRequester(new HttpUrlConnectionTask()).request(
+                metadata.getCredentialEndpoint(), token.getAccessToken(), configurationId, selectedIdentifier,
+                config.getFormat(), proofJwt, decryptor).get();
+
+        SdJwtValidator.validateFormat(credential.getCompact());
+        SdJwtParser.parse(credential.getCompact());
+        IssuerSignatureVerifier.verify(credential.getCompact(), apiGatewayUrl).get();
+
+        OID4VCICredential stored = new OID4VCICredential();
+        stored.setId(UUID.randomUUID().toString());
+        stored.setFormat(config.getFormat());
+        stored.setCredentialConfigurationId(configurationId);
+        stored.setCredentialIdentifier(selectedIdentifier);
+        stored.setCredential(credential.getCompact());
+        stored.setKid(keyId);
+        walletCore.addOID4VCICredential(stored);
+        return CompletableFuture.completedFuture(stored.getId());
+    }
+
+    @Override
     public CompletableFuture<String> requestRevokeVc(String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException {
         ReqRevokeVC reqRevokeVc = new ReqRevokeVC();
         reqRevokeVc.setVcId(vcId);
@@ -581,6 +686,150 @@ public class WalletService implements WalletServiceInterface {
                 challenge);
 
         return signedVp;
+    }
+
+    @Override
+    public List<MatchedCredential> matchCredentials(AuthorizationRequest authRequest) throws WalletException, UtilityException, WalletCoreException {
+        DCQLQuery dcql = (authRequest != null) ? authRequest.getDcqlQuery() : null;
+
+        // Determine the single presentation format across all credential queries.
+        Set<String> formats = new LinkedHashSet<>();
+        if (dcql != null && dcql.getCredentials() != null) {
+            for (CredentialQuery cq : dcql.getCredentials()) {
+                if (cq != null && cq.getFormat() != null) {
+                    formats.add(cq.getFormat());
+                }
+            }
+        }
+        if (formats.isEmpty()) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VP_UNSUPPORTED_PRESENTATION_FORMAT, "no credential format");
+        }
+        if (formats.size() > 1) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VP_UNSUPPORTED_PRESENTATION_FORMAT, "mixed credential formats: " + formats);
+        }
+        String format = formats.iterator().next();
+
+        Map<String, List<DCQLCredentialMatcher.MatchedClaim>> matched;
+        if (CredentialFormat.OPENDID_VC.matches(format)) {
+            List<VerifiableCredential> opendidVcs = walletCore.getAllCredentials();
+            matched = DCQLCredentialMatcher.matchCredentials(dcql, opendidVcs == null ? new ArrayList<>() : opendidVcs, null);
+        } else if (CredentialFormat.SD_JWT_VC.matches(format)) {
+            List<SdJwtCredentialItem> items = SdJwtParser.mapToSdJwtItems(walletCore.getAllOID4VCICredentials());
+            matched = DCQLCredentialMatcher.matchCredentials(dcql, null, items);
+        } else {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VP_UNSUPPORTED_PRESENTATION_FORMAT, format);
+        }
+
+        // Flatten to MatchedCredential in DCQL declaration order; skip queries with null id.
+        List<MatchedCredential> result = new ArrayList<>();
+        for (CredentialQuery cq : dcql.getCredentials()) {
+            if (cq.getId() == null) {
+                continue;
+            }
+            List<DCQLCredentialMatcher.MatchedClaim> claims = matched.get(cq.getId());
+            if (claims == null) {
+                continue;
+            }
+            for (DCQLCredentialMatcher.MatchedClaim mc : claims) {
+                result.add(new MatchedCredential(cq.getId(), mc.getCredentialId(), mc.getClaimCodes()));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public byte[] createVpToken(AuthorizationRequest authRequest, List<MatchedCredential> matchedCredentials, String passcode) throws WalletException, UtilityException, WalletCoreException {
+        DCQLQuery dcql = (authRequest != null) ? authRequest.getDcqlQuery() : null;
+        String clientId = (authRequest != null) ? authRequest.getClientId() : null;
+        String nonce = (authRequest != null) ? authRequest.getNonce() : null;
+
+        // Group by queryId preserving first-seen order.
+        LinkedHashMap<String, List<MatchedCredential>> grouped = new LinkedHashMap<>();
+        for (MatchedCredential mc : matchedCredentials) {
+            grouped.computeIfAbsent(mc.getQueryId(), k -> new ArrayList<>()).add(mc);
+        }
+
+        Map<String, Object> vpToken = new LinkedHashMap<>();
+        for (Map.Entry<String, List<MatchedCredential>> entry : grouped.entrySet()) {
+            String queryId = entry.getKey();
+            List<MatchedCredential> group = entry.getValue();
+            String format = formatForQuery(dcql, queryId);
+
+            if (CredentialFormat.OPENDID_VC.matches(format)) {
+                vpToken.put(queryId, buildOpendidVcVpEntry(group, passcode, clientId, nonce));
+            } else if (CredentialFormat.SD_JWT_VC.matches(format)) {
+                vpToken.put(queryId, buildSdJwtVpEntry(group, passcode, clientId, nonce));
+            } else {
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VP_UNSUPPORTED_PRESENTATION_FORMAT, String.valueOf(format));
+            }
+        }
+
+        return OID4VPResponseUtil.encodeResponseBody(authRequest, vpToken);
+    }
+
+    private String formatForQuery(DCQLQuery dcql, String queryId) throws WalletCoreException {
+        if (dcql != null && dcql.getCredentials() != null) {
+            for (CredentialQuery cq : dcql.getCredentials()) {
+                if (queryId != null && queryId.equals(cq.getId())) {
+                    return cq.getFormat();
+                }
+            }
+        }
+        throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VP_UNSUPPORTED_PRESENTATION_FORMAT, "unknown query id: " + queryId);
+    }
+
+    private List<Object> buildOpendidVcVpEntry(List<MatchedCredential> group, String passcode, String clientId, String nonce) throws WalletException, UtilityException, WalletCoreException {
+        List<ClaimInfo> claimInfos = new ArrayList<>();
+        for (MatchedCredential mc : group) {
+            claimInfos.add(new ClaimInfo(mc.getCredentialId(), mc.getClaimCodes()));
+        }
+        OIDV4VPChallenge challenge = new OIDV4VPChallenge(clientId, nonce);
+        VerifiablePresentation vp = createVp(claimInfos, passcode, nonce, challenge);
+        List<Object> entry = new ArrayList<>();
+        entry.add(JsonParser.parseString(vp.toJson()).getAsJsonObject());
+        return entry;
+    }
+
+    private List<Object> buildSdJwtVpEntry(List<MatchedCredential> group, String passcode, String clientId, String nonce) throws WalletException, UtilityException, WalletCoreException {
+        List<String> ids = new ArrayList<>();
+        for (MatchedCredential mc : group) {
+            ids.add(mc.getCredentialId());
+        }
+        List<OID4VCICredential> stored = walletCore.getOID4VCICredentials(ids);
+        Map<String, OID4VCICredential> byId = new HashMap<>();
+        if (stored != null) {
+            for (OID4VCICredential c : stored) {
+                byId.put(c.getId(), c);
+            }
+        }
+
+        DIDDocument holderDoc = walletCore.getDocument(Constants.DID_DOC_TYPE_HOLDER);
+
+        List<Object> entry = new ArrayList<>();
+        for (MatchedCredential mc : group) {
+            OID4VCICredential cred = byId.get(mc.getCredentialId());
+            if (cred == null) {
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VP_CREDENTIAL_NOT_FOUND, mc.getCredentialId());
+            }
+            final String kid = cred.getKid();
+            if (!walletCore.isSavedKey(kid) || walletCore.getKeyInfos(List.of(kid)).isEmpty()) {
+                throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VP_HOLDER_KEY_NOT_FOUND, kid);
+            }
+            JsonObject holderJwk = HolderJwkFactory.fromHolderDocument(holderDoc, kid);
+            SdJwt sdjwt = SdJwtParser.parse(cred.getCredential());
+            long iat = System.currentTimeMillis() / 1000L;
+
+            String token = SDJWTPresenter.createVpToken(sdjwt, mc.getClaimCodes(), clientId, nonce, holderJwk,
+                    data -> {
+                        byte[] pin = (passcode != null) ? passcode.getBytes(StandardCharsets.UTF_8) : null;
+                        byte[] sig65 = walletCore.sign(kid, pin, data, Constants.DID_DOC_TYPE_HOLDER);
+                        return Arrays.copyOfRange(sig65, 1, 65);
+                    }, iat);
+            entry.add(token);
+            WalletLogger.getInstance().d("buildSdJwtVpEntry credId=" + mc.getCredentialId()
+                    + " selectedClaimCodes=" + mc.getClaimCodes() + " vpToken=" + token);
+        }
+        return entry;
     }
 
     private Proof createProof(String did, ProofPurpose.PROOF_PURPOSE proofPurpose, String keyId) {

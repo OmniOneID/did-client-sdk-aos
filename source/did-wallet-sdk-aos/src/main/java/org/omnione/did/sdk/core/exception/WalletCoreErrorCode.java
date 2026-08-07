@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,6 +113,41 @@ public enum WalletCoreErrorCode {
     // integrated
     ERR_CODE_ZKP_CALCULATE_TEQ_FAIL                                      (ZKP_MANAGER_BASE,900, "Failed to calculate TEQ proof"),
     ERR_CODE_ZKP_CALCULATE_TNE_FAIL                                      (ZKP_MANAGER_BASE,901, "Failed to calculate TNE proof"),
+
+
+    /*  [05] OID4VCManager  */
+    OID4VC_MANAGER_BASE("05"),
+    ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER       (OID4VC_MANAGER_BASE, ERR_CODE_INVALID_PARAMETER),
+    ERR_CODE_OID4VC_MANAGER_DUPLICATED_PARAMETER    (OID4VC_MANAGER_BASE, ERR_CODE_DUPLICATED_PARAMETER),
+    ERR_CODE_OID4VC_MANAGER_FAIL_TO_DECODE          (OID4VC_MANAGER_BASE, ERR_CODE_FAIL_TO_DECODE),
+
+    /*  [05] OID4VC Issuance (requestIssueOID4VC)  */
+    // Common (051xx)
+    ERR_CODE_OID4VC_UNSUPPORTED_ID                  (OID4VC_MANAGER_BASE, 100, "Unsupported in : "),
+    ERR_CODE_OID4VC_UNSUPPORTED_FORMAT              (OID4VC_MANAGER_BASE, 101, "Unsupported format : "),
+    // JWE (052xx)
+    ERR_CODE_OID4VC_INVALID_JWE                     (OID4VC_MANAGER_BASE, 210, "Invalid JWE"),
+    ERR_CODE_OID4VC_UNSUPPORTED_ALGORITHM_JWE       (OID4VC_MANAGER_BASE, 211, "Unsupported algorithm for JWE"),
+    ERR_CODE_OID4VC_UNSUPPORTED_JWE_KEY             (OID4VC_MANAGER_BASE, 212, "Unsupported JWE key"),
+    ERR_CODE_OID4VC_INVALID_SEALED_BOX              (OID4VC_MANAGER_BASE, 213, "invalid SealedBox"),
+    ERR_CODE_OID4VC_AUTHENTICATION_FAILED           (OID4VC_MANAGER_BASE, 214, "Authentication failed"),
+    ERR_CODE_OID4VC_FAILED_TO_ENCRYPT               (OID4VC_MANAGER_BASE, 215, "Failed to encrypt"),
+    ERR_CODE_OID4VC_KEY_DERIVATION_FAILED           (OID4VC_MANAGER_BASE, 216, "Key derivation failed"),
+    ERR_CODE_OID4VC_INVALID_KDF_INPUT               (OID4VC_MANAGER_BASE, 217, "Invalid KDF input"),
+    // OID4VCI (053xx)
+    ERR_CODE_OID4VC_INVALID_CREDENTIAL_RESPONSE     (OID4VC_MANAGER_BASE, 300, "Invalid credential response"),
+    // verify (054xx)
+    ERR_CODE_OID4VC_NOT_FOUND_KID                   (OID4VC_MANAGER_BASE, 400, "Not found kid for verify"),
+    ERR_CODE_OID4VC_FAILED_TO_VERIFY_SIGNATURE      (OID4VC_MANAGER_BASE, 401, "Failed to verify signature"),
+    // OID4VP (055xx)
+    ERR_CODE_OID4VP_UNSUPPORTED_PRESENTATION_FORMAT (OID4VC_MANAGER_BASE, 500, "Presentation format is not supported : "),
+    ERR_CODE_OID4VP_INVALID_DCQL_QUERY              (OID4VC_MANAGER_BASE, 501, "Invalid DCQL query : "),
+    ERR_CODE_OID4VP_NO_MATCHED_CREDENTIALS          (OID4VC_MANAGER_BASE, 502, "No credentials matched the request"),
+    ERR_CODE_OID4VP_CREDENTIAL_SETS_NOT_SATISFIED   (OID4VC_MANAGER_BASE, 503, "Required credential_sets not satisfied : "),
+    ERR_CODE_OID4VP_CREDENTIAL_NOT_FOUND            (OID4VC_MANAGER_BASE, 504, "Matched credential not found"),
+    ERR_CODE_OID4VP_HOLDER_KEY_NOT_FOUND            (OID4VC_MANAGER_BASE, 505, "Holder signing key not found"),
+    ERR_CODE_OID4VP_MISSING_VERIFIER_ENCRYPTION_KEY (OID4VC_MANAGER_BASE, 506, "No verifier encryption key found in client_metadata for direct_post.jwt"),
+    ERR_CODE_OID4VP_UNSUPPORTED_RESPONSE_ENCRYPTION (OID4VC_MANAGER_BASE, 507, "Unsupported response encryption : "),
 
 
     /*  [10] StorageManager  */

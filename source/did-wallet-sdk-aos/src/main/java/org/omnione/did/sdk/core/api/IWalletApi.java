@@ -36,6 +36,11 @@ import org.omnione.did.sdk.datamodel.token.WalletTokenData;
 import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
 import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
+import org.omnione.did.sdk.core.oid4vc.model.IssuerMetadataResponse;
+import org.omnione.did.sdk.core.oid4vc.model.TokenResponse;
+import org.omnione.did.sdk.datamodel.oid4vc.SdJwtCredentialItem;
+import org.omnione.did.sdk.datamodel.oid4vc.AuthorizationRequest;
+import org.omnione.did.sdk.datamodel.oid4vc.MatchedCredential;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
 import org.omnione.did.sdk.datamodel.zkp.Credential;
@@ -108,5 +113,18 @@ public interface IWalletApi {
         void changePin(String keyId, String oldPin, String newPin) throws UtilityException, WalletCoreException;
         void changeLock(String oldPassCode, String newPassCode) throws UtilityException, WalletCoreException, WalletException;
         void authenticatePin(String id, byte[] pin) throws WalletCoreException, UtilityException;
+    }
+
+    interface IOID4VCService {
+        CompletableFuture<String> requestIssueOID4VC(String hWalletToken, IssuerMetadataResponse metadata, TokenResponse token, String passcode, String configurationId, String credentialIdentifier, String apiGatewayUrl) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
+        List<SdJwtCredentialItem> getAllOID4VCs(String hWalletToken) throws WalletException, UtilityException, WalletCoreException;
+        List<SdJwtCredentialItem> getOID4VCs(String hWalletToken, List<String> identifiers) throws WalletException, UtilityException, WalletCoreException;
+        void deleteOID4VCs(String hWalletToken, List<String> identifiers) throws WalletException, UtilityException, WalletCoreException;
+        boolean isAnyOID4VCSaved() throws WalletException;
+    }
+
+    interface IOID4VPService {
+        List<MatchedCredential> matchCredentials(String hWalletToken, AuthorizationRequest authRequest) throws WalletException, UtilityException, WalletCoreException;
+        byte[] createVpToken(String hWalletToken, AuthorizationRequest authRequest, List<MatchedCredential> matchedCredentials, String passcode) throws WalletException, UtilityException, WalletCoreException;
     }
 }

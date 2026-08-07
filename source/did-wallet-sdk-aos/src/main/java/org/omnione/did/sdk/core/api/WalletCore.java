@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ import org.omnione.did.sdk.wallet.WalletCoreInterface;
 import org.omnione.did.sdk.wallet.walletservice.config.Config;
 import org.omnione.did.sdk.wallet.walletservice.config.Constants;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletErrorCode;
+import org.omnione.did.sdk.datamodel.oid4vc.OID4VCICredential;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
 import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 
@@ -71,6 +72,7 @@ class WalletCore implements WalletCoreInterface {
     KeyManager<DetailKeyInfo> keyManager;
     DIDManager<DIDDocument> didManager;
     VCManager<VerifiableCredential> vcManager;
+    OID4VCManager oid4vcManager;
     BioPromptHelper bioPromptHelper;
     WalletLogger walletLogger;
     ZKPManager<ZKPInfo> zkpManager;
@@ -94,6 +96,7 @@ class WalletCore implements WalletCoreInterface {
         keyManager = new KeyManager<>(Constants.WALLET_HOLDER, context);
         didManager = new DIDManager<>(Constants.WALLET_HOLDER, context);
         vcManager = new VCManager<>(Constants.WALLET_HOLDER, context);
+        oid4vcManager = new OID4VCManager(Constants.WALLET_HOLDER, context);
         try {
             zkpManager = new ZKPManager<>(Constants.WALLET_HOLDER, context);
         } catch (UtilityException e) {
@@ -355,6 +358,43 @@ class WalletCore implements WalletCoreInterface {
 
         return vcManager.makePresentation(claimInfos, presentationInfo);
     }
+
+    // OID4VCI credential storage (encrypted, separate file extension from opendid_vc)
+    @Override
+    public void addOID4VCICredential(OID4VCICredential credential) throws WalletCoreException, UtilityException, WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+        oid4vcManager.addCredential(credential);
+    }
+    @Override
+    public List<OID4VCICredential> getAllOID4VCICredentials() throws WalletCoreException, UtilityException, WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+        if(!oid4vcManager.isAnyCredentialsSaved())
+            return null;
+        return oid4vcManager.getAllCredentials();
+    }
+    @Override
+    public List<OID4VCICredential> getOID4VCICredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+        if(!oid4vcManager.isAnyCredentialsSaved())
+            return null;
+        return oid4vcManager.getCredentials(identifiers);
+    }
+    @Override
+    public void deleteOID4VCICredentials(List<String> identifiers) throws WalletCoreException, UtilityException, WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+        oid4vcManager.deleteCredentials(identifiers);
+    }
+    @Override
+    public boolean isAnyOID4VCICredentialsSaved() throws WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+        return oid4vcManager.isAnyCredentialsSaved();
+    }
+
     @Override
     public void registerBioKey(Context ctx) throws WalletException {
         if(WalletApi.isLock)
@@ -449,6 +489,14 @@ class WalletCore implements WalletCoreInterface {
             throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
 
         return keyManager.isKeySaved(id);
+    }
+
+    @Override
+    public List<KeyInfo> getKeyInfos(List<String> ids) throws WalletCoreException, UtilityException, WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+
+        return keyManager.getKeyInfos(ids);
     }
 
     @Override

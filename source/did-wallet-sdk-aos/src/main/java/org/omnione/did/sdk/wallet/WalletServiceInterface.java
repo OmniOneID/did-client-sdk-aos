@@ -22,6 +22,10 @@ import org.omnione.did.sdk.datamodel.did.SignedDidDoc;
 import org.omnione.did.sdk.datamodel.security.DIDAuth;
 import org.omnione.did.sdk.datamodel.token.SignedWalletInfo;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
+import org.omnione.did.sdk.core.oid4vc.model.IssuerMetadataResponse;
+import org.omnione.did.sdk.core.oid4vc.model.TokenResponse;
+import org.omnione.did.sdk.datamodel.oid4vc.AuthorizationRequest;
+import org.omnione.did.sdk.datamodel.oid4vc.MatchedCredential;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
 import org.omnione.did.sdk.datamodel.common.enums.VerifyAuthType;
 import org.omnione.did.sdk.datamodel.did.DIDDocument;
@@ -51,9 +55,12 @@ public interface WalletServiceInterface {
     DIDAuth getSignedDIDAuth(String authNonce, String pin) throws WalletException, WalletCoreException, UtilityException;
 
     CompletableFuture<String> requestIssueVc(String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
+    CompletableFuture<String> requestIssueOID4VC(IssuerMetadataResponse metadata, TokenResponse token, String passcode, String configurationId, String credentialIdentifier, String apiGatewayUrl) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
     CompletableFuture<String> requestRevokeVc(String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws WalletException, WalletCoreException, UtilityException,  ExecutionException, InterruptedException;
     ReturnEncVP createEncVp(List<ClaimInfo> claimInfos, VerifyProfile verifyProfile, String apiGateWayUrl, String passcode) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException;
     ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth) throws WalletException, WalletCoreException, UtilityException;
     ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth, OIDV4VPChallenge challenge) throws WalletException, WalletCoreException, UtilityException;
     VerifiablePresentation createVp(List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws WalletException, UtilityException, WalletCoreException;
+    List<MatchedCredential> matchCredentials(AuthorizationRequest authRequest) throws WalletException, UtilityException, WalletCoreException;
+    byte[] createVpToken(AuthorizationRequest authRequest, List<MatchedCredential> matchedCredentials, String passcode) throws WalletException, UtilityException, WalletCoreException;
 }

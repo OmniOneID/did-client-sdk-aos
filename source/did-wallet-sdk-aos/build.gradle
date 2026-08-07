@@ -25,7 +25,7 @@ android {
 }
 
 ext {
-    customVersionMajorMinorBuild = "2.0.0"
+    customVersionMajorMinorBuild = "3.0.0"
 }
 
 task deleteObjectJar(type: Delete){
@@ -63,4 +63,8 @@ dependencies {
     implementation 'com.madgag.spongycastle:prov:1.54.0.0'
     implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
     implementation 'com.madgag.spongycastle:pg:1.54.0.0'
+
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+
+    compileOnly 'com.nimbusds:nimbus-jose-jwt:9.40'
 }

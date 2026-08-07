@@ -35,6 +35,10 @@ public class HttpUrlConnectionTask {
 
     }
     public String makeHttpRequest(String urlString, String method, String payload, String accessToken) throws CommunicationException {
+        return makeHttpRequest(urlString, method, payload, accessToken, "application/json");
+    }
+
+    public String makeHttpRequest(String urlString, String method, String payload, String accessToken, String contentType) throws CommunicationException {
         WalletLogger.getInstance().d("request : " + payload + " / " + urlString + " / [" + method + "]");
         if(urlString.isEmpty()){
             throw new CommunicationException(CommunicationErrorCode.ERR_CODE_COMMUNICATION_INVALID_PARAMETER, "urlString");
@@ -57,7 +61,7 @@ public class HttpUrlConnectionTask {
             if (accessToken != null) {
                 urlConnection.setRequestProperty("Authorization", "Bearer " +accessToken);
             }
-            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Content-Type", contentType);
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setRequestProperty("Accept-Language", getSystemLanguageTag());
 

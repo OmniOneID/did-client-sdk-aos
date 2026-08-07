@@ -20,6 +20,7 @@ import android.content.Context;
 
 import org.omnione.did.sdk.core.bioprompthelper.BioPromptHelper;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.vcmanager.datamodel.ClaimInfo;
 import org.omnione.did.sdk.datamodel.common.OIDV4VPChallenge;
 import org.omnione.did.sdk.datamodel.common.ProofContainer;
@@ -36,6 +37,12 @@ import org.omnione.did.sdk.datamodel.token.SignedWalletInfo;
 import org.omnione.did.sdk.datamodel.token.WalletTokenData;
 import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
 import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
+import org.omnione.did.sdk.core.oid4vc.model.IssuerMetadataResponse;
+import org.omnione.did.sdk.core.oid4vc.model.TokenResponse;
+import org.omnione.did.sdk.datamodel.oid4vc.SdJwtCredentialItem;
+import org.omnione.did.sdk.datamodel.oid4vc.AuthorizationRequest;
+import org.omnione.did.sdk.datamodel.oid4vc.MatchedCredential;
+import org.omnione.did.sdk.core.oid4vc.format.sdjwt.SdJwtParser;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
@@ -56,7 +63,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredentialService, IWalletApi.IDIDKeyService, IWalletApi.IZKPService, IWalletApi.ISecurityAuthService {
+public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredentialService, IWalletApi.IDIDKeyService, IWalletApi.IZKPService, IWalletApi.ISecurityAuthService, IWalletApi.IOID4VCService, IWalletApi.IOID4VPService {
     private Context context;
     private static WalletApi instance;
     public static boolean isLock = true;
@@ -410,6 +417,127 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.ISSUE_VC,
                 WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID_AND_ISSUE_VC));
         return walletService.requestIssueVc(url, apiGateWayUrl, serverToken, refId, profile, signedDIDAuth, txId);
+    }
+
+    /**
+     * Requests and stores an OID4VC SD-JWT credential, signing the proof JWT with the holder #pin/#bio DID key.
+     *
+     * @param hWalletToken The wallet token used to issue the credential.
+     * @param metadata The issuer metadata.
+     * @param token The token response.
+     * @param passcode The passcode for the holder #pin key; {@code null} or empty to sign with the #bio key.
+     * @param configurationId The credential configuration identifier.
+     * @param credentialIdentifier The credential identifier; {@code null} to resolve it from the token.
+     * @param apiGatewayUrl The API Gateway URL used to verify the issuer signature.
+     * @return CompletableFuture<String> - The stored credential ID.
+     * @throws WalletException
+     * @throws WalletCoreException
+     * @throws UtilityException
+     */
+    @Override
+    public CompletableFuture<String> requestIssueOID4VC(String hWalletToken, IssuerMetadataResponse metadata, TokenResponse token, String passcode, String configurationId, String credentialIdentifier, String apiGatewayUrl) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.ISSUE_VC,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.CREATE_DID_AND_ISSUE_VC));
+        return walletService.requestIssueOID4VC(metadata, token, passcode, configurationId, credentialIdentifier, apiGatewayUrl);
+    }
+
+    /**
+     * Retrieves all OID4VC credentials associated with the provided wallet token.
+     *
+     * @param hWalletToken The wallet token used to retrieve the credential list.
+     * @return List<SdJwtCredentialItem> - A list of all OID4VC credentials.
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     */
+    @Override
+    public List<SdJwtCredentialItem> getAllOID4VCs(String hWalletToken) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        return SdJwtParser.mapToSdJwtItems(walletCore.getAllOID4VCICredentials());
+    }
+
+    /**
+     * Retrieves specific OID4VC credentials based on the provided identifiers.
+     *
+     * @param hWalletToken The wallet token used to retrieve the credentials.
+     * @param identifiers A list of credential identifiers.
+     * @return List<SdJwtCredentialItem> - A list of OID4VC credentials matching the identifiers.
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     */
+    @Override
+    public List<SdJwtCredentialItem> getOID4VCs(String hWalletToken, List<String> identifiers) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        return SdJwtParser.mapToSdJwtItems(walletCore.getOID4VCICredentials(identifiers));
+    }
+
+    /**
+     * Deletes specific OID4VC credentials based on the provided identifiers.
+     *
+     * @param hWalletToken The wallet token used to delete the credentials.
+     * @param identifiers A list of credential identifiers.
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     */
+    @Override
+    public void deleteOID4VCs(String hWalletToken, List<String> identifiers) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.REMOVE_VC));
+        walletCore.deleteOID4VCICredentials(identifiers);
+    }
+
+    /**
+     * Checks whether any OID4VC credentials are saved in the holder's wallet.
+     *
+     * @return boolean - {@code true} if at least one credential is saved, {@code false} otherwise.
+     * @throws WalletException
+     */
+    @Override
+    public boolean isAnyOID4VCSaved() throws WalletException {
+        return walletCore.isAnyOID4VCICredentialsSaved();
+    }
+
+    /**
+     * Matches stored credentials against a verifier's OID4VP authorization request (DCQL).
+     *
+     * @param hWalletToken The wallet token used to authorize the operation.
+     * @param authRequest The verifier's authorization request carrying the DCQL query.
+     * @return List<MatchedCredential> - The submittable items satisfying the query.
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     */
+    @Override
+    public List<MatchedCredential> matchCredentials(String hWalletToken, AuthorizationRequest authRequest) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        return walletService.matchCredentials(authRequest);
+    }
+
+    /**
+     * Creates the OID4VP response body (a form-urlencoded {@code vp_token} submission, or an
+     * encrypted {@code response} for {@code direct_post.jwt}) for the selected credentials.
+     *
+     * @param hWalletToken The wallet token used to authorize the operation.
+     * @param authRequest The verifier's authorization request.
+     * @param matchedCredentials The credentials/claims to present.
+     * @param passcode The PIN when a PIN-bound key is used; {@code null} for a BIO key.
+     * @return byte[] - The form-urlencoded response body for the app to submit.
+     * @throws WalletException
+     * @throws UtilityException
+     * @throws WalletCoreException
+     */
+    @Override
+    public byte[] createVpToken(String hWalletToken, AuthorizationRequest authRequest, List<MatchedCredential> matchedCredentials, String passcode) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        if (matchedCredentials == null || matchedCredentials.isEmpty()) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER, "matchedCredentials");
+        }
+        return walletService.createVpToken(authRequest, matchedCredentials, passcode);
     }
 
     /**
