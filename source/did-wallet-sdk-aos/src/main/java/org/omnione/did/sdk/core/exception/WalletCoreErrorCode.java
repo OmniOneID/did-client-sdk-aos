@@ -115,17 +115,17 @@ public enum WalletCoreErrorCode {
     ERR_CODE_ZKP_CALCULATE_TNE_FAIL                                      (ZKP_MANAGER_BASE,901, "Failed to calculate TNE proof"),
 
 
-    /*  [05] OID4VCManager  */
-    OID4VC_MANAGER_BASE("05"),
+    /*  [06] OID4VCManager  */
+    OID4VC_MANAGER_BASE("06"),
     ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER       (OID4VC_MANAGER_BASE, ERR_CODE_INVALID_PARAMETER),
     ERR_CODE_OID4VC_MANAGER_DUPLICATED_PARAMETER    (OID4VC_MANAGER_BASE, ERR_CODE_DUPLICATED_PARAMETER),
     ERR_CODE_OID4VC_MANAGER_FAIL_TO_DECODE          (OID4VC_MANAGER_BASE, ERR_CODE_FAIL_TO_DECODE),
 
-    /*  [05] OID4VC Issuance (requestIssueOID4VC)  */
-    // Common (051xx)
+    /*  [06] OID4VC Issuance (requestIssueOID4VC)  */
+    // Common (061xx)
     ERR_CODE_OID4VC_UNSUPPORTED_ID                  (OID4VC_MANAGER_BASE, 100, "Unsupported in : "),
     ERR_CODE_OID4VC_UNSUPPORTED_FORMAT              (OID4VC_MANAGER_BASE, 101, "Unsupported format : "),
-    // JWE (052xx)
+    // JWE (062xx)
     ERR_CODE_OID4VC_INVALID_JWE                     (OID4VC_MANAGER_BASE, 210, "Invalid JWE"),
     ERR_CODE_OID4VC_UNSUPPORTED_ALGORITHM_JWE       (OID4VC_MANAGER_BASE, 211, "Unsupported algorithm for JWE"),
     ERR_CODE_OID4VC_UNSUPPORTED_JWE_KEY             (OID4VC_MANAGER_BASE, 212, "Unsupported JWE key"),
@@ -134,20 +134,31 @@ public enum WalletCoreErrorCode {
     ERR_CODE_OID4VC_FAILED_TO_ENCRYPT               (OID4VC_MANAGER_BASE, 215, "Failed to encrypt"),
     ERR_CODE_OID4VC_KEY_DERIVATION_FAILED           (OID4VC_MANAGER_BASE, 216, "Key derivation failed"),
     ERR_CODE_OID4VC_INVALID_KDF_INPUT               (OID4VC_MANAGER_BASE, 217, "Invalid KDF input"),
-    // OID4VCI (053xx)
+    // OID4VCI (063xx)
     ERR_CODE_OID4VC_INVALID_CREDENTIAL_RESPONSE     (OID4VC_MANAGER_BASE, 300, "Invalid credential response"),
-    // verify (054xx)
+    // verify (064xx)
     ERR_CODE_OID4VC_NOT_FOUND_KID                   (OID4VC_MANAGER_BASE, 400, "Not found kid for verify"),
     ERR_CODE_OID4VC_FAILED_TO_VERIFY_SIGNATURE      (OID4VC_MANAGER_BASE, 401, "Failed to verify signature"),
-    // OID4VP (055xx)
+    // OID4VP (065xx)
     ERR_CODE_OID4VP_UNSUPPORTED_PRESENTATION_FORMAT (OID4VC_MANAGER_BASE, 500, "Presentation format is not supported : "),
-    ERR_CODE_OID4VP_INVALID_DCQL_QUERY              (OID4VC_MANAGER_BASE, 501, "Invalid DCQL query : "),
+    ERR_CODE_OID4VP_INVALID_DCQL_QUERY              (OID4VC_MANAGER_BASE, 501, "Invalid DCQL query: "),
     ERR_CODE_OID4VP_NO_MATCHED_CREDENTIALS          (OID4VC_MANAGER_BASE, 502, "No credentials matched the request"),
-    ERR_CODE_OID4VP_CREDENTIAL_SETS_NOT_SATISFIED   (OID4VC_MANAGER_BASE, 503, "Required credential_sets not satisfied : "),
+    ERR_CODE_OID4VP_CREDENTIAL_SETS_NOT_SATISFIED   (OID4VC_MANAGER_BASE, 503, "Required credential_sets not satisfied: "),
     ERR_CODE_OID4VP_CREDENTIAL_NOT_FOUND            (OID4VC_MANAGER_BASE, 504, "Matched credential not found"),
     ERR_CODE_OID4VP_HOLDER_KEY_NOT_FOUND            (OID4VC_MANAGER_BASE, 505, "Holder signing key not found"),
     ERR_CODE_OID4VP_MISSING_VERIFIER_ENCRYPTION_KEY (OID4VC_MANAGER_BASE, 506, "No verifier encryption key found in client_metadata for direct_post.jwt"),
     ERR_CODE_OID4VP_UNSUPPORTED_RESPONSE_ENCRYPTION (OID4VC_MANAGER_BASE, 507, "Unsupported response encryption : "),
+    ERR_CODE_OID4VP_INVALID_SELECTED_CREDENTIALS    (OID4VC_MANAGER_BASE, 508, "Invalid selected credentials: "),
+    ERR_CODE_OID4VP_UNSUPPORTED_RESPONSE_MODE       (OID4VC_MANAGER_BASE, 509, "Unsupported response_mode : "),
+    // Proximity (066xx)
+    ERR_CODE_PROXIMITY_NO_MATCHED_DOCUMENTS         (OID4VC_MANAGER_BASE, 600, "No stored document can answer any docRequest"),
+    ERR_CODE_PROXIMITY_EMPTY_SELECTION              (OID4VC_MANAGER_BASE, 610, "No document was selected"),
+    ERR_CODE_PROXIMITY_INVALID_SELECTED_DOCUMENTS   (OID4VC_MANAGER_BASE, 611, "Invalid selected mdoc documents: "),
+    ERR_CODE_PROXIMITY_EMPTY_CLAIM_CODES            (OID4VC_MANAGER_BASE, 612, "A selected document carries no claim code"),
+    ERR_CODE_PROXIMITY_DUPLICATE_SELECTED_DOCUMENT  (OID4VC_MANAGER_BASE, 613, "The same document is selected twice for the same docRequest"),
+    ERR_CODE_PROXIMITY_DUPLICATE_CLAIM_CODE         (OID4VC_MANAGER_BASE, 614, "A selected document names the same claim code twice"),
+    ERR_CODE_PROXIMITY_INVALID_DEVICE_REQUEST       (OID4VC_MANAGER_BASE, 620, "Invalid DeviceRequest: "),
+    ERR_CODE_PROXIMITY_INVALID_SESSION_TRANSCRIPT   (OID4VC_MANAGER_BASE, 621, "Invalid SessionTranscript: "),
 
 
     /*  [10] StorageManager  */

@@ -16,10 +16,13 @@
 
 package org.omnione.did.sdk.core.oid4vc.presentation;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.JsonObject;
 
 import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.oid4vc.crypto.JwkThumbprintUtil;
 import org.omnione.did.sdk.core.oid4vc.crypto.VPResponseEncryptor;
 import org.omnione.did.sdk.datamodel.oid4vc.AuthorizationRequest;
 import org.omnione.did.sdk.datamodel.oid4vc.ClientMetadata;
@@ -32,6 +35,7 @@ import java.util.Map;
 
 public final class OID4VPResponseUtil {
 
+    private static final String RESPONSE_MODE_DIRECT_POST = "direct_post";
     private static final String RESPONSE_MODE_DIRECT_POST_JWT = "direct_post.jwt";
     private static final String ENC_A256GCM = "A256GCM";
     private static final String ENC_A128GCM = "A128GCM";
@@ -41,7 +45,8 @@ public final class OID4VPResponseUtil {
     public static byte[] encodeResponseBody(AuthorizationRequest req, Map<String, Object> vpToken)
             throws WalletCoreException {
         String state = req.getState();
-        if (RESPONSE_MODE_DIRECT_POST_JWT.equals(req.getResponseMode())) {
+        String responseMode = req.getResponseMode();
+        if (RESPONSE_MODE_DIRECT_POST_JWT.equals(responseMode)) {
             ClientMetadata cm = req.getClientMetadata();
             String enc = selectEnc(cm);
             JsonObject recipientJwk = selectRecipientKey(cm);
@@ -52,7 +57,21 @@ public final class OID4VPResponseUtil {
             return new EncryptedResponseSubmission(jwe).toFormData().getBytes(StandardCharsets.UTF_8);
         }
 
+        if (responseMode != null && !RESPONSE_MODE_DIRECT_POST.equals(responseMode)) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VP_UNSUPPORTED_RESPONSE_MODE,
+                    responseMode);
+        }
+
         return new VPTokenSubmission(vpToken, state).toFormData().getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Nullable
+    public static byte[] responseEncryptionJwkThumbprint(AuthorizationRequest req)
+            throws WalletCoreException {
+        if (req == null || !RESPONSE_MODE_DIRECT_POST_JWT.equals(req.getResponseMode())) {
+            return null;
+        }
+        return JwkThumbprintUtil.sha256(selectRecipientKey(req.getClientMetadata()));
     }
 
     private static String selectEnc(ClientMetadata cm) throws WalletCoreException {

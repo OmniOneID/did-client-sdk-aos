@@ -35,6 +35,14 @@ public class ClaimQuery {
     @Expose
     private List<Object> values;
 
+    @SerializedName("namespace")
+    @Expose
+    private String namespace;
+
+    @SerializedName("claim_name")
+    @Expose
+    private String claimName;
+
     public String getId() {
         return id;
     }
@@ -57,5 +65,21 @@ public class ClaimQuery {
 
     public void setValues(List<Object> values) {
         this.values = values;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
+    public String getClaimName() {
+        return claimName;
+    }
+
+    public void setClaimName(String claimName) {
+        this.claimName = claimName;
     }
 }

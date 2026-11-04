@@ -37,7 +37,6 @@ public final class SDJWTCredentialAdapter {
                 formatValue,
                 sdjwt.getVct(),
                 sdjwt.getIssuer(),
-                claimNames,
-                sdjwt);
+                claimNames);
     }
 }

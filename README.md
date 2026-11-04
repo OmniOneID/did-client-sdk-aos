@@ -48,7 +48,7 @@ did-client-sdk-aos
 │           └── ZKP_DataModel.md
 └── source
     └── release
-    │   └── did-wallet-sdk-aos-2.0.1.jar
+    │   └── did-wallet-sdk-aos-3.0.0.jar
     └── did-wallet-sdk-aos
         ├── build.gradle
         ├── gradle
@@ -85,8 +85,8 @@ did-client-sdk-aos
 | OS               | Android 14                                             |
 | Language         | Java 21                                                |
 | IDE              | Android Studio 4                                       |
-| Build System     | Gradle 8.2                                             |
-| Compatibility    | Android API level 34 or higher                         |
+| Build System     | Gradle 9.4.1 (Android Gradle Plugin 9.1.0)             |
+| Compatibility    | compileSdk 36.1, minSdk 26                             |
 | Test Environment | Minimum Requirements: Android 8.0 (Oreo, API Level 26) |
 |                  | Recommended Requirements: Android 14 (API Level 34)    |
 
@@ -98,37 +98,29 @@ Libraries can be found in the [releases folder](./source/release).
 
 ### Wallet SDK
 
-1. Copy the `did-wallet-sdk-aos-2.0.1.jar` file to the libs of the app project.
+1. Copy the `did-wallet-sdk-aos-3.0.0.jar` file to the libs of the app project.
 2. Add the following dependencies to the build.gradle of the app project.
 
 ```groovy
-    implementation files('libs/did-wallet-sdk-aos-2.0.1.jar')
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.navigation:navigation-fragment:2.7.7'
+    implementation files('libs/did-wallet-sdk-aos-3.0.0.jar')
+    implementation 'com.google.android.material:material:1.13.0'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    implementation 'com.google.firebase:firebase-messaging:20.0.0'
-    implementation 'com.google.android.gms:play-services-vision:20.1.3'
-
-    implementation "androidx.navigation:navigation-fragment-ktx:2.7.7"
-    implementation "androidx.navigation:navigation-ui-ktx:2.7.7"
-
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'org.bitcoinj:bitcoinj-core:0.15.7'
 
     implementation 'com.madgag.spongycastle:core:1.54.0.0'
     implementation 'com.madgag.spongycastle:prov:1.54.0.0'
-    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
-    implementation 'com.madgag.spongycastle:pg:1.54.0.0'
 
-    api "androidx.room:room-runtime:2.6.1"
-    annotationProcessor "androidx.room:room-compiler:2.6.1"
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.40'
+    implementation 'com.upokecenter:cbor:4.5.6'
+
+    api "androidx.room:room-runtime:2.8.4"
+    annotationProcessor "androidx.room:room-compiler:2.8.4"
 ```
 3. Sync `Gradle` to ensure the dependencies are properly added.
 

@@ -22,14 +22,13 @@ import com.google.gson.JsonObject;
 
 import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
+import org.omnione.did.sdk.core.oid4vc.format.sdjwt.SdJwtCompact;
 import org.omnione.did.sdk.datamodel.oid4vc.SdJwt;
 import org.omnione.did.sdk.utility.DataModels.DigestEnum;
 import org.omnione.did.sdk.utility.DigestUtils;
 import org.omnione.did.sdk.utility.Encodings.Base64;
 import org.omnione.did.sdk.utility.Errors.UtilityException;
 import org.omnione.did.sdk.wallet.walletservice.exception.WalletException;
-import org.omnione.did.sdjwt.datamodel.Disclosure;
-import org.omnione.did.sdjwt.datamodel.SDJWT;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -43,10 +42,6 @@ public final class SDJWTPresenter {
 
     private SDJWTPresenter() {}
 
-    public interface SignDigest {
-        byte[] sign(byte[] data) throws WalletException, WalletCoreException, UtilityException;
-    }
-
     public static String createVpToken(SdJwt sdjwt,
                                        List<String> claimCodes,
                                        String aud,
@@ -56,30 +51,25 @@ public final class SDJWTPresenter {
                                        long iatEpochSeconds)
             throws WalletException, WalletCoreException, UtilityException {
 
-        SDJWT parsed;
+        SdJwtCompact parsed;
         try {
-            parsed = SDJWT.parse(sdjwt.getCompact());
-        } catch (Exception e) {
+            parsed = SdJwtCompact.parse(sdjwt.getCompact());
+        } catch (RuntimeException e) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_INVALID_CREDENTIAL_RESPONSE,
                     "Failed to parse SD-JWT for presentation: " + e.getMessage());
         }
 
         boolean discloseAll = (claimCodes == null || claimCodes.isEmpty());
-        List<Disclosure> selected = new ArrayList<>();
-        if (parsed.hasDisclosures()) {
-            for (Disclosure d : parsed.getDisclosures()) {
-                if (discloseAll) {
-                    selected.add(d);
-                } else if (!d.isArrayElement() && d.getClaimName() != null
-                        && claimCodes.contains(d.getClaimName())) {
-                    selected.add(d);
-                }
+        List<SdJwtCompact.Disclosure> selected = new ArrayList<>();
+        for (SdJwtCompact.Disclosure d : parsed.getDisclosures()) {
+            if (discloseAll || (!d.isArrayElement() && claimCodes.contains(d.getClaimName()))) {
+                selected.add(d);
             }
         }
 
         StringBuilder base = new StringBuilder(parsed.getCredentialJwt());
-        for (Disclosure d : selected) {
-            base.append('~').append(d.getDisclosure());
+        for (SdJwtCompact.Disclosure d : selected) {
+            base.append('~').append(d.getEncoded());
         }
         base.append('~');
         String presentationBase = base.toString();

@@ -76,7 +76,8 @@ public final class IssuerMetadataFetcher {
                 wire.authorizationServers,
                 configs,
                 mapResponseEncryption(wire.credentialResponseEncryption),
-                wire.nonceEndpoint);
+                wire.nonceEndpoint,
+                wire.credentialRevocationEndpoint);
     }
 
     @Nullable

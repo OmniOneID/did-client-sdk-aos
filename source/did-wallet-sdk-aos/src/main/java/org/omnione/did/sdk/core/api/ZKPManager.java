@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 OmniOne.
+ * Copyright 2025-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,7 @@ import org.omnione.did.sdk.wallet.walletservice.logger.WalletLogger;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -80,8 +81,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 class ZKPManager<E extends BaseObject> {
     Context context;
@@ -606,8 +605,8 @@ class ZKPManager<E extends BaseObject> {
      * createReferent: Creates referent mappings from user-selected attributes for each credential.
      *
      * This method processes a list of user-defined referent selections and matches them against the
-     * stored credentials. For each matching credential, it constructs a Referent object by mapping
-     * the selected attribute names and values, then adds it to the ReferentInfo structure.
+     * stored credentials. For each matching credential, it constructs a Referent object whose attributes
+     * are keyed by referent key and carry the attribute name, then adds it to the ReferentInfo structure.
      * The method also performs null checks on essential referent fields such as referent key, raw value, and name.
      *
      * @param customReferents A list of UserReferent objects representing user-selected attributes for proof generation.
@@ -620,9 +619,11 @@ class ZKPManager<E extends BaseObject> {
         if (customReferents == null)
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "validRequest fail [customReferents has null parameter]");
 
-        ReferentInfo referentInfo = new ReferentInfo();
+        return createReferent(customReferents, this.getAllCredentials());
+    }
 
-        ArrayList<Credential> credentialList =  this.getAllCredentials();
+    static ReferentInfo createReferent(List<UserReferent> customReferents, List<Credential> credentialList) throws WalletCoreException {
+        ReferentInfo referentInfo = new ReferentInfo();
 
         // LOOP: Credential Key/Value
         for (Credential credential: credentialList) {
@@ -640,7 +641,8 @@ class ZKPManager<E extends BaseObject> {
                         throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_NULL, "referent name is null in createReferent");
 
                     WalletLogger.getInstance().d("credentialKey: "+credential.getCredentialId()+", inputReferent.getReferentName(): "+GsonWrapper.getGsonPrettyPrinting().toJson(inputReferent.getReferentName()));
-                    attr.put(inputReferent.getReferentName(), new ReferentAttributeValue(inputReferent.getReferentKey(), inputReferent.isRevealed()));
+                    if (attr.put(inputReferent.getReferentKey(), new ReferentAttributeValue(inputReferent.getReferentKey(), inputReferent.isRevealed(), inputReferent.getReferentName())) != null)
+                        throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_DUPLICATED, "[duplicated referent key: " + inputReferent.getReferentKey() + "]");
                     ref.setSchemaId(credential.getSchemaId());
                     ref.setCredDefId(credential.getCredDefId());
                 }
@@ -663,8 +665,8 @@ class ZKPManager<E extends BaseObject> {
      * It builds a list of ProveCredential objects, each of which contains the proper structure
      * and metadata needed for constructing a ZKP presentation.
      *
-     * For each ProofParam, this method extracts the associated Referent data and compares each
-     * requested attribute and predicate in the ProofRequest. Based on the configuration (revealed or not),
+     * For each ProofParam, this method looks up each selected referent key in the ProofRequest and rejects
+     * unknown, duplicated, mismatched, or missing selections. Based on the configuration (revealed or not),
      * it constructs the appropriate ProveRevealedAttribute, ProveUnrevealedAttribute, and ProvePredicate objects.
      *
      * @param proofRequest The ProofRequest object specifying the attributes and predicates required by the Verifier.
@@ -672,59 +674,82 @@ class ZKPManager<E extends BaseObject> {
      * @return Returns a list of ProveCredential objects representing the structure required for ZKP generation.
      * @throws WalletCoreException If no matching credentials are found or the data cannot be built for proving.
      */
-    private List<ProveCredential> getProvingCredential(ProofRequest proofRequest, List<ProofParam> proofParams) throws WalletCoreException {
+    static List<ProveCredential> getProvingCredential(ProofRequest proofRequest, List<ProofParam> proofParams, List<Credential> credentials) throws WalletCoreException {
 
         WalletLogger.getInstance().d("proving start ===============================================================proofParams.size: "+proofParams.size());
         List<ProveCredential> proveCredentialList = new LinkedList<ProveCredential>();
+        Set<String> attributeKeys = new HashSet<>();
+        Set<String> predicateKeys = new HashSet<>();
 
         for (ProofParam proofParam : proofParams) {
-            HashMap<String, Referent> referents = proofParam.getReferentInfo().getReferents();
+            for (Map.Entry<String, Referent> referentEntry : proofParam.getReferentInfo().getReferents().entrySet()) {
+                String credentialId = referentEntry.getKey();
+                Credential credential = credentials.stream()
+                        .filter(c -> credentialId.equals(c.getCredentialId()))
+                        .findFirst()
+                        .orElseThrow(() -> new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_CREDENTIAL_STORED, credentialId));
 
-            List<ProveRevealedAttribute> revealedAttrs = new LinkedList<ProveRevealedAttribute>();
-            List<ProveUnrevealedAttribute> unrevealedAttrs = new LinkedList<ProveUnrevealedAttribute>();
-            List<ProvePredicate> predicates = new LinkedList<ProvePredicate>();
+                List<ProveRevealedAttribute> revealedAttrs = new LinkedList<ProveRevealedAttribute>();
+                List<ProveUnrevealedAttribute> unrevealedAttrs = new LinkedList<ProveUnrevealedAttribute>();
+                List<ProvePredicate> predicates = new LinkedList<ProvePredicate>();
+                Set<String> revealedNames = new HashSet<>();
+                Set<String> unrevealedNames = new HashSet<>();
 
-            // LOOP: referents
-            for (String referentKey : referents.keySet()) {
-                Referent referent = referents.get(referentKey);
+                for (Map.Entry<String, ReferentAttributeValue> attrEntry : referentEntry.getValue().getAttributes().entrySet()) {
+                    String referentKey = attrEntry.getKey();
+                    ReferentAttributeValue referentAttributeValue = attrEntry.getValue();
+                    String attrName = referentAttributeValue.getAttrName();
+                    AttributeInfo requestAttrInfo = proofRequest.getRequestedAttributes().get(referentKey);
+                    PredicateInfo requestPredicateInfo = proofRequest.getRequestedPredicates().get(referentKey);
 
-                // LOOP: attr
-                for (String attrKey : referent.getAttributes().keySet()) {
-                    ReferentAttributeValue referentAttributeValue = referent.getAttributes().get(attrKey);
+                    if (requestAttrInfo != null) {
+                        if (!attributeKeys.add(referentKey))
+                            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_DUPLICATED, "[duplicated referent key: " + referentKey + "]");
+                        if (!Objects.equals(requestAttrInfo.getName(), attrName))
+                            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE, "[attribute name mismatch: " + referentKey + "]");
+                        if (!credential.getValues().containsKey(attrName))
+                            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE, "[attribute missing from credential: " + referentKey + "]");
 
-                    // create revealed Attrs
-                    for (String proofRequestAttrKey : proofRequest.getRequestedAttributes().keySet()) {
-                        AttributeInfo requestAttrInfo = proofRequest.getRequestedAttributes().get(proofRequestAttrKey);
-
-                        if (requestAttrInfo.getName().equals(attrKey) && referentAttributeValue.getRevealed()) {
+                        if (Boolean.TRUE.equals(referentAttributeValue.getRevealed())) {
+                            revealedNames.add(attrName);
                             revealedAttrs.add(new ProveRevealedAttribute.Builder()
-                                    .setAttributeName(attrKey)
-                                    .setReferentKey(referentAttributeValue.getReferentKey())
+                                    .setAttributeName(attrName)
+                                    .setReferentKey(referentKey)
                                     .build());
-                        } else if (requestAttrInfo.getName().equals(attrKey) && !referentAttributeValue.getRevealed()) {
+                        } else {
+                            unrevealedNames.add(attrName);
                             unrevealedAttrs.add(new ProveUnrevealedAttribute.Builder()
-                                    .setReferentKey(referentAttributeValue.getReferentKey())
+                                    .setReferentKey(referentKey)
                                     .build());
                         }
-                    }
+                    } else if (requestPredicateInfo != null) {
+                        if (!predicateKeys.add(referentKey))
+                            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_DUPLICATED, "[duplicated referent key: " + referentKey + "]");
+                        if (!Objects.equals(requestPredicateInfo.getName(), attrName))
+                            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_PREDICATE_ATTRIBUTE, "[predicate name mismatch: " + referentKey + "]");
+                        if (!credential.getValues().containsKey(attrName))
+                            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_PREDICATE_ATTRIBUTE, "[predicate attribute missing from credential: " + referentKey + "]");
 
-                    // create predicate Attrs
-                    for (String proofRequestPredicateKey : proofRequest.getRequestedPredicates().keySet()) {
-                        PredicateInfo requestPredicateInfo = proofRequest.getRequestedPredicates().get(proofRequestPredicateKey);
-
-                        if (requestPredicateInfo.getName().equals(attrKey) && !referentAttributeValue.getRevealed()) {
-                            predicates.add(new ProvePredicate.Builder()
-                                    .setAttributeName(attrKey)
-                                    .setReferentKey(referentAttributeValue.getReferentKey())
-                                    .setPType(requestPredicateInfo.getPType())
-                                    .setPValue(requestPredicateInfo.getPValue())
-                                    .build());
-                        }
+                        predicates.add(new ProvePredicate.Builder()
+                                .setAttributeName(attrName)
+                                .setReferentKey(referentKey)
+                                .setPType(requestPredicateInfo.getPType())
+                                .setPValue(requestPredicateInfo.getPValue())
+                                .build());
+                    } else {
+                        throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PARAMETER_VALID_FAIL, "[unknown referent key: " + referentKey + "]");
                     }
                 }
 
+                if (!Collections.disjoint(revealedNames, unrevealedNames))
+                    throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE, "[revealed and unrevealed on one attribute: " + revealedNames.stream().filter(unrevealedNames::contains).findFirst().get() + "]");
+                for (ProvePredicate predicate : predicates) {
+                    if (revealedNames.contains(predicate.getAttrName()))
+                        throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_PREDICATE_ATTRIBUTE, "[predicate on revealed attribute: " + predicate.getReferentKey() + "]");
+                }
+
                 proveCredentialList.add(new ProveCredential.Builder()
-                        .setCredentialId(referentKey)
+                        .setCredentialId(credentialId)
                         .setRevealedAttrs(revealedAttrs)
                         .setUnrevealedAttrs(unrevealedAttrs)
                         .setPredicates(predicates)
@@ -737,6 +762,10 @@ class ZKPManager<E extends BaseObject> {
 
         if (proveCredentialList.size() == 0)
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_BUILD_CREDENTIAL_FOR_PROVING_FAIL);
+        if (!attributeKeys.equals(proofRequest.getRequestedAttributes().keySet()))
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE, "[requested attributes not all selected]");
+        if (!predicateKeys.equals(proofRequest.getRequestedPredicates().keySet()))
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_PREDICATE_ATTRIBUTE, "[requested predicates not all selected]");
 
         WalletLogger.getInstance().d("credential for proving: " + GsonWrapper.getGsonPrettyPrinting().toJson(proveCredentialList));
         WalletLogger.getInstance().d("=============================================================== proving end");
@@ -773,41 +802,14 @@ class ZKPManager<E extends BaseObject> {
         WalletLogger.getInstance().d("proofParams: "+GsonWrapper.getGsonPrettyPrinting().toJson(proofParams));
         WalletLogger.getInstance().d("selfAttributes: "+GsonWrapper.getGsonPrettyPrinting().toJson(selfAttributes));
 
-        List<ProveCredential> proveCredentialList = this.getProvingCredential(proofRequest, proofParams);
+        ArrayList<Credential> credentialList = this.getAllCredentials();
+        List<ProveCredential> proveCredentialList = getProvingCredential(proofRequest, proofParams, credentialList);
         WalletLogger.getInstance().d("proveCredentialList: "+GsonWrapper.getGson().toJson(proveCredentialList));
-
-        Set<String> proofRequestRestrictionAttrs = proofRequest.getRequestedAttributes().keySet();
-        WalletLogger.getInstance().d("proofRequestRestrictionAttrs: "+proofRequestRestrictionAttrs);
-
-        Set<String> combinedReferentKeys = new HashSet<>();
-
-        for (ProveCredential proveCredential : proveCredentialList) {
-            WalletLogger.getInstance().d("proveCredential.getRevealedAttrs(): "+GsonWrapper.getGson().toJson(proveCredential.getRevealedAttrs()));
-            WalletLogger.getInstance().d("proveCredential.getUnrevealedAttrs(): "+GsonWrapper.getGson().toJson(proveCredential.getUnrevealedAttrs()));
-
-            Set<String> referentKeys = Stream.concat(
-                            proveCredential.getRevealedAttrs().stream().map(ProveRevealedAttribute::getReferentKey),
-                            proveCredential.getUnrevealedAttrs().stream().map(ProveUnrevealedAttribute::getReferentKey)
-                    ).filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-            WalletLogger.getInstance().d("referentKeys: "+referentKeys);
-
-            combinedReferentKeys.addAll(referentKeys);
-        }
-
-        WalletLogger.getInstance().d("combinedReferentKeys: "+combinedReferentKeys);
-        // Check if all items in proofRequestRestrictionAttrs exist in combinedReferentKeys
-        boolean allMatch = proofRequestRestrictionAttrs.equals(combinedReferentKeys);
-
-        if (!allMatch) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_ZKP_PROVER_NOT_FOUND_AVAILABLE_REQUEST_ATTRIBUTE);
-        }
 
         // create Proof
         ProofBuilder builder = new ProofBuilder(ZkpConstants.MASTER_SECRET_KEY);
         List<Identifiers> identifierList = new LinkedList<Identifiers>();
         RequestedProof requestedProof = new RequestedProof();
-        ArrayList<Credential> credentialList = this.getAllCredentials();
 
         //LOOP proving, credential,schema, def
         for (int i = 0 ; i < proveCredentialList.size() ; i ++) {

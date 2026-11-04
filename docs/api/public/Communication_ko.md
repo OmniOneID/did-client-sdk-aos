@@ -19,12 +19,13 @@ Android Communication API
 ==
 
 - 주제: Communication
-- 작성: Sangjun Kim
-- 일자: 2024-09-04
-- 버전: v1.0.0
+- 작성: 김은정
+- 일자: 2026-10-28
+- 버전: v3.0.0
 
 | 버전   | 일자       | 변경 내용                 |
 | ------ | ---------- | -------------------------|
+| v3.0.0 | 2026-10-30 | accessToken, contentType 파라미터 추가 |
 | v1.0.0 | 2024-09-04 | 초기 작성                 |
 
 
@@ -36,7 +37,7 @@ Android Communication API
 
 <br>
 
-## API 목록
+# API 목록
 ### 1. makeHttpRequest
 
 #### Description
@@ -45,7 +46,8 @@ Android Communication API
 #### Declaration
 
 ```java
-public String makeHttpRequest(String urlString, String method, String payload)
+public String makeHttpRequest(String urlString, String method, String payload, String accessToken) throws CommunicationException
+public String makeHttpRequest(String urlString, String method, String payload, String accessToken, String contentType) throws CommunicationException
 ```
 
 
@@ -56,6 +58,8 @@ public String makeHttpRequest(String urlString, String method, String payload)
 | urlString    | String    | 서버 URL |M| |
 | method    | String    | HTTP 메서드 |M| |
 | payload    | String    | 요청데이터 |M| |
+| accessToken    | String    | `Authorization: Bearer` 헤더로 전송. null 이면 보내지 않음 |O| |
+| contentType    | String    | `Content-Type` 헤더 값 |O| 4-파라미터 오버로드는 `application/json` |
 
 #### Returns
 
@@ -67,7 +71,7 @@ public String makeHttpRequest(String urlString, String method, String payload)
 #### Usage
 ```java
 HttpUrlConnectionTask httpFunc = new HttpUrlConnectionTask();
-String response = httpFunc.makeHttpRequest("http://opendid/api/v1", "POST", requestData);
+String response = httpFunc.makeHttpRequest("http://opendid/api/v1", "POST", requestData, null);
 ```
 
 <br>

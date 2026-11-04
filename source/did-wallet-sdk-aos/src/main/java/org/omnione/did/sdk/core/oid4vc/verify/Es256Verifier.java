@@ -40,7 +40,7 @@ public final class Es256Verifier {
                 Security.addProvider(p);
                 WalletLogger.getInstance().d("Es256Verifier: registered provider " + p.getName());
             }
-        } catch (Throwable t) {
+        } catch (ReflectiveOperationException | LinkageError | RuntimeException t) {
             WalletLogger.getInstance().d("Es256Verifier: SpongyCastle provider not available: " + t);
         }
     }

@@ -39,10 +39,12 @@ import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
 import org.omnione.did.sdk.datamodel.vc.VerifiableCredential;
 import org.omnione.did.sdk.core.oid4vc.model.IssuerMetadataResponse;
 import org.omnione.did.sdk.core.oid4vc.model.TokenResponse;
-import org.omnione.did.sdk.datamodel.oid4vc.SdJwtCredentialItem;
+import org.omnione.did.sdk.core.oid4vc.format.OID4VCItemMapper;
+import org.omnione.did.sdk.datamodel.oid4vc.OID4VCCredentialItem;
 import org.omnione.did.sdk.datamodel.oid4vc.AuthorizationRequest;
 import org.omnione.did.sdk.datamodel.oid4vc.MatchedCredential;
-import org.omnione.did.sdk.core.oid4vc.format.sdjwt.SdJwtParser;
+import org.omnione.did.sdk.datamodel.oid4vc.MdocDeviceResponse;
+import org.omnione.did.sdk.datamodel.oid4vc.MdocRequestedDocument;
 import org.omnione.did.sdk.datamodel.vc.issue.ReturnEncVP;
 import org.omnione.did.sdk.datamodel.vp.VerifiablePresentation;
 import org.omnione.did.sdk.datamodel.zkp.AvailableReferent;
@@ -63,7 +65,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredentialService, IWalletApi.IDIDKeyService, IWalletApi.IZKPService, IWalletApi.ISecurityAuthService, IWalletApi.IOID4VCService, IWalletApi.IOID4VPService {
+public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredentialService, IWalletApi.IDIDKeyService, IWalletApi.IZKPService, IWalletApi.ISecurityAuthService, IWalletApi.IOID4VCService, IWalletApi.IOID4VPService, IWalletApi.IProximityService {
     private Context context;
     private static WalletApi instance;
     public static boolean isLock = true;
@@ -181,6 +183,10 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
      */
     public String createNonceForWalletToken(String apiGateWayUrl, WalletTokenData walletTokenData) throws WalletException, UtilityException, WalletCoreException, ExecutionException, InterruptedException {
         return walletToken.createNonceForWalletToken(apiGateWayUrl, walletTokenData);
+    }
+
+    public String createLocalWalletToken(WalletTokenPurpose.WALLET_TOKEN_PURPOSE purpose, String pkgName) throws WalletException, UtilityException {
+        return walletToken.createLocalWalletToken(purpose, pkgName);
     }
 
     /**
@@ -442,19 +448,39 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
     }
 
     /**
+     * Requests the issuer to revoke a stored OID4VC (SD-JWT VC / mdoc): requests a nonce, signs a JWT revocation token, and POSTs it to the credential_revocation_endpoint.
+     *
+     * @param hWalletToken The wallet token used for VC revocation.
+     * @param metadata The issuer metadata; nonce_endpoint and credential_revocation_endpoint are required.
+     * @param vcId The ID of the stored OID4VC to be revoked.
+     * @param passcode The passcode; required when the stored kid is pin. When the stored kid is bio, biometric authentication is used.
+     * @return CompletableFuture<Void> - Completes normally when the issuer responds with 200 OK.
+     * @throws WalletException
+     * @throws WalletCoreException
+     * @throws UtilityException
+     * @throws ExecutionException If the nonce request or the revocation POST fails; for the revocation POST the cause is a CommunicationException.
+     * @throws InterruptedException
+     */
+    @Override
+    public CompletableFuture<Void> requestRevokeOID4VC(String hWalletToken, IssuerMetadataResponse metadata, String vcId, String passcode) throws WalletException, WalletCoreException, UtilityException, ExecutionException, InterruptedException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.REMOVE_VC));
+        return walletService.requestRevokeOID4VC(metadata, vcId, passcode);
+    }
+
+    /**
      * Retrieves all OID4VC credentials associated with the provided wallet token.
      *
      * @param hWalletToken The wallet token used to retrieve the credential list.
-     * @return List<SdJwtCredentialItem> - A list of all OID4VC credentials.
+     * @return List<OID4VCCredentialItem> - A list of all OID4VC credentials.
      * @throws WalletException
      * @throws UtilityException
      * @throws WalletCoreException
      */
     @Override
-    public List<SdJwtCredentialItem> getAllOID4VCs(String hWalletToken) throws WalletException, UtilityException, WalletCoreException {
+    public List<OID4VCCredentialItem> getAllOID4VCs(String hWalletToken) throws WalletException, UtilityException, WalletCoreException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC,
                 WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
-        return SdJwtParser.mapToSdJwtItems(walletCore.getAllOID4VCICredentials());
+        return OID4VCItemMapper.map(walletCore.getAllOID4VCICredentials());
     }
 
     /**
@@ -462,16 +488,16 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
      *
      * @param hWalletToken The wallet token used to retrieve the credentials.
      * @param identifiers A list of credential identifiers.
-     * @return List<SdJwtCredentialItem> - A list of OID4VC credentials matching the identifiers.
+     * @return List<OID4VCCredentialItem> - A list of OID4VC credentials matching the identifiers.
      * @throws WalletException
      * @throws UtilityException
      * @throws WalletCoreException
      */
     @Override
-    public List<SdJwtCredentialItem> getOID4VCs(String hWalletToken, List<String> identifiers) throws WalletException, UtilityException, WalletCoreException {
+    public List<OID4VCCredentialItem> getOID4VCs(String hWalletToken, List<String> identifiers) throws WalletException, UtilityException, WalletCoreException {
         walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC,
                 WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
-        return SdJwtParser.mapToSdJwtItems(walletCore.getOID4VCICredentials(identifiers));
+        return OID4VCItemMapper.map(walletCore.getOID4VCICredentials(identifiers));
     }
 
     /**
@@ -538,6 +564,29 @@ public class WalletApi implements IWalletApi.IWalletService, IWalletApi.ICredent
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER, "matchedCredentials");
         }
         return walletService.createVpToken(authRequest, matchedCredentials, passcode);
+    }
+
+    @Override
+    public List<MdocRequestedDocument> matchMdocRequest(String hWalletToken, byte[] deviceRequest) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        if (deviceRequest == null || deviceRequest.length == 0) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER, "deviceRequest");
+        }
+        return walletService.matchMdocRequest(deviceRequest);
+    }
+
+    @Override
+    public MdocDeviceResponse createDeviceResponse(String hWalletToken, byte[] deviceRequest, byte[] sessionTranscript, List<MdocRequestedDocument> selected, String passcode) throws WalletException, UtilityException, WalletCoreException {
+        walletToken.verifyWalletToken(hWalletToken, List.of(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
+                WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP));
+        if (deviceRequest == null || deviceRequest.length == 0) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER, "deviceRequest");
+        }
+        if (sessionTranscript == null || sessionTranscript.length == 0) {
+            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER, "sessionTranscript");
+        }
+        return walletService.createDeviceResponse(deviceRequest, sessionTranscript, selected, passcode);
     }
 
     /**

@@ -32,20 +32,24 @@ import java.nio.charset.StandardCharsets;
 public final class ProofJwtBuilder {
 
     private static final String TYP = "openid4vci-proof+jwt";
+    private static final String REVOCATION_TYP = "opendid-credential-revocation+jwt";
+    private static final long REVOCATION_LIFETIME_SECONDS = 300;
     private static final String ALG = "ES256";
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
 
     private ProofJwtBuilder() {}
 
     @NonNull
-    public static String buildSigningInput(@NonNull JsonObject holderJwk,
+    public static String buildSigningInput(@NonNull String holderDid,
+                                           @NonNull String versionId,
+                                           @NonNull String keyId,
                                            @NonNull String audience,
                                            @Nullable String nonce,
                                            long iatEpochSeconds) {
         JsonObject header = new JsonObject();
         header.addProperty("typ", TYP);
         header.addProperty("alg", ALG);
-        header.add("jwk", holderJwk);
+        header.addProperty("kid", holderKid(holderDid, versionId, keyId));
 
         JsonObject payload = new JsonObject();
         payload.addProperty("aud", audience);
@@ -57,6 +61,42 @@ public final class ProofJwtBuilder {
         String encodedHeader = b64Url(GSON.toJson(header).getBytes(StandardCharsets.UTF_8));
         String encodedPayload = b64Url(GSON.toJson(payload).getBytes(StandardCharsets.UTF_8));
         return encodedHeader + "." + encodedPayload;
+    }
+
+    @NonNull
+    public static String buildRevocationSigningInput(@NonNull String holderDid,
+                                                     @NonNull String versionId,
+                                                     @NonNull String keyId,
+                                                     @NonNull String nonce,
+                                                     @NonNull String statusListUri,
+                                                     long statusListIdx,
+                                                     long iatEpochSeconds) {
+        JsonObject header = new JsonObject();
+        header.addProperty("alg", ALG);
+        header.addProperty("typ", REVOCATION_TYP);
+        header.addProperty("kid", holderKid(holderDid, versionId, keyId));
+
+        JsonObject statusList = new JsonObject();
+        statusList.addProperty("uri", statusListUri);
+        statusList.addProperty("idx", statusListIdx);
+        JsonObject credentialStatus = new JsonObject();
+        credentialStatus.add("status_list", statusList);
+
+        JsonObject payload = new JsonObject();
+        payload.addProperty("iss", holderDid);
+        payload.addProperty("iat", iatEpochSeconds);
+        payload.addProperty("exp", iatEpochSeconds + REVOCATION_LIFETIME_SECONDS);
+        payload.addProperty("nonce", nonce);
+        payload.add("credential_status", credentialStatus);
+
+        String encodedHeader = b64Url(GSON.toJson(header).getBytes(StandardCharsets.UTF_8));
+        String encodedPayload = b64Url(GSON.toJson(payload).getBytes(StandardCharsets.UTF_8));
+        return encodedHeader + "." + encodedPayload;
+    }
+
+    @NonNull
+    private static String holderKid(@NonNull String holderDid, @NonNull String versionId, @NonNull String keyId) {
+        return holderDid + "?versionId=" + versionId + "#" + keyId;
     }
 
     @NonNull

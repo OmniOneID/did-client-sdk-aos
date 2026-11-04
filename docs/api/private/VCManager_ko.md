@@ -19,12 +19,13 @@ Android VCManager API
 ==
 
 - 주제: VCManager
-- 작성: Sangjun Kim
-- 일자: 2024-07-10
-- 버전: v1.0.0
+- 작성: 김은정
+- 일자: 2026-10-28
+- 버전: v3.0.0
 
 | 버전   | 일자       | 변경 내용                 |
 | ------ | ---------- | -------------------------|
+| v3.0.0 | 2026-10-30 | OID4VCManager 추가, 전체 클레임 코드 지정 시 VC 전체 제출 |
 | v1.0.0 | 2024-07-10 | 초기 작성                 |
 
 
@@ -33,18 +34,27 @@ Android VCManager API
 # 목차
 - [APIs](#api-목록)
     - [1. constructor](#1-constructor)
-    - [2. isAnyCredentialsSaved](#2-isanykeysaved)
+    - [2. isAnyCredentialsSaved](#2-isanycredentialssaved)
     - [3. addCredential](#3-addcredential)
     - [4. getCredentials](#4-getcredentials)
     - [5. getAllCredentials](#5-getallcredentials)
     - [6. deleteCredentials](#6-deletecredentials)
     - [7. deleteAllCredentials](#7-deleteallcredentials)
     - [8. makePresentation](#8-makepresentation)
+- [OID4VCManager APIs](#oid4vcmanager-apis)
+    - [1. OID4VCManager constructor](#1-oid4vcmanager-constructor)
+    - [2. OID4VCManager.isAnyCredentialsSaved](#2-oid4vcmanagerisanycredentialssaved)
+    - [3. OID4VCManager.addCredential](#3-oid4vcmanageraddcredential)
+    - [4. OID4VCManager.getCredentials](#4-oid4vcmanagergetcredentials)
+    - [5. OID4VCManager.getAllCredentials](#5-oid4vcmanagergetallcredentials)
+    - [6. OID4VCManager.deleteCredentials](#6-oid4vcmanagerdeletecredentials)
+    - [7. OID4VCManager.deleteAllCredentials](#7-oid4vcmanagerdeleteallcredentials)
 - [Value Object](#value-object)
     - [1. VerifiableCredential](#1-verifiablecredential)
     - [2. ClaimInfo](#2-claiminfo)
     - [3. PresentationInfo](#3-presentationinfo)
     - [4. VerifiablePresentation](#4-verifiablepresentation)
+    - [5. OID4VCICredential](#5-oid4vcicredential)
 
 # API 목록
 ## 1. Constructor
@@ -122,7 +132,7 @@ if(vcManager.isAnyCredentialsSaved()) {
 ### Declaration
 
 ```java
-void addCredentials(VerifiableCredential verifiableCredential) throws Exceptionvoid addCredentials(VerifiableCredential verifiableCredential) throws Exception
+void addCredentials(VerifiableCredential verifiableCredential) throws Exception
 ```
 
 ### Parameters
@@ -318,6 +328,217 @@ VerifiablePresentation vp = vcManager.makePresentation(claimInfos, presentationI
 <br>
 
 
+# OID4VCManager APIs
+
+`OID4VCManager` 는 OID4VC credential(SD-JWT VC, mdoc)을 `VCManager` 와 별도의 월렛 파일에 저장한다. `VCManager` 와 같은 파일명으로 생성한다.
+
+## 1. OID4VCManager constructor
+
+### Description
+`OID4VCManager 생성자`
+
+### Declaration
+
+```java
+OID4VCManager(String fileName, Context context);
+```
+
+### Parameters
+
+| Parameter | Type | Description | **M/O** | **비고** |
+|-----------|------|-------------|---------|-------------|
+| fileName | String | 파일명 | M | OID4VCManager에서 저장할 월렛의 파일명 |
+| context | Context | Context | M | |
+
+### Returns
+
+| Type | Description | **M/O** | **비고** |
+|------|-------------|---------|-------------|
+| OID4VCManager | OID4VCManager 객체 | M | |
+
+### Usage
+```java
+OID4VCManager oid4vcManager = new OID4VCManager("MyWallet", this);
+```
+
+<br>
+
+## 2. OID4VCManager.isAnyCredentialsSaved
+
+### Description
+`저장된 OID4VC가 1개 이상 있는지 확인한다.`
+
+### Declaration
+
+```java
+boolean isAnyCredentialsSaved()
+```
+
+### Parameters
+
+n/a
+
+### Returns
+
+| Type | Description | **M/O** | **비고** |
+|------|-------------|---------|-------------|
+| boolean | 저장된 OID4VC 존재 여부 | M |  |
+
+### Usage
+```java
+OID4VCManager oid4vcManager = new OID4VCManager("MyWallet", this);
+if(oid4vcManager.isAnyCredentialsSaved()) {
+    oid4vcManager.deleteAllCredentials();
+}
+```
+
+<br>
+
+## 3. OID4VCManager.addCredential
+
+### Description
+`발급받은 OID4VC를 저장한다.`
+
+### Declaration
+
+```java
+void addCredential(OID4VCICredential credential) throws WalletCoreException, UtilityException
+```
+
+### Parameters
+
+| Parameter | Type | Description | **M/O** | **비고** |
+|-----------|------|-------------|---------|-------------|
+| credential | OID4VCICredential | 발급받은 OID4VC credential | M | [OID4VCICredential](#5-oid4vcicredential) |
+
+### Returns
+
+void
+
+### Usage
+```java
+OID4VCManager oid4vcManager = new OID4VCManager("MyWallet", this);
+oid4vcManager.addCredential(credential);
+```
+
+<br>
+
+## 4. OID4VCManager.getCredentials
+
+### Description
+`ID 목록에 해당하는 OID4VC를 모두 반환한다.`
+
+### Declaration
+
+```java
+List<OID4VCICredential> getCredentials(List<String> identifiers) throws WalletCoreException, UtilityException
+```
+
+### Parameters
+
+| Parameter | Type | Description | **M/O** | **비고** |
+|-----------|------|-------------|---------|-------------|
+| identifiers | List&lt;String&gt; | 조회할 OID4VC ID 목록. 비어 있지 않고 중복이 없어야 한다 | M |  |
+
+### Returns
+
+| Type | Description | **M/O** | **비고** |
+|------|-------------|---------|-------------|
+| List&lt;OID4VCICredential&gt; | ID에 해당하는 OID4VC 목록 | M | [OID4VCICredential](#5-oid4vcicredential) |
+
+### Usage
+```java
+OID4VCManager oid4vcManager = new OID4VCManager("MyWallet", this);
+List<OID4VCICredential> credentials = oid4vcManager.getCredentials(List.of("credentialId"));
+```
+
+<br>
+
+## 5. OID4VCManager.getAllCredentials
+
+### Description
+`저장된 OID4VC를 모두 반환한다.`
+
+### Declaration
+
+```java
+List<OID4VCICredential> getAllCredentials() throws WalletCoreException, UtilityException
+```
+
+### Parameters
+
+n/a
+
+### Returns
+
+| Type | Description | **M/O** | **비고** |
+|------|-------------|---------|-------------|
+| List&lt;OID4VCICredential&gt; | 저장된 OID4VC 목록 | M | [OID4VCICredential](#5-oid4vcicredential) |
+
+### Usage
+```java
+OID4VCManager oid4vcManager = new OID4VCManager("MyWallet", this);
+List<OID4VCICredential> credentials = oid4vcManager.getAllCredentials();
+```
+
+<br>
+
+## 6. OID4VCManager.deleteCredentials
+
+### Description
+`ID 목록에 해당하는 OID4VC를 삭제한다. 남은 OID4VC가 없으면 월렛 파일을 삭제한다.`
+
+### Declaration
+
+```java
+void deleteCredentials(List<String> identifiers) throws WalletCoreException, UtilityException
+```
+
+### Parameters
+
+| Parameter | Type | Description | **M/O** | **비고** |
+|-----------|------|-------------|---------|-------------|
+| identifiers | List&lt;String&gt; | 삭제할 OID4VC ID 목록. 비어 있지 않고 중복이 없어야 한다 | M |  |
+
+### Returns
+
+void
+
+### Usage
+```java
+OID4VCManager oid4vcManager = new OID4VCManager("MyWallet", this);
+oid4vcManager.deleteCredentials(List.of("credentialId"));
+```
+
+<br>
+
+## 7. OID4VCManager.deleteAllCredentials
+
+### Description
+`저장된 OID4VC를 모두 삭제한다.`
+
+### Declaration
+
+```java
+void deleteAllCredentials() throws WalletCoreException
+```
+
+### Parameters
+
+n/a
+
+### Returns
+
+void
+
+### Usage
+```java
+OID4VCManager oid4vcManager = new OID4VCManager("MyWallet", this);
+oid4vcManager.deleteAllCredentials();
+```
+
+<br>
+
 # Value Object
 
 ## 1. VerifiableCredential
@@ -372,7 +593,7 @@ public class ClaimInfo {
 | Name          | Type               | Description                      | **M/O** | **Note**   
 |-----------|--------|----------------------------|---------|---------|
 | credentialId    | String | VC의 ID |M| |
-| claimCodes    | List&lt;String&gt; | 클레임 코드 리스트 |M| |
+| claimCodes    | List&lt;String&gt; | 클레임 코드 리스트 |M| 비어 있거나 VC 의 전체 클레임 코드와 같으면 VC 전체를 제출 |
 
 <br>
 
@@ -428,3 +649,36 @@ public class VerifiablePresentation {
     List<Proof> proofs;
 }
 ```
+
+
+<br>
+
+## 5. OID4VCICredential
+
+### Description
+
+`OID4VCManager 가 저장하는 OID4VC credential 객체`
+
+### Declaration
+
+```java
+public class OID4VCICredential extends BaseObject {
+    String id;
+    String format;
+    String credentialConfigurationId;
+    String credentialIdentifier;
+    String credential;
+    String kid;
+}
+```
+
+### Property
+
+| Name | Type | Description | **M/O** | **비고** |
+|------|------|-------------|---------|-------------|
+| id | String | 저장된 credential 의 ID | M | |
+| format | String | credential 형식 값 | M | |
+| credentialConfigurationId | String | 발급자 메타데이터의 credential configuration 식별자 | M | |
+| credentialIdentifier | String | credential 식별자 | O | |
+| credential | String | 발급받은 credential 문자열 | M | |
+| kid | String | proof 서명에 사용한 holder 키 ID | M | |

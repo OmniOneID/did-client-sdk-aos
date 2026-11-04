@@ -1,5 +1,37 @@
 # Changelog
 
+## v3.0.0 (2026-10-30)
+
+### 🚀 New Features
+- OID4VC Credential Issuance
+    - Added DID-based SD-JWT VC (`dc+sd-jwt-did`) credential issuance.
+    - Added DID-based mdoc (`mso_mdoc-did`) credential issuance.
+    - Added `requestRevokeOID4VC` for OID4VC credential revocation.
+- OID4VP Presentation
+    - Added `opendid_vc` credential presentation.
+    - Added DID-based SD-JWT VC (`dc+sd-jwt-did`) credential presentation.
+    - Added DID-based mdoc (`mso_mdoc-did`) credential presentation.
+    - Rejects an unsupported `response_mode` and revalidates the OID4VP selection.
+- mdoc Proximity Presentation
+    - Exposed the mdoc device response for proximity presentation.
+    - Aligned the mdoc proximity API with the ISO/IEC 18013-5 draft.
+- Wallet Token
+    - Added `createLocalWalletToken` to issue a wallet token locally.
+- Certificate VC Verification
+    - `createEncVp` and `createEncZkpProof` verify the certificate VC before creating the presentation.
+- Others
+    - Added a `getDidDoc` overload with `versionId` in `WalletUtil`.
+    - Added the `userId` field to `P210RequestVo` for proxy server integration.
+
+### 🐞 Bug Fixes
+- Treats the full claim code set as present-all in `makePresentation`.
+- Uses the DID itself as the verification method controller.
+- Keeps every ZKP requested item on its own referent key.
+
+### 🔧 Build and Dependencies
+- Upgraded the Android Gradle Plugin to 9.1.0 and moved dependencies to the version catalog.
+- Removed unused dependencies.
+
 ## v2.0.1 (2025-11-29)
 
 ### 🚀 New Features

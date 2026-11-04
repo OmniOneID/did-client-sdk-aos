@@ -16,44 +16,64 @@
 
 package org.omnione.did.sdk.core.oid4vc.presentation.format;
 
-import org.omnione.did.sdk.datamodel.oid4vc.SdJwt;
-
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 public final class ParsedCredential {
 
     private final String credentialId;
     private final String format;
-    private final String vct;
+    private final String typeIdentifier;
     private final String issuer;
     private final Set<String> availableClaimNames;
-    private final SdJwt raw;
+    private final Map<String, String> claimAliases;
 
     public ParsedCredential(String credentialId,
                             String format,
-                            String vct,
+                            String typeIdentifier,
+                            String issuer,
+                            Set<String> availableClaimNames) {
+        this(credentialId, format, typeIdentifier, issuer, availableClaimNames, null);
+    }
+
+    public ParsedCredential(String credentialId,
+                            String format,
+                            String typeIdentifier,
                             String issuer,
                             Set<String> availableClaimNames,
-                            SdJwt raw) {
+                            Map<String, String> claimAliases) {
         this.credentialId = credentialId;
         this.format = format;
-        this.vct = vct;
+        this.typeIdentifier = typeIdentifier;
         this.issuer = issuer;
         this.availableClaimNames = availableClaimNames == null
                 ? Collections.emptySet()
-                : Collections.unmodifiableSet(availableClaimNames);
-        this.raw = raw;
+                : Collections.unmodifiableSet(new LinkedHashSet<>(availableClaimNames));
+        this.claimAliases = claimAliases == null
+                ? Collections.emptyMap()
+                : Collections.unmodifiableMap(new LinkedHashMap<>(claimAliases));
     }
 
     public String credentialId() { return credentialId; }
     public String format() { return format; }
-    public String vct() { return vct; }
+    public String typeIdentifier() { return typeIdentifier; }
     public String issuer() { return issuer; }
     public Set<String> availableClaimNames() { return availableClaimNames; }
-    public SdJwt raw() { return raw; }
+
+    public String resolveClaim(String claimName) {
+        if (claimName == null) {
+            return null;
+        }
+        if (availableClaimNames.contains(claimName)) {
+            return claimName;
+        }
+        return claimAliases.get(claimName);
+    }
 
     public boolean hasClaim(String claimName) {
-        return availableClaimNames.contains(claimName);
+        return resolveClaim(claimName) != null;
     }
 }

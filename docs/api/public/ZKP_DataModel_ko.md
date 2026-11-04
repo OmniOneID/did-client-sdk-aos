@@ -19,12 +19,13 @@ Android ZKP DataModel
 ==
 
 - 주제: ZKP 기반 데이터모델
-- 작성: 박동준
-- 일자: 2025-04-30
-- 버전: v1.0.0
+- 작성: 김은정
+- 일자: 2026-10-28
+- 버전: v3.0.0
 
 | 버전     | 일자         | 변경 내용 |
 | ------ | ---------- | ----- |
+| v3.0.0 | 2026-10-30 | Referent · ReferentAttributeValue 추가 |
 | v1.0.0 | 2025-04-30 | 초안 |
 
 
@@ -39,13 +40,14 @@ Android ZKP DataModel
     - [2.1. CredentialSignature](#21-credentialsignature)
     - [2.2. SignatureCorrectnessProof](#22-signaturecorrectnessproof)
 - [3. ReferentInfo](#3-referentinfo)
+    - [3.1. Referent](#31-referent)
+        - [3.1.1. ReferentAttributeValue](#311-referentattributevalue)
 - [4. AvailableReferent](#4-availablereferent)
     - [4.1. AttrReferent](#41-attrreferent)
     - [4.2. PredicateReferent](#42-predicatereferent)
     - [4.3. SubReferent](#43-subreferent)
 - [5. Proof](#5-proof)
     - [5.1. SubProof](#51-subproof)
-        - [5.1.1. PrimaryProof](#511-primaryproof)
     - [5.2. AggregatedProof](#52-aggregatedproof)
     - [5.3. RequestedProof](#53-requestedproof)
     - [5.4. Identifiers](#54-identifiers)
@@ -233,6 +235,58 @@ public class ReferentInfo {
 | Name      | Type                   | Description            | **M/O** | **Note** |
 | --------- | ---------------------- | ---------------------- | ------- | -------- |
 | referents | Map<String, Referent> | credentialId 기반의 참조 정보 | M       |          |
+
+<br>
+
+### 3.1. Referent
+
+#### Description
+
+`Referent 정보 중 credential 하나에 대한 항목`
+
+#### Declaration
+
+```java
+public class Referent {
+    @SerializedName("schemaId")  String schemaId;
+    @SerializedName("credDefId") String credDefId;
+    @SerializedName("attrs")     LinkedHashMap<String, ReferentAttributeValue> attributes;
+}
+```
+
+#### Property
+
+| Name       | Type                                          | Description | **M/O** | **Note** |
+|------------|-----------------------------------------------|-------------|---------|----------|
+| schemaId   | String                                        | 스키마 ID | -       |          |
+| credDefId  | String                                        | Credential Definition ID | -       |          |
+| attributes | LinkedHashMap<String, ReferentAttributeValue> | referentKey 별 속성 참조 | -       | [ReferentAttributeValue](#311-referentattributevalue) |
+
+<br>
+
+#### 3.1.1. ReferentAttributeValue
+
+##### Description
+
+`요청 항목 하나에 대한 속성 참조`
+
+##### Declaration
+
+```java
+public class ReferentAttributeValue {
+    @SerializedName("referentKey") String referentKey;
+    @SerializedName("isRevealed")  Boolean isRevealed;
+    @SerializedName("attrName")    String attrName;
+}
+```
+
+##### Property
+
+| Name        | Type    | Description | **M/O** | **Note** |
+|-------------|---------|-------------|---------|----------|
+| referentKey | String  | Proof Request 의 referent 키 | -       |          |
+| isRevealed  | Boolean | 속성 공개 여부 | -       |          |
+| attrName    | String  | credential 의 속성 이름 | -       |          |
 
 <br>
 

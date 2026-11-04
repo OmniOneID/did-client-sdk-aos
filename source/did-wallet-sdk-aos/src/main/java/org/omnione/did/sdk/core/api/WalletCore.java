@@ -123,22 +123,21 @@ class WalletCore implements WalletCoreInterface {
 //        );
 //        keyManager.generateKey(keyGenInfo);
 
-        String controller = Config.DID_CONTROLLER;
         List<KeyInfo> keyInfos = keyManager.getKeyInfos(List.of(Constants.KEY_ID_PIN, Constants.KEY_ID_BIO, Constants.KEY_ID_KEY_AGREE));
         List<DIDKeyInfo> didKeyInfos = new ArrayList<>();
         for(KeyInfo keyInfo : keyInfos){
             DIDKeyInfo didKeyInfo = new DIDKeyInfo();
             if(keyInfo.getId().equals(Constants.KEY_ID_PIN)) {
-                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), null);
             }
             if(keyInfo.getId().equals(Constants.KEY_ID_BIO)) {
-                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), null);
             }
             if(keyInfo.getId().equals(Constants.KEY_ID_KEY_AGREE))
-                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), controller);
+                didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), null);
             didKeyInfos.add(didKeyInfo);
         }
-        didManager.updateDocument(didKeyInfos, controller, null);
+        didManager.updateDocument(didKeyInfos, null);
         return didManager.getDocument();
 
     }
@@ -178,11 +177,11 @@ class WalletCore implements WalletCoreInterface {
             for(KeyInfo keyInfo : keyInfos){
                 DIDKeyInfo didKeyInfo = new DIDKeyInfo();
                 if(keyInfo.getId().equals(Constants.KEY_ID_ASSERT))
-                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod), controller);
+                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod), null);
                 if(keyInfo.getId().equals(Constants.KEY_ID_AUTH))
-                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.authentication), null);
                 if(keyInfo.getId().equals(Constants.KEY_ID_KEY_AGREE))
-                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), controller);
+                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), null);
                 didKeyInfos.add(didKeyInfo);
             }
             deviceDIDManager.createDocument(did, didKeyInfos, controller, null);
@@ -213,13 +212,13 @@ class WalletCore implements WalletCoreInterface {
             for(KeyInfo keyInfo : keyInfos){
                 DIDKeyInfo didKeyInfo = new DIDKeyInfo();
                 if(keyInfo.getId().equals(Constants.KEY_ID_PIN)) {
-                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), null);
                 }
                 if(keyInfo.getId().equals(Constants.KEY_ID_BIO)) {
-                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), controller);
+                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.assertionMethod, DIDMethodType.DID_METHOD_TYPE.authentication), null);
                 }
                 if(keyInfo.getId().equals(Constants.KEY_ID_KEY_AGREE))
-                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), controller);
+                    didKeyInfo = new DIDKeyInfo(keyInfo, List.of(DIDMethodType.DID_METHOD_TYPE.keyAgreement), null);
                 didKeyInfos.add(didKeyInfo);
             }
             didManager.createDocument(did, didKeyInfos,controller, null);

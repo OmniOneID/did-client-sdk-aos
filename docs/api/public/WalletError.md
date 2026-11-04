@@ -19,12 +19,13 @@ Android WalletError
 ==
 
 - Topic: WalletError
-- Author: Sangjun Kim
-- Date: 2024-08-23
-- Version: v1.0.0
+- Author: Eunjeong Kim
+- Date: 2026-10-28
+- Version: v3.0.0
 
 | Version          | Date       | Changes                  |
 | ---------------- | ---------- | ------------------------ |
+| v3.0.0  | 2026-10-30 | Add MSDKWLT05046, 05053; fix 05032, 05070 |
 | v1.0.0  | 2024-08-23 | Initial version          |
 
 <div style="page-break-after: always;"></div>
@@ -63,6 +64,7 @@ public enum WalletErrorCode {
     private final String walletCoreCode = "MSDKWLT";
     private int code;
     private String msg;
+    private String feature;
 }
 ```
 
@@ -70,8 +72,9 @@ public enum WalletErrorCode {
 
 | Name               | Type       | Description                            | **M/O** | **Note**              |
 |--------------------|------------|----------------------------------------|---------|-----------------------|
-| code               | String     | Error code    |    M    |                       | 
+| code               | int        | Error code    |    M    |                       | 
 | message            | String     | Error description                      |    M    |                       | 
+| feature            | String     | Feature code                           |    M    |                       |
 
 <br>
 
@@ -117,7 +120,7 @@ public enum WalletErrorCode {
 |--------------|--------------------------------------|-----------------------------------|-----------------------------------|
 | MSDKWLT05030 | Failed to execute insert query       | Insert query execution failed     | Review query execution            |
 | MSDKWLT05031 | Failed to execute select query       | Select query execution failed     | Review query execution            |
-| MSDKWLT05031 | Failed to execute delete query       | Delete query execution failed     | Review query execution            |
+| MSDKWLT05032 | Failed to execute delete query       | Delete query execution failed     | Review query execution            |
 
 <br>
 
@@ -131,6 +134,7 @@ public enum WalletErrorCode {
 | MSDKWLT05043 | Failed to save keystore              | Keystore saving failed            | Ensure proper keystore saving process |
 | MSDKWLT05044 | Incorrect passcode                   | Passcode entered is incorrect     | Verify and re-enter the correct passcode |
 | MSDKWLT05045 | Wallet ID not found                  | Specified wallet ID not found     | Check wallet ID                  |
+| MSDKWLT05046 | Wallet has not been personalized     | Local wallet token requested before the wallet was personalized online | Personalize the wallet online (`bindUser`) first |
 
 <br>
 
@@ -141,6 +145,7 @@ public enum WalletErrorCode {
 | MSDKWLT05050 | Failed to register user              | User registration failed          | Check user registration process   |
 | MSDKWLT05051 | Failed to restore user              | User restoration failed          | Check user restoration process   |
 | MSDKWLT05052 | Failed to match DID              | DID matching failed          | Check the DID to compare   |
+| MSDKWLT05053 | Failed to update user              | User update failed          | Check user update process   |
 
 <br>
 
@@ -156,4 +161,4 @@ public enum WalletErrorCode {
 ## 8. VP
 | Error Code   | Error Message                        | Description                       | Action Required                   |
 |--------------|--------------------------------------|-----------------------------------|-----------------------------------|
-| MSDKWLS05070 | Failed to submit credential                 | Credential submission failed           | Check credential submission process            |
+| MSDKWLT05070 | Failed to submit credential                 | Credential submission failed           | Check credential submission process            |

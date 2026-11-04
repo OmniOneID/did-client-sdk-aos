@@ -1,0 +1,31 @@
+[versions]
+agp = "9.1.0"
+material = "1.13.0"
+gson = "2.13.2"
+room = "2.8.4"
+biometric = "1.1.0"
+bitcoinj = "0.15.7"
+spongycastle = "1.54.0.0"
+nimbusJoseJwt = "9.40"
+upokecenterCbor = "4.5.6"
+junit = "4.13.2"
+androidxTestExtJunit = "1.1.5"
+espressoCore = "3.5.1"
+
+[libraries]
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
+bitcoinj-core = { module = "org.bitcoinj:bitcoinj-core", version.ref = "bitcoinj" }
+spongycastle-core = { module = "com.madgag.spongycastle:core", version.ref = "spongycastle" }
+spongycastle-prov = { module = "com.madgag.spongycastle:prov", version.ref = "spongycastle" }
+nimbus-jose-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbusJoseJwt" }
+upokecenter-cbor = { module = "com.upokecenter:cbor", version.ref = "upokecenterCbor" }
+junit = { module = "junit:junit", version.ref = "junit" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExtJunit" }
+espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
+
+[plugins]
+android-library = { id = "com.android.library", version.ref = "agp" }

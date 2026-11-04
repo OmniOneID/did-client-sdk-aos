@@ -19,12 +19,13 @@ Android Communication API
 ==
 
 - Subject: Communication
-- Author: Sangjun Kim
-- Date: 2024-09-04
-- Version: v1.0.0
+- Author: Eunjeong Kim
+- Date: 2026-10-28
+- Version: v3.0.0
 
 | Version | Date       | Changes                  |
 | ------- | ---------- | ------------------------ |
+| v3.0.0  | 2026-10-30 | Add accessToken, contentType parameters |
 | v1.0.0  | 2024-09-04 | Initial version          |
 
 
@@ -44,7 +45,8 @@ Android Communication API
 #### Declaration
 
 ```java
-public String makeHttpRequest(String urlString, String method, String payload)
+public String makeHttpRequest(String urlString, String method, String payload, String accessToken) throws CommunicationException
+public String makeHttpRequest(String urlString, String method, String payload, String accessToken, String contentType) throws CommunicationException
 ```
 
 #### Parameters
@@ -54,6 +56,8 @@ public String makeHttpRequest(String urlString, String method, String payload)
 | urlString    | String    | Server URL |M| |
 | method    | String    | HTTP Method |M| |
 | payload    | String    | Request data |M| |
+| accessToken    | String    | Sent as `Authorization: Bearer` header; not sent when null |O| |
+| contentType    | String    | `Content-Type` header value |O| Defaults to `application/json` in the 4-parameter overload |
 
 #### Returns
 
@@ -64,7 +68,7 @@ public String makeHttpRequest(String urlString, String method, String payload)
 #### Usage
 ```java
 HttpUrlConnectionTask httpFunc = new HttpUrlConnectionTask();
-String response = httpFunc.makeHttpRequest("http://opendid/api/v1", "POST", requestData);
+String response = httpFunc.makeHttpRequest("http://opendid/api/v1", "POST", requestData, null);
 ```
 
 <br>

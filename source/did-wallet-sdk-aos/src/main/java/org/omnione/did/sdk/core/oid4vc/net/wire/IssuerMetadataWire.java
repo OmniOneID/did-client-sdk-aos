@@ -38,6 +38,9 @@ public final class IssuerMetadataWire {
     @SerializedName("nonce_endpoint")
     public String nonceEndpoint;
 
+    @SerializedName("credential_revocation_endpoint")
+    public String credentialRevocationEndpoint;
+
     @SerializedName("credential_configurations_supported")
     public Map<String, ConfigSupported> credentialConfigurationsSupported;
 

@@ -19,12 +19,13 @@ Android Wallet API
 ==
 
 - Subject: WalletAPI
-- Writer: Dongjun Park
-- Date: 2025-10-14
-- Version: v2.0.1
+- Writer: Eunjeong Kim
+- Date: 2026-10-28
+- Version: v3.0.0
 
 | Version | Date       | History                                      |
 | ------- | ---------- | -------------------------------------------- |
+| v3.0.0  | 2026-10-30 | Add OID4VC, OID4VP, Proximity APIs and createVp; sync signatures with source |
 | v2.0.1  | 2025-10-14 | Add DID-related function and authenticatePin |
 | v2.0.0  | 2025-04-30 | ZKP                                          |
 | v1.0.0  | 2024-08-19 | Initial                                      |
@@ -41,10 +42,11 @@ Android Wallet API
         - [2.3. deleteWallet](#23-deletewallet)
         - [2.4. createWalletTokenSeed](#24-createwallettokenseed)
         - [2.5. createNonceForWalletToken](#25-createnonceforwallettoken)
-        - [2.6. bindUser](#26-bindUser)
-        - [2.7. unbindUser](#27-unbinduser)
-        - [2.8. requestRegisterUser](#28-requestregisteruser)
-        - [2.9. getSignedWalletInfo](#29-getsignedwalletinfo)
+        - [2.6. createLocalWalletToken](#26-createlocalwallettoken)
+        - [2.7. bindUser](#27-binduser)
+        - [2.8. unbindUser](#28-unbinduser)
+        - [2.9. requestRegisterUser](#29-requestregisteruser)
+        - [2.10. getSignedWalletInfo](#210-getsignedwalletinfo)
     - [3. DIDKey](#3-didkey)
         - [3.1. createHolderDIDDoc](#31-createholderdiddoc)
         - [3.2. createSignedDIDDoc](#32-createsigneddiddoc)
@@ -65,6 +67,7 @@ Android Wallet API
         - [4.6. createEncVp](#46-createencvp)
         - [4.7. addProofsToDocument](#47-addproofstodocument)
         - [4.8. isAnyCredentialsSaved](#48-isanycredentialssaved)
+        - [4.9. createVp](#49-createvp)
     - [5. ZKP](#5-zkp)
         - [5.1. createZkpReferent](#51-createzkpreferent)
         - [5.2. createEncZkpProof](#52-createenczkpproof)
@@ -74,13 +77,26 @@ Android Wallet API
         - [5.6. getZkpCredentials](#56-getzkpcredentials)
     - [6. SecurityAuth](#6-securityauth)
         - [6.1. registerLock](#61-registerlock)
-        - [6.2. authenticateLock](#61-authenticatelock)
-        - [6.3. isLock](#61-islock)
+        - [6.2. authenticateLock](#62-authenticatelock)
+        - [6.3. isLock](#63-islock)
         - [6.4. registerBioKey](#64-registerbiokey)
         - [6.5. authenticateBioKey](#65-authenticatebiokey)
         - [6.6. changePin](#66-changepin)
         - [6.7. changeLock](#67-changelock)
         - [6.8. authenticatePin](#68-authenticatepin)
+    - [7. OID4VC](#7-oid4vc)
+        - [7.1. requestIssueOID4VC](#71-requestissueoid4vc)
+        - [7.2. requestRevokeOID4VC](#72-requestrevokeoid4vc)
+        - [7.3. getAllOID4VCs](#73-getalloid4vcs)
+        - [7.4. getOID4VCs](#74-getoid4vcs)
+        - [7.5. deleteOID4VCs](#75-deleteoid4vcs)
+        - [7.6. isAnyOID4VCSaved](#76-isanyoid4vcsaved)
+    - [8. OID4VP](#8-oid4vp)
+        - [8.1. matchCredentials](#81-matchcredentials)
+        - [8.2. createVpToken](#82-createvptoken)
+    - [9. Proximity](#9-proximity)
+        - [9.1. matchMdocRequest](#91-matchmdocrequest)
+        - [9.2. createDeviceResponse](#92-createdeviceresponse)
   
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
@@ -183,7 +199,7 @@ public boolean createWallet(String walletUrl, String tasUrl) throws Exception
 #### Usage
 
 ```java
-boolean success = walletApi.createWallet();
+boolean success = walletApi.createWallet(walletUrl, tasUrl);
 ```
 
 <br>
@@ -258,30 +274,75 @@ WalletTokenSeed tokenSeed = walletApi.createWalletTokenSeed(purpose, "org.opendi
 #### Declaration
 
 ```java
-public String createNonceForWalletToken(WalletTokenData walletTokenData) throws Exception
+public String createNonceForWalletToken(String apiGateWayUrl, WalletTokenData walletTokenData) throws Exception
 ```
 
 #### Parameters
 
-| Name           | Type           | Description                  | **M/O** | **Note** |
-|----------------|----------------|-----------------------|---------|----------|
-| walletTokenData | WalletTokenData | Wallet token Data      | M       |[WalletTokenData](#2-wallettokendata)          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| apiGateWayUrl | String | API Gateway URL | M |  |
+| walletTokenData | WalletTokenData | Wallet token Data | M | [WalletTokenData](#2-wallettokendata) |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| String | Nonce for wallet token generation | M |  |
+
+#### Usage
+
+```java
+String nonce = walletApi.createNonceForWalletToken(apiGateWayUrl, walletTokenData);
+```
+
+<br>
+
+### 2.6. createLocalWalletToken
+
+#### Description
+`Issue a wallet token locally, without contacting the CAS.`
+
+Available once the wallet has been personalized online (`bindUser`), and only for the read and
+presentation purposes: `LIST_VC`, `DETAIL_VC`, `PRESENT_VP`, `LIST_VC_AND_PRESENT_VP`. The call
+is synchronous and performs no network I/O. Unlike `createNonceForWalletToken` it returns the
+hWalletToken itself, not a nonce. The stored token is replaced, so a token obtained earlier by
+either path stops verifying.
+
+#### Declaration
+
+```java
+public String createLocalWalletToken(WalletTokenPurpose.WALLET_TOKEN_PURPOSE purpose, String pkgName) throws Exception
+```
+
+#### Parameters
+
+| Name      | Type   | Description                             | **M/O** | **Note** |
+|-----------|--------|----------------------------------|---------|----------|
+| purpose   | WALLET_TOKEN_PURPOSE | Wallet token purpose. One of the four above. | M       |[WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)         |
+| pkgName   | String | CA Package Name                        | M       |          |
 
 #### Returns
 
 | Type    | Description              | **M/O** | **Note** |
 |---------|-------------------|---------|----------|
-| String  | Nonce for wallet token generation | M       |          |
+| String  | hWalletToken to pass to the APIs that accept the given purpose | M       |          |
+
+#### Throws
+
+- `MSDKWLT05002` (`ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL`): `pkgName` is empty, or `purpose` is not one of the four
+- `MSDKWLT05046` (`ERR_CODE_WALLET_NOT_PERSONALIZED`): the wallet has never been personalized
 
 #### Usage
 
 ```java
-String nonce = walletApi.createNonceForWalletToken(walletTokenData);
+String hWalletToken = walletApi.createLocalWalletToken(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC, "org.opendid.did.ca");
+List<VerifiableCredential> credentials = walletApi.getAllCredentials(hWalletToken);
 ```
 
 <br>
 
-### 2.6. bindUser
+### 2.7. bindUser
 
 #### Description
 `Perform user personalization in Wallet.`
@@ -312,7 +373,7 @@ boolean success = walletApi.bindUser("hWalletToken");
 
 <br>
 
-### 2.7. unbindUser
+### 2.8. unbindUser
 
 #### Description
 `Perform user depersonalization.`
@@ -343,7 +404,7 @@ boolean success = walletApi.unbindUser("hWalletToken");
 
 <br>
 
-### 2.8. requestRegisterUser
+### 2.9. requestRegisterUser
 
 #### Description
 `Request user registration.`
@@ -373,12 +434,12 @@ public CompletableFuture<String> requestRegisterUser(String hWalletToken, String
 #### Usage
 
 ```java
-String _M132_RequestRegisterUser = walletApi.requestRegisterUser("hWalletToken", "txId", "hServerToken", signedDIDDoc).get();
+String _M132_RequestRegisterUser = walletApi.requestRegisterUser("hWalletToken", tasUrl, "txId", "hServerToken", signedDIDDoc).get();
 ```
 
 <br>
 
-### 2.9. getSignedWalletInfo
+### 2.10. getSignedWalletInfo
 
 #### Description
 `signed wallet information.`
@@ -498,7 +559,7 @@ public DIDDocument getDIDDocument(int type) throws Exception
 #### Usage
 
 ```java
-DIDDocument didDoc = walletApi.getDIDDocument("hWalletToken", 1);
+DIDDocument didDoc = walletApi.getDIDDocument(1);
 ```
 
 <br>
@@ -680,7 +741,7 @@ CompletableFuture<String> requestUpdateUser(String hWalletToken, String tasUrl, 
 #### Usage
 
 ```java
-walletApi.requestUpdateUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAuth, signedDidDoc, txId).get();
+walletApi.requestUpdateUser(hWalletToken, tasUrl, hServerToken, didAuth, signedDidDoc, txId).get();
 ```
 
 <br>
@@ -715,7 +776,7 @@ CompletableFuture<String> requestRestoreUser(String hWalletToken, String tasUrl,
 #### Usage
 
 ```java
-walletApi.requestRestoreUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAuth, txId).get();
+walletApi.requestRestoreUser(hWalletToken, tasUrl, hServerToken, didAuth, txId).get();
 ```
 
 <br>
@@ -731,31 +792,32 @@ walletApi.requestRestoreUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAut
 #### Declaration
 
 ```java
-public CompletableFuture<String> requestIssueVc(String hWalletToken, String tasUrl, String apiGateWayUrl, String txId, String serverToken, String refId, String authNonce, IssueProfile profile, DIDAuth signedDIDAuth) throws Exception
+public CompletableFuture<String> requestIssueVc(String hWalletToken, String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws Exception
 ```
 
 #### Parameters
 
-| Name        | Type           | Description                        | **M/O** | **Note** |
-|-------------|----------------|-----------------------------|---------|----------|
-| tasUrl | String         | TAS URL                  | M       |          |
-| hWalletToken | String         | Wallet Token                 | M       |          |
-| txId     | String       | Transaction Code                | M       |          |
-| serverToken     | String       | Server Token                | M       |          |
-| refId     | String       | Reference ID                | M       |          |
-| profile|IssueProfile | Issue Profile   | M       |[datamodel link]          |
-| signedDIDAuth|DIDAuth | Signed DID Document object   | M       |[DIDAuth](#6-didauth)         |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| url | String | TAS or Proxy URL | M |  |
+| apiGateWayUrl | String | API Gateway URL | M |  |
+| serverToken | String | Server Token | M |  |
+| refId | String | Reference ID | M |  |
+| profile | IssueProfile | Issue Profile | M |  |
+| signedDIDAuth | DIDAuth | Signed DID Auth object | M | [DIDAuth](#6-didauth) |
+| txId | String | Transaction Code | M |  |
 
 #### Returns
 
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| String | VC ID | M       |Returns the ID of the VC issued on success          |
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| String | VC ID | M | Returns the ID of the VC issued on success |
 
 #### Usage
 
 ```java
-String vcId = walletApi.requestIssueVc("hWalletToken", "txId", "hServerToken", "refId", profile, signedDIDAuth).get();
+String vcId = walletApi.requestIssueVc("hWalletToken", url, apiGateWayUrl, "hServerToken", "refId", profile, signedDIDAuth, "txId").get();
 ```
 
 <br>
@@ -768,34 +830,32 @@ String vcId = walletApi.requestIssueVc("hWalletToken", "txId", "hServerToken", "
 #### Declaration
 
 ```java
-public CompletableFuture<String> requestRevokeVc(String hWalletToken, String tasUrl, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws Exception
-
+public CompletableFuture<String> requestRevokeVc(String hWalletToken, String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws Exception
 ```
 
 #### Parameters
 
-| Name        | Type           | Description                        | **M/O** | **Note** |
-|-------------|----------------|-----------------------------|---------|----------|
-| hWalletToken | String         | Wallet Token                   | M       |          |
-| tasUrl | String         | TAS URL                   | M       |          |
-| txId     | String       | Transaction code               | M       |          |
-| serverToken     | String       | Server Token                | M       |          |
-| vcId     | String       | VC ID                | M       |          |
-| issuerNonce|String | Issuer nonce   | M       |[datamodel link]          |
-| passcode|String | PIN for signing   | M       |[DIDAuth](#6-didauth)         |
-| authType|VERIFY_AUTH_TYPE | Submission authentication method type   | M       |       |
-
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| url | String | TAS or Proxy URL | M |  |
+| serverToken | String | Server Token | M |  |
+| txId | String | Transaction code | M |  |
+| vcId | String | VC ID | M |  |
+| issuerNonce | String | Issuer nonce | M |  |
+| passcode | String | PIN for signing | M |  |
+| authType | VERIFY_AUTH_TYPE | Submission authentication method type | M |  |
 
 #### Returns
 
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| String | txId | M       |Returns the Transaction ID of the VC revoked on success          |
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| String | txId | M | Returns the Transaction ID of the VC revoked on success |
 
 #### Usage
 
 ```java
-String result = walletApi.requestRevokeVc("hWalletToken", "hServerToken", "txId", "vcId", "issuerNonce", "123456").get();
+String result = walletApi.requestRevokeVc("hWalletToken", url, "hServerToken", "txId", "vcId", "issuerNonce", "123456", VERIFY_AUTH_TYPE.PIN).get();
 ```
 
 <br>
@@ -895,41 +955,37 @@ walletApi.deleteCredentials("hWalletToken", "vcId");
 ### 4.6. createEncVp
 
 #### Description
-`Generate encrypted VP and accE2e.`
+`Verify the verifier's certificate VC, then generate the encrypted VP and accE2e.`
 
 #### Declaration
 
 ```java
-public ReturnEncVP createEncVp(String hWalletToken, String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws Exception
-
+public ReturnEncVP createEncVp(String hWalletToken, List<ClaimInfo> claimInfos, VerifyProfile verifyProfile, String apiGateWayUrl, String passcode) throws Exception
 ```
 
 #### Parameters
 
-| Name        | Type           | Description                        | **M/O** | **Note** |
-|-------------|----------------|-----------------------------|---------|----------|
-| hWalletToken | String         | Wallet Token                   | M       |          |
-| vcId     | String       | VC ID               | M       |          |
-| claimCode     | List&lt;String&gt;       | Claim Code to Submit                | M       |          |
-| reqE2e     | ReqE2e       | E2E encryption/decryption information                | M       |        |
-|passcode|String | PIN for signing   | M       |          |
-| nonce|String | nonce   | M       |       |
-| authType|VERIFY_AUTH_TYPE | Submission authentication method type   | M       |       |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| claimInfos | List&lt;ClaimInfo&gt; | VC IDs and claim codes to submit | M | [ClaimInfo](../private/VCManager.md#2-claiminfo) |
+| verifyProfile | VerifyProfile | Verify profile carrying the verifier information and the E2E request | M |  |
+| apiGateWayUrl | String | API Gateway URL used to verify the verifier's certificate VC | M |  |
+| passcode | String | PIN for signing | O | When signing with a PIN key |
 
 #### Returns
 
-| Type   | Description              | **M/O** | **Note** |
-|--------|-------------------|---------|----------|
-| ReturnEncVP  | Encrypted VP Object| M       |acce2e object, encVp Multibas encoded value      |
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| ReturnEncVP | Encrypted VP Object | M | acce2e object, encVp Multibase encoded value |
 
 #### Usage
 
 ```java
-EncVP encVp = walletApi.createEncVp("hWalletToken", "vcId", List.of("claim_code"), reqE2e, "123456", "nonce", VERIFY_AUTH_TYPE.PIN);
+ReturnEncVP encVp = walletApi.createEncVp("hWalletToken", List.of(new ClaimInfo("vcId", List.of("claim_code"))), verifyProfile, apiGateWayUrl, "123456");
 ```
 
 <br>
-
 
 ### 4.7. addProofsToDocument
 
@@ -976,7 +1032,7 @@ DIDDocument signedDIDDoc = (DIDDocument) walletApi.addProofsToDocument(didDocume
 #### Declaration
 
 ```java
-public void isAnyCredentialsSaved() throws WalletException
+public boolean isAnyCredentialsSaved() throws WalletException
 ```
 
 #### Parameters
@@ -984,12 +1040,14 @@ public void isAnyCredentialsSaved() throws WalletException
 N/A
 
 #### Returns
-boolean
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| boolean | `true` if at least one credential is saved | M |  |
 
 #### Usage
 
 ```java
-
 if (!walletApi.isAnyCredentialsSaved()) {
     ...
 }
@@ -997,6 +1055,40 @@ if (!walletApi.isAnyCredentialsSaved()) {
 
 <br>
 
+### 4.9. createVp
+
+#### Description
+`Generate a VP (not encrypted) for the given claims.`
+
+#### Declaration
+
+```java
+public VerifiablePresentation createVp(String hWalletToken, List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| claimInfos | List&lt;ClaimInfo&gt; | VC IDs and claim codes to submit | M | [ClaimInfo](../private/VCManager.md#2-claiminfo) |
+| passcode | String | PIN for signing | O | When signing with a PIN key |
+| verifierNonce | String | Verifier nonce | M |  |
+| challenge | OIDV4VPChallenge | Domain and challenge | M | [OIDV4VPChallenge](./DataModel.md#8-oidv4vpchallenge) |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| VerifiablePresentation | VP | M |  |
+
+#### Usage
+
+```java
+VerifiablePresentation vp = walletApi.createVp("hWalletToken", claimInfos, "123456", verifierNonce, challenge);
+```
+
+<br>
 
 ## 5. ZKP
 
@@ -1040,30 +1132,31 @@ ReferentInfo referentInfo = WalletApi.getInstance(getContext()).createZkpReferen
 #### Declaration
 
 ```java
-public P311RequestVo createEncZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile,
-                                        List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws Exception
+public P311RequestVo createEncZkpProof(String hWalletToken, List<ProofParam> proofParams, Map<String, String> selfAttributes,
+                                       ProofRequestProfile proofRequestProfile, String txId, String apiGateWayUrl) throws Exception
 ```
 
 #### Parameters
 
-| Name                | Type   | Description                                                                                                      | **M/O** | **Note** |
-| ------------------- | ------ | ---------------------------------------------------------------------------------------------------------------- | ------- | -------- |
-| walletToken         | String | Wallet Token                                                                                                     | M       |          |
-| proofRequestProfile | String | The profile containing verifier's requirements for proof, such as requested attributes and predicates.           | M       |          |
-| proofParams         | String | A list of proof parameters including credentials, referents, and other necessary information for ZKP generation. | M       |          |
-| selfAttributes      | String | A map of self-attested attributes that are not backed by credentials but are asserted by the prover.             | M       |          |
-| txId                | String | A transaction ID used for tracking or logging the proof creation process.                                        | M       |          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| proofParams | List&lt;ProofParam&gt; | Proof parameters including credentials and referents | M |  |
+| selfAttributes | Map&lt;String, String&gt; | Self-attested attributes | M |  |
+| proofRequestProfile | ProofRequestProfile | Profile containing the verifier's proof request | M |  |
+| txId | String | Transaction code | M |  |
+| apiGateWayUrl | String | API Gateway URL used to verify the verifier | M |  |
 
 #### Returns
 
-| Type         | Description                                                          | **M/O** | **Note** |
-| ------------ | -------------------------------------------------------------------- | ------- | -------- |
-| P311RequestVo | An object representing the generated ZKP, which will be used for verifiable presentation. | M       |          |
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| P311RequestVo | Request object carrying the encrypted ZKP proof | M |  |
 
 #### Usage
 
 ```java
-P311RequestVo requestVo = WalletApi.getInstance(context).createEncZkpProof(hWalletToken, vpProfile, proofParams, selfAttr, txId);
+P311RequestVo requestVo = WalletApi.getInstance(context).createEncZkpProof(hWalletToken, proofParams, selfAttr, proofRequestProfile, txId, apiGateWayUrl);
 ```
 
 <br>
@@ -1256,7 +1349,7 @@ Void
 #### Usage
 
 ```java
-walletApi.authenticateLock("hWalletToken", "123456");
+walletApi.authenticateLock("123456");
 ```
 
 <br>
@@ -1300,22 +1393,23 @@ boolean isLocked = walletApi.isLock();
 #### Declaration
 
 ```java
-public void registerBioKey(Context context)
+public void registerBioKey(Context ctx) throws WalletException
 ```
 
 #### Parameters
 
-| Name         | Type     | Description                        | **M/O** | **Note** |
-|--------------|----------|-----------------------------|---------|----------|
-| context       | Context   |        | M       |          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| ctx | Context |  | M |  |
 
 #### Returns
+
 N/A
 
 #### Usage
 
 ```java
-walletApi.registerBioKey("hWalletToken", context);
+walletApi.registerBioKey(context);
 ```
 
 <br>
@@ -1328,16 +1422,14 @@ walletApi.registerBioKey("hWalletToken", context);
 #### Declaration
 
 ```java
-public void authenticateBioKey(Fragment fragment, Context context) throws Exception
+public void authenticateBioKey(Context ctx) throws WalletCoreException, WalletException
 ```
 
 #### Parameters
 
-| Name         | Type     | Description                        | **M/O** | **Note** |
-|--------------|----------|-----------------------------|---------|----------|
-| hWalletToken | String   | Wallet Token                   | M       |          |
-| fragment       | Fragment   |       | M       |          |
-| context       | Context   |        | M       |          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| ctx | Context |  | M |  |
 
 #### Returns
 
@@ -1346,11 +1438,10 @@ N/A
 #### Usage
 
 ```java
-walletApi.authenticateBioKey(fragment.this, context);
+walletApi.authenticateBioKey(context);
 ```
 
 <br>
-
 
 ### 6.6. changePin
 
@@ -1392,29 +1483,27 @@ walletApi.changePin(Constants.KEY_ID_PIN, oldPin, newPin);
 #### Declaration
 
 ```java
-public void changeLock(String oldPin, String newPin) throws Exception
+public void changeLock(String oldPassCode, String newPassCode) throws Exception
 ```
 
 #### Parameters
 
-| Name   | Type   | Description   | **M/O** | **Note** |
-| ------ | ------ | ------------- | ------- | -------- |
-| oldPIN | String | old PIN      | M       |          |
-| newPIN | String | new PIN    | M       |          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| oldPassCode | String | old PIN | M |  |
+| newPassCode | String | new PIN | M |  |
 
 #### Returns
 
+N/A
 
 #### Usage
 
 ```java
-String oldPin = "123456";
-String newPin = "654321";
-walletApi.changeLock(oldPin, newPin);
+walletApi.changeLock("123456", "654321");
 ```
 
 <br>
-
 
 ### 6.8. authenticatePin
 
@@ -1449,6 +1538,356 @@ try {
 
 <br>
 
+## 7. OID4VC
+
+### 7.1. requestIssueOID4VC
+
+#### Description
+`Request an OID4VC credential from the issuer and store it.` The proof JWT is signed with the holder DID key (`#pin` or `#bio`).
+
+#### Declaration
+
+```java
+public CompletableFuture<String> requestIssueOID4VC(String hWalletToken, IssuerMetadataResponse metadata, TokenResponse token, String passcode, String configurationId, String credentialIdentifier, String apiGatewayUrl) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| metadata | IssuerMetadataResponse | Issuer metadata | M | [IssuerMetadataResponse](./DataModel.md#6-issuermetadataresponse) |
+| token | TokenResponse | Token response | M | [TokenResponse](./DataModel.md#7-tokenresponse) |
+| passcode | String | PIN for signing; `null` or empty to sign with the BIO key | O |  |
+| configurationId | String | Credential configuration identifier | M |  |
+| credentialIdentifier | String | Credential identifier; `null` to resolve it from the token | O |  |
+| apiGatewayUrl | String | API Gateway URL used to verify the issuer signature | M |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| String | Stored credential ID | M |  |
+
+#### Usage
+
+```java
+String vcId = walletApi.requestIssueOID4VC("hWalletToken", metadata, token, "123456", configurationId, null, apiGatewayUrl).get();
+```
+
+<br>
+
+### 7.2. requestRevokeOID4VC
+
+#### Description
+`Request the issuer to revoke a stored OID4VC (SD-JWT VC / mdoc).` Requests a nonce, signs a JWT revocation token, and POSTs it to `credential_revocation_endpoint`.
+
+#### Declaration
+
+```java
+public CompletableFuture<Void> requestRevokeOID4VC(String hWalletToken, IssuerMetadataResponse metadata, String vcId, String passcode) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| metadata | IssuerMetadataResponse | Issuer metadata; `nonce_endpoint` and `credential_revocation_endpoint` are required | M | [IssuerMetadataResponse](./DataModel.md#6-issuermetadataresponse) |
+| vcId | String | ID of the stored OID4VC to revoke | M |  |
+| passcode | String | Required when the stored kid is pin; biometric authentication is used when it is bio | O |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| CompletableFuture&lt;Void&gt; | Completes normally when the issuer responds with 200 OK | M |  |
+
+#### Throws
+
+- `ExecutionException`: the nonce request or the revocation POST failed; for the revocation POST the cause is a `CommunicationException`
+
+#### Usage
+
+```java
+walletApi.requestRevokeOID4VC("hWalletToken", metadata, "vcId", "123456").get();
+```
+
+<br>
+
+### 7.3. getAllOID4VCs
+
+#### Description
+`Retrieve all stored OID4VC credentials.`
+
+#### Declaration
+
+```java
+public List<OID4VCCredentialItem> getAllOID4VCs(String hWalletToken) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| List&lt;OID4VCCredentialItem&gt; | All OID4VC credentials | M | [OID4VCCredentialItem](./DataModel.md#1-oid4vccredentialitem) |
+
+#### Usage
+
+```java
+List<OID4VCCredentialItem> items = walletApi.getAllOID4VCs("hWalletToken");
+```
+
+<br>
+
+### 7.4. getOID4VCs
+
+#### Description
+`Retrieve the OID4VC credentials with the given identifiers.`
+
+#### Declaration
+
+```java
+public List<OID4VCCredentialItem> getOID4VCs(String hWalletToken, List<String> identifiers) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| identifiers | List&lt;String&gt; | Credential identifiers | M |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| List&lt;OID4VCCredentialItem&gt; | OID4VC credentials matching the identifiers | M | [OID4VCCredentialItem](./DataModel.md#1-oid4vccredentialitem) |
+
+#### Usage
+
+```java
+List<OID4VCCredentialItem> items = walletApi.getOID4VCs("hWalletToken", List.of("vcId"));
+```
+
+<br>
+
+### 7.5. deleteOID4VCs
+
+#### Description
+`Delete the OID4VC credentials with the given identifiers.`
+
+#### Declaration
+
+```java
+public void deleteOID4VCs(String hWalletToken, List<String> identifiers) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| identifiers | List&lt;String&gt; | Credential identifiers | M |  |
+
+#### Returns
+
+N/A
+
+#### Usage
+
+```java
+walletApi.deleteOID4VCs("hWalletToken", List.of("vcId"));
+```
+
+<br>
+
+### 7.6. isAnyOID4VCSaved
+
+#### Description
+`Check whether any OID4VC credential is saved in the holder's wallet.`
+
+#### Declaration
+
+```java
+public boolean isAnyOID4VCSaved() throws WalletException
+```
+
+#### Parameters
+
+N/A
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| boolean | `true` if at least one credential is saved | M |  |
+
+#### Usage
+
+```java
+if (!walletApi.isAnyOID4VCSaved()) {
+    ...
+}
+```
+
+<br>
+
+## 8. OID4VP
+
+### 8.1. matchCredentials
+
+#### Description
+`Match stored credentials against the verifier's OID4VP authorization request (DCQL).`
+
+#### Declaration
+
+```java
+public List<MatchedCredential> matchCredentials(String hWalletToken, AuthorizationRequest authRequest) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| authRequest | AuthorizationRequest | Verifier's authorization request carrying the DCQL query | M | [AuthorizationRequest](./DataModel.md#2-authorizationrequest) |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| List&lt;MatchedCredential&gt; | Submittable items satisfying the query | M | [MatchedCredential](./DataModel.md#3-matchedcredential) |
+
+#### Usage
+
+```java
+List<MatchedCredential> matched = walletApi.matchCredentials("hWalletToken", authRequest);
+```
+
+<br>
+
+### 8.2. createVpToken
+
+#### Description
+`Create the OID4VP response body for the selected credentials.` A form-urlencoded `vp_token` submission, or an encrypted `response` for `direct_post.jwt`.
+
+#### Declaration
+
+```java
+public byte[] createVpToken(String hWalletToken, AuthorizationRequest authRequest, List<MatchedCredential> matchedCredentials, String passcode) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| authRequest | AuthorizationRequest | Verifier's authorization request | M | [AuthorizationRequest](./DataModel.md#2-authorizationrequest) |
+| matchedCredentials | List&lt;MatchedCredential&gt; | Credentials/claims to present; must not be empty | M | [MatchedCredential](./DataModel.md#3-matchedcredential) |
+| passcode | String | PIN when a PIN-bound key is used; `null` for a BIO key | O |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| byte[] | Form-urlencoded response body for the app to submit | M |  |
+
+#### Throws
+
+- `MSDKWLT06000` (`ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER`): `matchedCredentials` is null or empty
+
+#### Usage
+
+```java
+byte[] body = walletApi.createVpToken("hWalletToken", authRequest, matched, "123456");
+```
+
+<br>
+
+## 9. Proximity
+
+### 9.1. matchMdocRequest
+
+#### Description
+`Match stored mdoc credentials against an mdoc DeviceRequest received over proximity.`
+
+#### Declaration
+
+```java
+public List<MdocRequestedDocument> matchMdocRequest(String hWalletToken, byte[] deviceRequest) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| deviceRequest | byte[] | CBOR-encoded DeviceRequest; must not be empty | M |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| List&lt;MdocRequestedDocument&gt; | Requested documents and the matched credentials | M | [MdocRequestedDocument](./DataModel.md#4-mdocrequesteddocument) |
+
+#### Throws
+
+- `MSDKWLT06000` (`ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER`): `deviceRequest` is null or empty
+
+#### Usage
+
+```java
+List<MdocRequestedDocument> docs = walletApi.matchMdocRequest("hWalletToken", deviceRequest);
+```
+
+<br>
+
+### 9.2. createDeviceResponse
+
+#### Description
+`Create the mdoc DeviceResponse for the selected documents.`
+
+#### Declaration
+
+```java
+public MdocDeviceResponse createDeviceResponse(String hWalletToken, byte[] deviceRequest, byte[] sessionTranscript, List<MdocRequestedDocument> selected, String passcode) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | Wallet Token | M |  |
+| deviceRequest | byte[] | CBOR-encoded DeviceRequest; must not be empty | M |  |
+| sessionTranscript | byte[] | CBOR-encoded SessionTranscript, bare or #6.24-tagged; must not be empty | M |  |
+| selected | List&lt;MdocRequestedDocument&gt; | Documents chosen from `matchMdocRequest` | M | [MdocRequestedDocument](./DataModel.md#4-mdocrequesteddocument) |
+| passcode | String | PIN when a PIN-bound key is used; `null` for a BIO key | O |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| MdocDeviceResponse | DeviceResponse bytes and the device auth method per document | M | [MdocDeviceResponse](./DataModel.md#5-mdocdeviceresponse) |
+
+#### Throws
+
+- `MSDKWLT06000` (`ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER`): `deviceRequest` or `sessionTranscript` is null or empty
+
+#### Usage
+
+```java
+MdocDeviceResponse res = walletApi.createDeviceResponse("hWalletToken", deviceRequest, sessionTranscript, selected, "123456");
+```
+
+<br>
+
 # Enumerators
 ## 1. WALLET_TOKEN_PURPOSE
 
@@ -1466,13 +1905,14 @@ public enum WALLET_TOKEN_PURPOSE {
     CONFIGLOCK(4),
     CREATE_DID(5),
     UPDATE_DID(6),
-    ISSUE_VC(7),
-    REMOVE_VC(8),
-    PRESENT_VP(9),
-    LIST_VC(10),
-    DETAIL_VC(11),
-    CREATE_DID_AND_ISSUE_VC(12),
-    LIST_VC_AND_PRESENT_VP(13);
+    RESTORE_DID(7),
+    ISSUE_VC(8),
+    REMOVE_VC(9),
+    PRESENT_VP(10),
+    LIST_VC(11),
+    DETAIL_VC(12),
+    CREATE_DID_AND_ISSUE_VC(13),
+    LIST_VC_AND_PRESENT_VP(14);
 }
 ```
 <br>

@@ -28,8 +28,6 @@ import org.omnione.did.sdk.datamodel.oid4vc.SdJwt;
 import org.omnione.did.sdk.datamodel.oid4vc.SdJwtCredentialItem;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
 import org.omnione.did.sdk.utility.Encodings.Base64;
-import org.omnione.did.sdjwt.datamodel.Disclosure;
-import org.omnione.did.sdjwt.datamodel.SDJWT;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -43,37 +41,24 @@ public final class SdJwtParser {
 
     @NonNull
     public static SdJwt parse(@NonNull String compact) throws WalletCoreException {
-        SDJWT sdjwt;
+        SdJwtCompact sdjwt;
         try {
-            sdjwt = SDJWT.parse(compact);
-        } catch (Exception e) {
+            sdjwt = SdJwtCompact.parse(compact);
+        } catch (RuntimeException e) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_INVALID_CREDENTIAL_RESPONSE,
                     "Failed to parse SD-JWT VC: " + e.getMessage());
         }
         String credentialJwt = sdjwt.getCredentialJwt();
-        if (credentialJwt == null) {
-            throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_INVALID_CREDENTIAL_RESPONSE,
-                    "SD-JWT has no credential JWT");
-        }
 
         JsonObject jwtPayload = decodeJwtPayload(credentialJwt);
         Map<String, Object> disclosed = new LinkedHashMap<>();
-        if (sdjwt.hasDisclosures()) {
-            for (Disclosure d : sdjwt.getDisclosures()) {
-                if (d.isArrayElement() || d.getClaimName() == null) continue;
-                disclosed.put(d.getClaimName(), d.getClaimValue());
-            }
+        for (SdJwtCompact.Disclosure d : sdjwt.getDisclosures()) {
+            if (d.isArrayElement()) continue;
+            disclosed.put(d.getClaimName(), d.getClaimValue());
         }
         return new SdJwt(compact, credentialJwt, jwtPayload, disclosed);
     }
 
-    /**
-     * Parses each stored OID4VC credential into a presentable {@link SdJwtCredentialItem}.
-     *
-     * @param stored The stored OID4VC credentials (may be {@code null}).
-     * @return The parsed items; an empty list when {@code stored} is {@code null} or empty.
-     * @throws WalletCoreException When any stored credential fails to parse as an SD-JWT.
-     */
     @NonNull
     public static List<SdJwtCredentialItem> mapToSdJwtItems(List<OID4VCICredential> stored) throws WalletCoreException {
         List<SdJwtCredentialItem> items = new ArrayList<>();
@@ -81,6 +66,9 @@ public final class SdJwtParser {
             return items;
         }
         for (OID4VCICredential c : stored) {
+            if (!CredentialFormat.SD_JWT_VC.matches(c.getFormat())) {
+                continue;
+            }
             SdJwt sdjwt = parse(c.getCredential());
             items.add(new SdJwtCredentialItem(c.getId(), CredentialFormat.fromValue(c.getFormat()),
                     c.getCredentialConfigurationId(), c.getKid(), c.getCredentialIdentifier(), sdjwt));

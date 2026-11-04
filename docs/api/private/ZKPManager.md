@@ -21,23 +21,24 @@ Android ZKPManager API
 
 ==
 - Subject: ZKPManager
-- Author: Dongjun Park
-- Date: 2025-04-30
-- Version: v1.0.0
+- Author: Eunjeong Kim
+- Date: 2026-10-28
+- Version: v3.0.0
 
 | Version | Date       | Description    |
 |---------|------------|----------------|
+| v3.0.0  | 2026-10-30 | Referent attributes keyed by referent key |
 | v1.0.0  | 2025-04-30 | Initial Draft  |
 
 # Table of Contents
 
 - [APIs](#api-list)
   - [1. constructor](#1-constructor)
-  - [2. addCredentials](#2-addcredentials)
-  - [3. getCredentials](#3-getcredentials)
-  - [4. getAllCredentials](#4-getallcredentials)
-  - [5. deleteCredentials](#5-deletecredentials)
-  - [6. deleteAllCredentials](#6-deleteallcredentials)
+  - [2. getCredentials](#2-getcredentials)
+  - [3. getAllCredentials](#3-getallcredentials)
+  - [4. deleteCredentials](#4-deletecredentials)
+  - [5. deleteAllCredentials](#5-deleteallcredentials)
+  - [6. isAnyCredentialsSaved](#6-isanycredentialssaved)
   - [7. createCredentialRequest](#7-createcredentialrequest)
   - [8. verifyAndStoreCredential](#8-verifyandstorecredential)
   - [9. searchCredentials](#9-searchcredentials)
@@ -267,11 +268,12 @@ ZkpSearchCredentialBuilder searchCredentials(ProofRequest proofRequest)
 ### Description
 
 Create Referents for each credential based on the user-selected referent information.
+Each attribute is stored under its referent key, with the attribute name kept in `ReferentAttributeValue`. The same referent key given twice for the same credential throws `MSDKWLT04603`.
 
 ### Declaration
 
 ```java
-ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
+ReferentInfo createReferent(List<UserReferent> customReferents) throws WalletCoreException, UtilityException
 ```
 
 ### Parameters
@@ -285,7 +287,7 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 
 | Type                     | Description      | **M/O** | Note |
 | ------------------------ | ---------------- | ------- | ---- |
-| ZkpCreateReferentBuilder | Referent Builder | M       |      |
+| ReferentInfo             | Referent information | M       |      |
 |                          |                  |         |      |
 
 
@@ -294,6 +296,7 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 ### Description
 
 Generate a ZKP proof based on the user's credentials and referents.
+Every requested attribute and predicate must be selected exactly once under its referent key, with a name matching the proof request and present in the credential. Otherwise `MSDKWLT04500`, `MSDKWLT04501`, `MSDKWLT04603` or `MSDKWLT04000` (unknown referent key) is thrown.
 
 ### Declaration
 

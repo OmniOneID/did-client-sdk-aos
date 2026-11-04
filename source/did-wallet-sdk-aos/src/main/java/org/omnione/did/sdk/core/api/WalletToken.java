@@ -38,6 +38,8 @@ import org.omnione.did.sdk.wallet.walletservice.db.DBManager;
 import org.omnione.did.sdk.wallet.walletservice.db.Preference;
 import org.omnione.did.sdk.wallet.walletservice.db.Token;
 import org.omnione.did.sdk.wallet.walletservice.db.TokenDao;
+import org.omnione.did.sdk.wallet.walletservice.db.User;
+import org.omnione.did.sdk.wallet.walletservice.db.UserDao;
 import org.omnione.did.sdk.datamodel.token.WalletTokenData;
 import org.omnione.did.sdk.datamodel.common.enums.WalletTokenPurpose;
 import org.omnione.did.sdk.datamodel.token.WalletTokenSeed;
@@ -49,6 +51,7 @@ import org.omnione.did.sdk.wallet.walletservice.util.WalletUtil;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -57,6 +60,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 class WalletToken {
+    static final List<WalletTokenPurpose.WALLET_TOKEN_PURPOSE> localTokenPurposes = Arrays.asList(
+            WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC,
+            WalletTokenPurpose.WALLET_TOKEN_PURPOSE.DETAIL_VC,
+            WalletTokenPurpose.WALLET_TOKEN_PURPOSE.PRESENT_VP,
+            WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC_AND_PRESENT_VP);
+
     private Context context;
     WalletCore walletCore;
     WalletLogger walletLogger;
@@ -162,6 +171,43 @@ class WalletToken {
 
         return resultNonce;
     }
+
+    public String createLocalWalletToken(WalletTokenPurpose.WALLET_TOKEN_PURPOSE purpose, String pkgName) throws WalletException, UtilityException {
+        if(pkgName == null || pkgName.isEmpty())
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL, "pkgName");
+        if(!localTokenPurposes.contains(purpose))
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL, "purpose");
+
+        DBManager walletDB = DBManager.getDatabases(context);
+        TokenDao tokenDao = walletDB.tokenDao();
+        UserDao userDao = walletDB.userDao();
+
+        List<User> users = userDao.getAll();
+        if(users.isEmpty())
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_NOT_PERSONALIZED);
+
+        String hWalletToken = Base16.toHex(CryptoUtils.generateNonce(32));
+        walletLogger.d("local hWalletToken : " + hWalletToken);
+
+        Token token = new Token();
+        token.idx = WalletUtil.genId();
+        token.walletId = Preference.loadWalletId(context);
+        token.validUntil = WalletUtil.createValidUntil(30);
+        token.purpose = purpose.toString();
+        token.pii = users.get(0).pii;
+        token.nonce = "";
+        token.pkgName = pkgName;
+        token.hWalletToken = hWalletToken;
+        token.createDate = WalletUtil.getDate();
+
+        walletDB.runInTransaction(() -> {
+            tokenDao.deleteAll();
+            tokenDao.insertAll(token);
+        });
+
+        return hWalletToken;
+    }
+
     private String createWalletToken(WalletTokenData walletTokenData, String resultNonce) throws UtilityException{
         String walletToken = walletTokenData.toJson() + resultNonce;
         walletToken = Base16.toHex(DigestUtils.getDigest(walletToken.getBytes(), DigestEnum.DIGEST_ENUM.SHA_256));

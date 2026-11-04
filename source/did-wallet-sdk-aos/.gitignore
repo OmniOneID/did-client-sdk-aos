@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+.claude/
+.serena/
+.taskmaster/
+.mcp.json
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.docs/
+.maestro/

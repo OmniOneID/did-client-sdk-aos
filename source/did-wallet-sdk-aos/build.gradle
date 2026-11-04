@@ -1,11 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.library' version '8.2.1'
+    alias(libs.plugins.android.library)
 }
 
 android {
     namespace 'org.omnione.did.sdk.wallet'
-    compileSdk 34
+    compileSdk {
+        version = release(36) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         minSdk 26
@@ -22,6 +26,15 @@ android {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
+    lint {
+        targetSdk = 36
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            it.include '**/*Test.class'
+        }
+    }
 }
 
 ext {
@@ -33,7 +46,7 @@ task deleteObjectJar(type: Delete){
 }
 
 task exportJar(type: Copy){
-    from('build/intermediates/aar_main_jar/release/')
+    from('build/intermediates/aar_main_jar/release/syncReleaseLibJars/')
     into('../release/')
 //    into('../../../did-ca-aos/source/did-ca-aos/app/libs')
     include('classes.jar')
@@ -44,27 +57,24 @@ task exportJar(type: Copy){
 exportJar.dependsOn(deleteObjectJar, build)
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation libs.material
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.espresso.core
 
-    implementation 'org.bitcoinj:bitcoinj-core:0.15.7'
+    implementation libs.bitcoinj.core
 
-    api "androidx.room:room-runtime:2.6.1"
-    annotationProcessor "androidx.room:room-compiler:2.6.1"
+    api libs.room.runtime
+    annotationProcessor libs.room.compiler
 
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation libs.gson
+    implementation libs.biometric
 
-    implementation 'com.madgag.spongycastle:core:1.54.0.0'
-    implementation 'com.madgag.spongycastle:prov:1.54.0.0'
-    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
-    implementation 'com.madgag.spongycastle:pg:1.54.0.0'
+    implementation libs.spongycastle.core
+    implementation libs.spongycastle.prov
 
-    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly libs.nimbus.jose.jwt
 
-    compileOnly 'com.nimbusds:nimbus-jose-jwt:9.40'
+    compileOnly libs.upokecenter.cbor
+    testImplementation libs.upokecenter.cbor
 }

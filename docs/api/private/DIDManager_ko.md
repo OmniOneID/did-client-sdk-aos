@@ -19,12 +19,13 @@ Android DIDManager API
 ==
 
 - 주제: DIDManager
-- 작성: Dongjun Park
-- 일자: 2025-10-15
-- 버전: v1.0.1
+- 작성: 김은정
+- 일자: 2026-10-28
+- 버전: v3.0.0
 
 | 버전   | 일자       | 변경 내용            |
 | ------ | ---------- | -------------------- |
+| v3.0.0 | 2026-10-30 | updateDocument 에서 controller 제거, 공개키 controller 기본값 |
 | v1.0.1 | 2025-10-15 | DIDDoc 업데이트 추가 |
 | v1.0.0 | 2024-07-10 | 초기 작성            |
 
@@ -34,7 +35,7 @@ Android DIDManager API
 # 목차
 - [APIs](#api-목록)
     - [1. constructor](#1-constructor)
-    - [2. genDID](#2-isanykeysaved)
+    - [2. genDID](#2-gendid)
     - [3. isSaved](#3-issaved)
     - [4. createDocument](#4-createdocument)
     - [5. getDocument](#5-getdocument)
@@ -503,7 +504,7 @@ didManager.resetChanges());
 ### Declaration
 
 ```java
-void updateDocument(List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws Exception
+void updateDocument(List<DIDKeyInfo> keyInfos, List<Service> service) throws Exception
 ```
 
 ### Parameters
@@ -511,7 +512,6 @@ void updateDocument(List<DIDKeyInfo> keyInfos, String controller, List<Service> 
 | Parameter  | Type                   | Description                                                       | **M/O** | **Notes**                   |
 | ---------- | ---------------------- | ----------------------------------------------------------------- | ------- | --------------------------- |
 | keyInfos   | List&lt;DIDKeyInfo&gt; | DID 문서에 등록할 공개키 정보 객체의 배열                                  | M       | [DIDKeyInfo](#2-didkeyinfo) |
-| controller | String                 | DID 문서에 controller로 등록할 DID. <br>null이면, `did` 항목을 사용한다.   | M       |                             |
 | service    | List&lt;Service&gt;    | DID 문서에 명시할 서비스 정보 객체                                        | M       | [Service](#4-service)       |
 
 
@@ -523,7 +523,7 @@ void
 ```java
 DIDManager<DIDDocument> didManager = new DIDManager<>("MyWallet", this);
 
-didManager.updateDIDDoc(didKeyInfos, controller, null);
+didManager.updateDocument(didKeyInfos, null);
 ```
 
 <br>
@@ -623,7 +623,7 @@ public class DIDKeyInfo {
 |---------------|--------------------|----------------------------------|---------|-----------------------------|
 | keyInfo       | KeyInfo            | KeyManager가 반환한 공개키 정보 객체   |    M    |                             |
 | methodType    | DID_METHOD_TYPE      | DID 문서에 등록되는 공개키가 어떤 용도인지 명시하는 타입 |  M  |                     |
-| controller    | String           | DID 문서에 등록되는 공개키의 controller로 등록할 DID. nil이면, DID 문서의 id를 controller로 등록한다. |    M    |                     |
+| controller    | String           | DID 문서에 등록되는 공개키의 controller로 등록할 DID. null 이거나 빈 값이면, DID 문서의 id를 controller로 등록한다. |    M    |                     |
 
 <br>
 

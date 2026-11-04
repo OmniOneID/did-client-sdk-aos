@@ -20,11 +20,14 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.crypto.ECDHDecrypter;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+
+import java.text.ParseException;
 
 import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
@@ -54,7 +57,7 @@ public final class CredentialResponseDecryptor {
         try {
             ECKey key = new ECKeyGenerator(Curve.P_256).generate();
             return new CredentialResponseDecryptor(key, alg, enc);
-        } catch (Exception e) {
+        } catch (JOSEException | RuntimeException e) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_UNSUPPORTED_JWE_KEY,
                     "Failed to generate response-encryption key: " + e.getMessage());
         }
@@ -78,7 +81,7 @@ public final class CredentialResponseDecryptor {
             JWEObject jwe = JWEObject.parse(jweCompact.trim());
             jwe.decrypt(new ECDHDecrypter(ephemeralKey));
             return jwe.getPayload().toString();
-        } catch (Exception e) {
+        } catch (ParseException | JOSEException | RuntimeException e) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_INVALID_JWE,
                     "Failed to decrypt credential response: " + e.getMessage());
         }

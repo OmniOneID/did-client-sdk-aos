@@ -19,12 +19,13 @@ Android DataModel SDK
 ==
 
 - 주제: DataModel
-- 작성: Sangjun Kim
-- 일자: 2024-08-28
-- 버전: v1.0.0
+- 작성: 김은정
+- 일자: 2026-10-28
+- 버전: v3.0.0
 
 | 버전   | 일자       | 변경 내용                 |
 | ------ | ---------- | -------------------------|
+| v3.0.0 | 2026-10-30 | OID4VC 모델 추가          |
 | v1.0.0 | 2024-08-28 | 초기 작성                 |
 
 
@@ -99,12 +100,32 @@ Android DataModel SDK
     - [5. Offer](#5-offer)
         - [5.1. IssueOfferPayload](#51-issueofferpayload)
         - [5.2. VerifyOfferPayload](#52-verifyofferpayload)
-    - [6. Issue VC](#6-issue-vc)
+    - [6. Issue VC](#6-vc)
         - [6.1. ReqVC](#61-reqvc)
             - [6.1.1. Profile](#611-profile)
         - [6.2. VCPlanList](#62-vcplanlist)
             - [6.2.1. VCPlan](#621-vcplan)
                 - [6.2.1.1. Option](#6211-option)
+- [OID4VCVo](#oid4vcvo)
+    - [1. OID4VCCredentialItem](#1-oid4vccredentialitem)
+        - [1.1. SdJwtCredentialItem](#11-sdjwtcredentialitem)
+            - [1.1.1. SdJwt](#111-sdjwt)
+        - [1.2. MdocCredentialItem](#12-mdoccredentialitem)
+            - [1.2.1. Mdoc](#121-mdoc)
+    - [2. AuthorizationRequest](#2-authorizationrequest)
+        - [2.1. ClientMetadata](#21-clientmetadata)
+        - [2.2. DCQLQuery](#22-dcqlquery)
+            - [2.2.1. CredentialQuery](#221-credentialquery)
+                - [2.2.1.1. ClaimQuery](#2211-claimquery)
+                - [2.2.1.2. TrustedAuthority](#2212-trustedauthority)
+            - [2.2.2. CredentialSetQuery](#222-credentialsetquery)
+    - [3. MatchedCredential](#3-matchedcredential)
+    - [4. MdocRequestedDocument](#4-mdocrequesteddocument)
+    - [5. MdocDeviceResponse](#5-mdocdeviceresponse)
+        - [5.1. MdocDeviceAuthMethod](#51-mdocdeviceauthmethod)
+    - [6. IssuerMetadataResponse](#6-issuermetadataresponse)
+    - [7. TokenResponse](#7-tokenresponse)
+    - [8. OIDV4VPChallenge](#8-oidv4vpchallenge)
 - [Enumerators](#enumerators)
     - [1. DID_KEY_TYPE](#1-did_key_type)
     - [2. DID_SERVICE_TYPE](#2-did_service_type)
@@ -127,6 +148,7 @@ Android DataModel SDK
     - [19. ROLE_TYPE](#19-role_type)
     - [20. SERVER_TOKEN_PURPOSE](#20-server_token_purpose)
     - [21. WALLET_TOKEN_PURPOSE](#21-wallet_token_purpose)
+    - [22. CREDENTIAL_FORMAT](#22-credential_format)
 - [Apis](#apis)
     - [1. deserialize](#1-deserialize)
     - [2. convertFrom](#2-convertfrom)
@@ -432,8 +454,8 @@ public class Claim {
 | code      | String                       | Claim 코드                   |    M    |                          |
 | caption   | String                       | Claim 이름                   |    M    |                          |
 | value     | String                       | Claim 값                  |    M    |                          |
-| type      | CLAIM_TYPE                    | Claim 종류                   |    M    | [CLAIM_TYPE](#11-claim_type)         |
-| format    | ClaimFormat                  | Claim 포맷                 |    M    | [CLAIM_FORMAT](#12-claim_format)           |
+| type      | CLAIM_TYPE                    | Claim 종류                   |    M    | [CLAIM_TYPE](#10-claim_type)         |
+| format    | ClaimFormat                  | Claim 포맷                 |    M    | [CLAIM_FORMAT](#11-claim_format)           |
 | hideValue | Bool                         | 값 숨김                   |    O    | Default(false)           |
 | location  | LOCATION                     | 값 위치                   |    O    | Default(inline) <br> [LOCATION](#12-location) |
 | digestSRI | String                       | Digest Subresource Integrity |    O    |                          |
@@ -912,7 +934,7 @@ public class ReqE2e {
 | Name      | Type      | Description                                   | **M/O** | **Note**                 |
 |-----------|-----------|-----------------------------------------------|---------|--------------------------|
 | nonce     | String               | 대칭키 생성용 nonce  |    M    | 멀티베이스 인코딩됨     |
-| curve     | ELLIPTIC_CURVE_TYPE    | 타원곡선 종류                  |    M    | [ELLIPTIC_CURVE_TYPE](#18-elliptic_curve_type)   |
+| curve     | ELLIPTIC_CURVE_TYPE    | 타원곡선 종류                  |    M    | [ELLIPTIC_CURVE_TYPE](#17-elliptic_curve_type)   |
 | publicKey | String               | 암호화용 서버 공개키 |    M    | 멀티베이스 인코딩됨     |
 | cipher    | SYMMETRIC_CIPHER_TYPE  | 암호화 종류                        |    M    | [SYMMETRIC_CIPHER_TYPE](#14-symmetric_cipher_type)  |
 | padding   | SYMMETRIC_PADDING_TYPE | 패딩 종류                       |    M    | [SYMMETRIC_PADDING_TYPE](#13-symmetric_padding_type)   |
@@ -1190,6 +1212,7 @@ public class P210RequestVo extends BaseRequestVo {
     AccE2e accE2e;
     String encReqVc;
     String vcId;
+    String userId;
 }
 ```
 
@@ -1207,6 +1230,7 @@ public class P210RequestVo extends BaseRequestVo {
 | accE2e       | AccE2e            | E2E 암호화 데이터              |    M    | [AccE2e](#33-acce2e) |
 | encReqVc     | String            | 암호화 VC 요청 데이터    |    M    |          |
 | vcId         | String            | VC ID                      |    M    |          |
+| userId       | String            | 사용자 ID |    O    | SDK 를 사용하는 앱에서 설정 |
 
 <br>
 
@@ -2040,6 +2064,542 @@ public static class Option {
 <br>
 
 
+# OID4VCVo
+
+## 1. OID4VCCredentialItem
+
+### Description
+
+`저장된 OID4VC 의 공통 뷰. getAllOID4VCs · getOID4VCs 가 반환한다. 실제 타입은 SdJwtCredentialItem 또는 MdocCredentialItem 이다.`
+
+### Declaration
+
+```java
+public interface OID4VCCredentialItem {
+    String getId();
+    CredentialFormat getFormat();
+    String getConfigurationId();
+    String getKid();
+    String getCredentialIdentifier();
+    String getRawCredential();
+}
+```
+
+### Property
+
+| Name                 | Type             | Description                          | **M/O** | **Note** |
+|----------------------|------------------|--------------------------------------|---------|----------|
+| id                   | String           | 저장된 credential ID                 |    M    |          |
+| format               | CredentialFormat | credential 포맷                      |    M    | [CREDENTIAL_FORMAT](#22-credential_format) |
+| configurationId      | String           | credential configuration 식별자      |    M    |          |
+| kid                  | String           | credential 에 바인딩된 holder 키 ID |    M    |          |
+| credentialIdentifier | String           | credential 식별자                    |    O    |          |
+| rawCredential        | String           | 저장된 credential 의 compact 형태 |    M    |          |
+
+<br>
+
+## 1.1. SdJwtCredentialItem
+
+### Description
+
+`SD-JWT VC 용 OID4VCCredentialItem`
+
+### Declaration
+
+```java
+public final class SdJwtCredentialItem implements OID4VCCredentialItem {
+    String id;
+    CredentialFormat format;
+    String configurationId;
+    String kid;
+    String credentialIdentifier;
+    SdJwt sdjwt;
+}
+```
+
+### Property
+
+| Name   | Type  | Description                                     | **M/O** | **Note** |
+|--------|-------|-------------------------------------------------|---------|----------|
+| sdjwt  | SdJwt | 파싱된 SD-JWT. `getRawCredential()` 은 `sdjwt.getCompact()` 를 반환 |    M    | [SdJwt](#111-sdjwt) |
+
+나머지 속성은 [OID4VCCredentialItem](#1-oid4vccredentialitem) 과 같다.
+
+<br>
+
+## 1.1.1. SdJwt
+
+### Description
+
+`파싱된 SD-JWT VC`
+
+### Declaration
+
+```java
+public final class SdJwt {
+    String compact;
+    String credentialJwt;
+    JsonObject jwtPayload;
+    Map<String, Object> disclosedClaims;
+}
+```
+
+### Property
+
+| Name            | Type                | Description                          | **M/O** | **Note** |
+|-----------------|---------------------|--------------------------------------|---------|----------|
+| compact         | String              | compact SD-JWT                       |    M    |          |
+| credentialJwt   | String              | 발급자 서명 JWT 부분                 |    M    |          |
+| jwtPayload      | JsonObject          | 발급자 서명 JWT 의 payload           |    M    | `getIssuer()` 는 `iss`, `getVct()` 는 `vct` 를 반환(없으면 null) |
+| disclosedClaims | Map<String, Object> | 공개된 claim                         |    M    |          |
+
+<br>
+
+## 1.2. MdocCredentialItem
+
+### Description
+
+`mdoc(mso_mdoc-did) 용 OID4VCCredentialItem`
+
+### Declaration
+
+```java
+public final class MdocCredentialItem implements OID4VCCredentialItem {
+    String id;
+    CredentialFormat format;
+    String configurationId;
+    String kid;
+    String credentialIdentifier;
+    Mdoc mdoc;
+}
+```
+
+### Property
+
+| Name | Type | Description                                     | **M/O** | **Note** |
+|------|------|-------------------------------------------------|---------|----------|
+| mdoc | Mdoc | 파싱된 mdoc. `getRawCredential()` 은 `mdoc.getCompact()` 를 반환 |    M    | [Mdoc](#121-mdoc) |
+
+나머지 속성은 [OID4VCCredentialItem](#1-oid4vccredentialitem) 과 같다.
+
+<br>
+
+## 1.2.1. Mdoc
+
+### Description
+
+`파싱된 mdoc`
+
+### Declaration
+
+```java
+public final class Mdoc {
+    String compact;
+    String docType;
+    Map<String, Map<String, Object>> nameSpaces;
+    MdocMso mso;
+}
+```
+
+### Property
+
+| Name       | Type                             | Description                          | **M/O** | **Note** |
+|------------|----------------------------------|--------------------------------------|---------|----------|
+| compact    | String                           | mdoc 의 compact 형태                 |    M    |          |
+| docType    | String                           | mdoc docType                         |    O    |          |
+| nameSpaces | Map<String, Map<String, Object>> | namespace 별 claim                   |    M    | `getFlatClaims()` 는 이를 하나의 map 으로 반환 |
+| mso        | MdocMso                          | Mobile security object               |    M    |          |
+
+<br>
+
+## 2. AuthorizationRequest
+
+### Description
+
+`검증자의 OID4VP authorization request. matchCredentials · createVpToken 에 전달한다`
+
+### Declaration
+
+```java
+public class AuthorizationRequest {
+    @SerializedName("client_id")       String clientId;
+    @SerializedName("nonce")           String nonce;
+    @SerializedName("state")           String state;
+    @SerializedName("response_mode")   String responseMode;
+    @SerializedName("response_uri")    String responseUri;
+    @SerializedName("dcql_query")      DCQLQuery dcqlQuery;
+    @SerializedName("client_metadata") ClientMetadata clientMetadata;
+}
+```
+
+### Property
+
+| Name           | Type           | Description                    | **M/O** | **Note** |
+|----------------|----------------|--------------------------------|---------|----------|
+| clientId       | String         | 검증자 client ID               |    M    |          |
+| nonce          | String         | Nonce                          |    M    |          |
+| state          | String         | State                          |    O    |          |
+| responseMode   | String         | 응답 모드                      |    O    | null 이면 `direct_post` 로 처리. `direct_post`, `direct_post.jwt` 만 지원 |
+| responseUri    | String         | Response URI                   |    M    |          |
+| dcqlQuery      | DCQLQuery      | DCQL 쿼리                      |    M    | [DCQLQuery](#22-dcqlquery) |
+| clientMetadata | ClientMetadata | 검증자 client metadata         |    O    | responseMode 가 `direct_post.jwt` 이면 필수 |
+
+<br>
+
+## 2.1. ClientMetadata
+
+### Description
+
+`검증자 client metadata`
+
+### Declaration
+
+```java
+public class ClientMetadata {
+    @SerializedName("client_name")                             String clientName;
+    @SerializedName("jwks")                                    JsonObject jwks;
+    @SerializedName("encrypted_response_enc_values_supported") List<String> encryptedResponseEncValuesSupported;
+    @SerializedName("authorization_encrypted_response_alg")    String authorizationEncryptedResponseAlg;
+}
+```
+
+### Property
+
+| Name                                | Type         | Description                           | **M/O** | **Note** |
+|-------------------------------------|--------------|---------------------------------------|---------|----------|
+| clientName                          | String       | 검증자 이름                           |    M    |          |
+| jwks                                | JsonObject   | 검증자 JWK Set                        |    O    | responseMode 가 `direct_post.jwt` 이면 필수(EC P-256 키). `jwkKeys()` 는 그 키 목록을 반환 |
+| encryptedResponseEncValuesSupported | List<String> | 지원하는 응답 암호화 `enc` 값 |    O    |          |
+| authorizationEncryptedResponseAlg   | String       | 응답 암호화 `alg`                     |    -    |          |
+
+<br>
+
+## 2.2. DCQLQuery
+
+### Description
+
+`DCQL 쿼리`
+
+### Declaration
+
+```java
+public class DCQLQuery {
+    @SerializedName("credentials")     List<CredentialQuery> credentials;
+    @SerializedName("credential_sets") List<CredentialSetQuery> credentialSets;
+}
+```
+
+### Property
+
+| Name           | Type                     | Description            | **M/O** | **Note** |
+|----------------|--------------------------|------------------------|---------|----------|
+| credentials    | List<CredentialQuery>    | credential 쿼리 목록   |    M    | [CredentialQuery](#221-credentialquery) |
+| credentialSets | List<CredentialSetQuery> | credential set 쿼리 목록 |    O    | [CredentialSetQuery](#222-credentialsetquery) |
+
+<br>
+
+## 2.2.1. CredentialQuery
+
+### Description
+
+`DCQL 의 credential 쿼리`
+
+### Declaration
+
+```java
+public class CredentialQuery {
+    @SerializedName("id")                  String id;
+    @SerializedName("format")              String format;
+    @SerializedName("meta")                Map<String, Object> meta;
+    @SerializedName("claims")              List<ClaimQuery> claims;
+    @SerializedName("claim_sets")          List<List<String>> claimSets;
+    @SerializedName("trusted_authorities") List<TrustedAuthority> trustedAuthorities;
+}
+```
+
+### Property
+
+| Name               | Type                   | Description             | **M/O** | **Note** |
+|--------------------|------------------------|-------------------------|---------|----------|
+| id                 | String                 | 쿼리 ID                 |    M    |          |
+| format             | String                 | 요청한 credential 포맷 |    M    |          |
+| meta               | Map<String, Object>    | 포맷별 메타데이터 |    M    |          |
+| claims             | List<ClaimQuery>       | claim 쿼리 목록         |    O    | [ClaimQuery](#2211-claimquery) |
+| claimSets          | List<List<String>>     | claim set (claim 쿼리 ID 목록) |    O    |          |
+| trustedAuthorities | List<TrustedAuthority> | 신뢰 기관 목록          |    O    | [TrustedAuthority](#2212-trustedauthority) |
+
+<br>
+
+## 2.2.1.1. ClaimQuery
+
+### Description
+
+`DCQL 의 claim 쿼리`
+
+### Declaration
+
+```java
+public class ClaimQuery {
+    @SerializedName("id")         String id;
+    @SerializedName("path")       List<Object> path;
+    @SerializedName("values")     List<Object> values;
+    @SerializedName("namespace")  String namespace;
+    @SerializedName("claim_name") String claimName;
+}
+```
+
+### Property
+
+| Name      | Type         | Description           | **M/O** | **Note** |
+|-----------|--------------|-----------------------|---------|----------|
+| id        | String       | claim 쿼리 ID         |    O    |          |
+| path      | List<Object> | claim 경로            |    O    |          |
+| values    | List<Object> | 허용 값               |    O    |          |
+| namespace | String       | mdoc namespace        |    O    |          |
+| claimName | String       | mdoc claim name       |    O    |          |
+
+<br>
+
+## 2.2.1.2. TrustedAuthority
+
+### Description
+
+`DCQL 의 신뢰 기관`
+
+### Declaration
+
+```java
+public class TrustedAuthority {
+    @SerializedName("type")   String type;
+    @SerializedName("values") List<String> values;
+}
+```
+
+### Property
+
+| Name   | Type         | Description         | **M/O** | **Note** |
+|--------|--------------|---------------------|---------|----------|
+| type   | String       | 기관 유형           |    M    |          |
+| values | List<String> | 기관 값             |    O    |          |
+
+<br>
+
+## 2.2.2. CredentialSetQuery
+
+### Description
+
+`DCQL 의 credential set 쿼리`
+
+### Declaration
+
+```java
+public class CredentialSetQuery {
+    @SerializedName("options")  List<List<String>> options;
+    @SerializedName("required") Boolean required;
+    @SerializedName("purpose")  Object purpose;
+}
+```
+
+### Property
+
+| Name     | Type               | Description                            | **M/O** | **Note** |
+|----------|--------------------|----------------------------------------|---------|----------|
+| options  | List<List<String>> | 선택지 (credential 쿼리 ID 목록) |    M    |          |
+| required | Boolean            | 필수 여부                              |    O    | null 이면 `isRequired()` 는 true 를 반환 |
+| purpose  | Object             | 목적                                   |    M    |          |
+
+<br>
+
+## 3. MatchedCredential
+
+### Description
+
+`DCQL credential 쿼리에 매칭된 저장 credential 과 claim. matchCredentials 가 반환하고 createVpToken 에 전달한다`
+
+### Declaration
+
+```java
+public class MatchedCredential {
+    String queryId;
+    String credentialId;
+    List<String> claimCodes;
+}
+```
+
+### Property
+
+| Name         | Type         | Description                   | **M/O** | **Note** |
+|--------------|--------------|-------------------------------|---------|----------|
+| queryId      | String       | DCQL credential 쿼리 ID       |    M    |          |
+| credentialId | String       | 저장된 credential ID          |    M    |          |
+| claimCodes   | List<String> | 제출할 claim 코드             |    M    |          |
+
+<br>
+
+## 4. MdocRequestedDocument
+
+### Description
+
+`ISO 18013-5 DeviceRequest 의 문서 요청 하나에 매칭된 저장 mdoc. matchMdocRequest 가 반환하고 createDeviceResponse 에 전달한다`
+
+### Declaration
+
+```java
+public final class MdocRequestedDocument {
+    int docRequestIndex;
+    String docType;
+    String credentialId;
+    List<String> claimCodes;
+    Map<String, Boolean> intentToRetain;
+    List<String> missing;
+}
+```
+
+### Property
+
+| Name            | Type                 | Description                          | **M/O** | **Note** |
+|-----------------|----------------------|--------------------------------------|---------|----------|
+| docRequestIndex | int                  | DeviceRequest 안 docRequest 의 인덱스 |    M    |          |
+| docType         | String               | 요청된 docType                       |    M    |          |
+| credentialId    | String               | 저장된 credential ID                 |    M    |          |
+| claimCodes      | List<String>         | 제출할 claim 코드                    |    M    |          |
+| intentToRetain  | Map<String, Boolean> | claim 코드별 검증자의 보관 의사 |    M    |          |
+| missing         | List<String>         | 요청됐으나 credential 에 없는 claim 코드 |    M    |          |
+
+<br>
+
+## 5. MdocDeviceResponse
+
+### Description
+
+`ISO 18013-5 DeviceResponse. createDeviceResponse 가 반환한다`
+
+### Declaration
+
+```java
+public final class MdocDeviceResponse {
+    byte[] response;
+    Map<String, MdocDeviceAuthMethod> authMethods;
+}
+```
+
+### Property
+
+| Name        | Type                              | Description                     | **M/O** | **Note** |
+|-------------|-----------------------------------|---------------------------------|---------|----------|
+| response    | byte[]                            | 인코딩된 DeviceResponse         |    M    |          |
+| authMethods | Map<String, MdocDeviceAuthMethod> | credential ID 별 기기 인증 방식 |    M    | [MdocDeviceAuthMethod](#51-mdocdeviceauthmethod) |
+
+<br>
+
+## 5.1. MdocDeviceAuthMethod
+
+### Description
+
+`mdoc 기기 인증 방식`
+
+### Declaration
+
+```java
+public enum MdocDeviceAuthMethod {
+    DEVICE_SIGNATURE,
+    DEVICE_MAC
+}
+```
+
+<br>
+
+## 6. IssuerMetadataResponse
+
+### Description
+
+`OID4VCI credential issuer metadata. requestIssueOID4VC · requestRevokeOID4VC 에 전달한다`
+
+### Declaration
+
+```java
+public final class IssuerMetadataResponse {
+    @NonNull  String credentialIssuer;
+    @NonNull  String credentialEndpoint;
+    @NonNull  String tokenEndpoint;
+    @Nullable List<String> authorizationServers;
+    @NonNull  Map<String, CredentialConfigDescriptor> configurationsSupported;
+    @Nullable CredentialResponseEncryptionSpec responseEncryption;
+    @Nullable String nonceEndpoint;
+    @Nullable String credentialRevocationEndpoint;
+}
+```
+
+### Property
+
+| Name                         | Type                                    | Description                         | **M/O** | **Note** |
+|------------------------------|-----------------------------------------|-------------------------------------|---------|----------|
+| credentialIssuer             | String                                  | credential issuer 식별자            |    M    |          |
+| credentialEndpoint           | String                                  | Credential endpoint                 |    M    |          |
+| tokenEndpoint                | String                                  | Token endpoint                      |    M    |          |
+| authorizationServers         | List<String>                            | authorization server 목록           |    O    |          |
+| configurationsSupported      | Map<String, CredentialConfigDescriptor> | ID 별 지원 credential configuration |    M    | `configForId(configurationId)` 로 하나를 조회 |
+| responseEncryption           | CredentialResponseEncryptionSpec        | credential 응답 암호화              |    O    |          |
+| nonceEndpoint                | String                                  | Nonce endpoint                      |    O    | requestRevokeOID4VC 에 필요 |
+| credentialRevocationEndpoint | String                                  | Credential revocation endpoint      |    O    | requestRevokeOID4VC 에 필요 |
+
+<br>
+
+## 7. TokenResponse
+
+### Description
+
+`OID4VCI token response. requestIssueOID4VC 에 전달한다`
+
+### Declaration
+
+```java
+public final class TokenResponse {
+    @NonNull  String accessToken;
+    @Nullable String tokenType;
+    @Nullable Integer expiresIn;
+    @Nullable String cNonce;
+    @Nullable Integer cNonceExpiresIn;
+}
+```
+
+### Property
+
+| Name            | Type    | Description           | **M/O** | **Note** |
+|-----------------|---------|-----------------------|---------|----------|
+| accessToken     | String  | Access token          |    M    |          |
+| tokenType       | String  | 토큰 유형             |    O    |          |
+| expiresIn       | Integer | 만료 시간             |    O    |          |
+| cNonce          | String  | c_nonce               |    O    |          |
+| cNonceExpiresIn | Integer | c_nonce 만료 시간 |    O    |          |
+
+<br>
+
+## 8. OIDV4VPChallenge
+
+### Description
+
+`createVp 에 전달하는 domain 과 challenge`
+
+### Declaration
+
+```java
+public class OIDV4VPChallenge extends BaseObject {
+    @SerializedName("domain")    String domain;
+    @SerializedName("challenge") String challenge;
+}
+```
+
+### Property
+
+| Name      | Type   | Description  | **M/O** | **Note** |
+|-----------|--------|--------------|---------|----------|
+| domain    | String | Domain       |    M    |          |
+| challenge | String | Challenge    |    M    |          |
+
+<br>
+
+
 # Enumerators
 
 ## 1. DID_KEY_TYPE
@@ -2173,7 +2733,8 @@ public enum PRESENCE {
 ```java
 public enum PROFILE_TYPE {
     issueProfile("IssueProfile"),
-    verifyProfile("VerifyProfile");
+    verifyProfile("VerifyProfile"),
+    proofRequestProfile("ProofRequestProfile");
 }
 ```
 
@@ -2409,7 +2970,7 @@ public enum SERVER_TOKEN_PURPOSE {
     UPDATE_DID(6),
     RESTORE_DID(7),
     ISSUE_VC(8),
-    REMOVE_VC(9),
+    REVOKE_VC(9),
     PRESENT_VP(10),
     CREATE_DID_AND_ISSUE_VC(13);
 }
@@ -2444,8 +3005,25 @@ public enum WALLET_TOKEN_PURPOSE {
 }
 ```
 
+<br>
 
+## 22. CREDENTIAL_FORMAT
 
+### Description
+
+`OID4VC credential 포맷`
+
+### Declaration
+
+```java
+public enum CredentialFormat {
+    OPENDID_VC("opendid_vc"),
+    SD_JWT_VC("dc+sd-jwt-did"),
+    MSO_MDOC("mso_mdoc-did");
+}
+```
+
+<br>
 
 # APIs
 

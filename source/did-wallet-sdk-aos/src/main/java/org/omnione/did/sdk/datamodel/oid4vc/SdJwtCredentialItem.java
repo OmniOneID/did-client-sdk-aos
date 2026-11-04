@@ -16,7 +16,7 @@
 
 package org.omnione.did.sdk.datamodel.oid4vc;
 
-public final class SdJwtCredentialItem {
+public final class SdJwtCredentialItem implements OID4VCCredentialItem {
 
     private final String id;
     private final CredentialFormat format;
@@ -35,10 +35,11 @@ public final class SdJwtCredentialItem {
         this.sdjwt = sdjwt;
     }
 
-    public String getId() { return id; }
-    public CredentialFormat getFormat() { return format; }
-    public String getConfigurationId() { return configurationId; }
-    public String getKid() { return kid; }
-    public String getCredentialIdentifier() { return credentialIdentifier; }
+    @Override public String getId() { return id; }
+    @Override public CredentialFormat getFormat() { return format; }
+    @Override public String getConfigurationId() { return configurationId; }
+    @Override public String getKid() { return kid; }
+    @Override public String getCredentialIdentifier() { return credentialIdentifier; }
+    @Override public String getRawCredential() { return sdjwt != null ? sdjwt.getCompact() : null; }
     public SdJwt getSdjwt() { return sdjwt; }
 }

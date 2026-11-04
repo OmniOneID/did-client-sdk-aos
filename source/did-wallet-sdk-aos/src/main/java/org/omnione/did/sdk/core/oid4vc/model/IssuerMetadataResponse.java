@@ -32,6 +32,7 @@ public final class IssuerMetadataResponse {
     @NonNull private final Map<String, CredentialConfigDescriptor> configurationsSupported;
     @Nullable private final CredentialResponseEncryptionSpec responseEncryption;
     @Nullable private final String nonceEndpoint;
+    @Nullable private final String credentialRevocationEndpoint;
 
     public IssuerMetadataResponse(@NonNull String credentialIssuer,
                                  @NonNull String credentialEndpoint,
@@ -39,7 +40,8 @@ public final class IssuerMetadataResponse {
                                  @Nullable List<String> authorizationServers,
                                  @NonNull Map<String, CredentialConfigDescriptor> configurationsSupported,
                                  @Nullable CredentialResponseEncryptionSpec responseEncryption,
-                                 @Nullable String nonceEndpoint) {
+                                 @Nullable String nonceEndpoint,
+                                 @Nullable String credentialRevocationEndpoint) {
         this.credentialIssuer = credentialIssuer;
         this.credentialEndpoint = credentialEndpoint;
         this.tokenEndpoint = tokenEndpoint;
@@ -48,6 +50,7 @@ public final class IssuerMetadataResponse {
         this.configurationsSupported = Collections.unmodifiableMap(configurationsSupported);
         this.responseEncryption = responseEncryption;
         this.nonceEndpoint = nonceEndpoint;
+        this.credentialRevocationEndpoint = credentialRevocationEndpoint;
     }
 
     @NonNull public String getCredentialIssuer() { return credentialIssuer; }
@@ -59,6 +62,8 @@ public final class IssuerMetadataResponse {
     @Nullable public CredentialResponseEncryptionSpec getResponseEncryption() { return responseEncryption; }
 
     @Nullable public String getNonceEndpoint() { return nonceEndpoint; }
+
+    @Nullable public String getCredentialRevocationEndpoint() { return credentialRevocationEndpoint; }
 
     @Nullable
     public CredentialConfigDescriptor configForId(@NonNull String configurationId) {

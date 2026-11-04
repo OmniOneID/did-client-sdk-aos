@@ -30,6 +30,7 @@ import org.omnione.did.sdk.core.oid4vc.net.wire.ErrorResponseWire;
 import org.omnione.did.sdk.core.oid4vc.net.wire.TokenResponseWire;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -108,7 +109,7 @@ public final class TokenRequester {
     private static String urlEncode(@NonNull String value) {
         try {
             return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
-        } catch (Exception e) {
+        } catch (UnsupportedEncodingException | RuntimeException e) {
             return value;
         }
     }
@@ -144,7 +145,7 @@ public final class TokenRequester {
     private static ErrorResponseWire tryParseError(@NonNull String body) {
         try {
             return GsonWrapper.getGson().fromJson(body, ErrorResponseWire.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return null;
         }
     }

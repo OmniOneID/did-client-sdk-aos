@@ -19,12 +19,13 @@ Android DIDManager API
 ==
 
 - Topic: DIDManager
-- Author: Dongjun Park
-- Date: 2025-10-15
-- Version: v1.0.10
+- Author: Eunjeong Kim
+- Date: 2026-10-28
+- Version: v3.0.0
 
 | Version | Date       | Changes           |
 | ------- | ---------- | ----------------- |
+| v3.0.0  | 2026-10-30 | Remove controller from updateDocument; key controller fallback |
 | v1.0.1  | 2025-10-15 | Add DIDDoc Update |
 | v1.0.0  | 2024-07-10 | Initial version   |
 
@@ -34,7 +35,7 @@ Android DIDManager API
 # Table of Contents
 - [APIs](#api-list)
     - [1. constructor](#1-constructor)
-    - [2. genDID](#2-isanykeysaved)
+    - [2. genDID](#2-gendid)
     - [3. isSaved](#3-issaved)
     - [4. createDocument](#4-createdocument)
     - [5. getDocument](#5-getdocument)
@@ -483,7 +484,7 @@ didManager.resetChanges();
 ### Declaration
 
 ```java
-void updateDocument(List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws Exception
+void updateDocument(List<DIDKeyInfo> keyInfos, List<Service> service) throws Exception
 ```
 
 ### Parameters
@@ -491,8 +492,7 @@ void updateDocument(List<DIDKeyInfo> keyInfos, String controller, List<Service> 
 | Parameter  | Type             | Description                                                                                 | **M/O** | **Notes**                            |
 | ---------- | ---------------- | ------------------------------------------------------------------------------------------- | ------- | ------------------------------------ |
 | keyInfos   | List<DIDKeyInfo> | Array of public key information objects to register in DID document                         | M       | Refer to [DIDKeyInfo](#2-didkeyinfo) |
-| controller | String           | DID to register as controller in the DID document.<br>If null, the `did` parameter is used. | M       |                                      |
-| services   | List<Service>    | Service information objects to specify in the DID document                                  | M       | Refer to [Service](#4-service)       |
+| service    | List<Service>    | Service information objects to specify in the DID document                                  | M       | Refer to [Service](#4-service)       |
 
 ### Returns
 
@@ -502,7 +502,7 @@ void
 ```java
 DIDManager<DIDDocument> didManager = new DIDManager<>("MyWallet", this);
 
-didManager.updateDIDDoc(didKeyInfos, controller, null);
+didManager.updateDocument(didKeyInfos, null);
 ```
 
 <br>
@@ -603,7 +603,7 @@ public class DIDKeyInfo {
 |-------------|----------------------|--------------------------------------------------------------------|---------|---------------------------------------------------------|
 | keyInfo     | KeyInfo              | Public key information object returned by KeyManager               | M       |                                                         |
 | methodType  | DID_METHOD_TYPE      | Type specifying the purpose of the public key registered in the DID document | M       |                                                         |
-| controller  | String               | DID to register as the controller of the public key in the DID document. If null, the ID of the DID document is used as the controller. | M       |                                                         |
+| controller  | String               | DID to register as the controller of the public key in the DID document. If null or empty, the ID of the DID document is used as the controller. | M       |                                                         |
 
 <br>
 

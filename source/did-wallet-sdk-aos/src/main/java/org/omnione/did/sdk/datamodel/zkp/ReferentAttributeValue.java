@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 OmniOne.
+ * Copyright 2025-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,13 @@ public class ReferentAttributeValue {
     @SerializedName("isRevealed")
     private Boolean isRevealed;
 
-    public ReferentAttributeValue(String referentKey, Boolean isRevealed) {
+    @SerializedName("attrName")
+    private String attrName;
+
+    public ReferentAttributeValue(String referentKey, Boolean isRevealed, String attrName) {
         this.referentKey = referentKey;
         this.isRevealed = isRevealed;
+        this.attrName = attrName;
     }
 
     public String getReferentKey() {
@@ -45,5 +49,9 @@ public class ReferentAttributeValue {
 
     public void setRevealed(Boolean revealed) {
         isRevealed = revealed;
+    }
+
+    public String getAttrName() {
+        return attrName;
     }
 }

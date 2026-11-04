@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,12 +44,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -60,6 +58,7 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
 import java.util.Arrays;
 
 public class Secp256R1Manager implements SignableInterface {
@@ -93,17 +92,16 @@ public class Secp256R1Manager implements SignableInterface {
             byte[] signature = ecdsaSign.sign();
             return compressedSignValue(signature, pubKey, digest);
         } catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException |
-                 InvalidAlgorithmParameterException | InvalidKeySpecException | IOException e) {
+                 InvalidParameterSpecException | InvalidKeySpecException | IOException e) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_SIGNABLE_CREATE_SIGNATURE);
         }
     }
 
-    private java.security.PrivateKey getECPrivateKeyFromBytes(byte[] privateKeyBytes, ECGenParameterSpec ecSpec) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeySpecException {
+    private java.security.PrivateKey getECPrivateKeyFromBytes(byte[] privateKeyBytes, ECGenParameterSpec ecSpec) throws NoSuchAlgorithmException, InvalidParameterSpecException, InvalidKeySpecException {
         BigInteger s = new BigInteger(1, privateKeyBytes);
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
-        kpg.initialize(ecSpec);
-        KeyPair kp = kpg.generateKeyPair();
-        ECParameterSpec params = ((java.security.interfaces.ECPublicKey) kp.getPublic()).getParams();
+        AlgorithmParameters parameters = AlgorithmParameters.getInstance("EC");
+        parameters.init(ecSpec);
+        ECParameterSpec params = parameters.getParameterSpec(ECParameterSpec.class);
 
         ECPrivateKeySpec privateKeySpec = new ECPrivateKeySpec(s, params);
         KeyFactory keyFactory = KeyFactory.getInstance("EC");

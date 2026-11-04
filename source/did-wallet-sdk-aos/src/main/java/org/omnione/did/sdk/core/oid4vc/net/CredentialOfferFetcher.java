@@ -26,6 +26,7 @@ import org.omnione.did.sdk.core.oid4vc.model.TxCodeSpec;
 import org.omnione.did.sdk.core.oid4vc.net.wire.CredentialOfferWire;
 import org.omnione.did.sdk.datamodel.util.GsonWrapper;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -85,7 +86,7 @@ public final class CredentialOfferFetcher {
     private static String decode(@NonNull String encoded) {
         try {
             return URLDecoder.decode(encoded, StandardCharsets.UTF_8.name());
-        } catch (Exception e) {
+        } catch (UnsupportedEncodingException | RuntimeException e) {
             return encoded;
         }
     }

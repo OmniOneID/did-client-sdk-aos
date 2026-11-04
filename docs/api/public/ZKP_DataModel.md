@@ -19,12 +19,13 @@ Android ZKP DataModel
 ==
 
 - Subject: ZKP-Based Data Model
-- Author: Dongjun Park
-- Date: 2025-04-30
-- Version: v1.0.0
+- Author: Eunjeong Kim
+- Date: 2026-10-28
+- Version: v3.0.0
 
 | Version | Date       | Change Description |
 |---------|------------|--------------------|
+| v3.0.0  | 2026-10-30 | Add Referent and ReferentAttributeValue |
 | v1.0.0  | 2025-04-30 | Initial version    |
 
 <div style="page-break-after: always;"></div>
@@ -37,13 +38,14 @@ Android ZKP DataModel
     - [2.1. CredentialSignature](#21-credentialsignature)
     - [2.2. SignatureCorrectnessProof](#22-signaturecorrectnessproof)
 - [3. ReferentInfo](#3-referentinfo)
+    - [3.1. Referent](#31-referent)
+        - [3.1.1. ReferentAttributeValue](#311-referentattributevalue)
 - [4. AvailableReferent](#4-availablereferent)
     - [4.1. AttrReferent](#41-attrreferent)
     - [4.2. PredicateReferent](#42-predicatereferent)
     - [4.3. SubReferent](#43-subreferent)
 - [5. Proof](#5-proof)
     - [5.1. SubProof](#51-subproof)
-        - [5.1.1. PrimaryProof](#511-primaryproof)
     - [5.2. AggregatedProof](#52-aggregatedproof)
     - [5.3. RequestedProof](#53-requestedproof)
     - [5.4. Identifiers](#54-identifiers)
@@ -225,6 +227,58 @@ public class ReferentInfo {
 | Name      | Type                   | Description                                 | **M/O** | **Note** |
 |-----------|------------------------|---------------------------------------------|---------|----------|
 | referents | Map<String, Referent> | Reference information based on credentialId | M       |          |
+<br>
+
+### 3.1. Referent
+
+#### Description
+
+Referent entry for one credential
+
+#### Declaration
+
+```java
+public class Referent {
+    @SerializedName("schemaId")  String schemaId;
+    @SerializedName("credDefId") String credDefId;
+    @SerializedName("attrs")     LinkedHashMap<String, ReferentAttributeValue> attributes;
+}
+```
+
+#### Property
+
+| Name       | Type                                          | Description | **M/O** | **Note** |
+|------------|-----------------------------------------------|-------------|---------|----------|
+| schemaId   | String                                        | Schema ID | -       |          |
+| credDefId  | String                                        | Credential Definition ID | -       |          |
+| attributes | LinkedHashMap<String, ReferentAttributeValue> | Attribute referents by referentKey | -       | [ReferentAttributeValue](#311-referentattributevalue) |
+
+<br>
+
+#### 3.1.1. ReferentAttributeValue
+
+##### Description
+
+Attribute referent for one requested item
+
+##### Declaration
+
+```java
+public class ReferentAttributeValue {
+    @SerializedName("referentKey") String referentKey;
+    @SerializedName("isRevealed")  Boolean isRevealed;
+    @SerializedName("attrName")    String attrName;
+}
+```
+
+##### Property
+
+| Name        | Type    | Description | **M/O** | **Note** |
+|-------------|---------|-------------|---------|----------|
+| referentKey | String  | Referent key in the Proof Request | -       |          |
+| isRevealed  | Boolean | Whether the attribute is revealed | -       |          |
+| attrName    | String  | Attribute name in the credential | -       |          |
+
 <br>
 
 ## 4. AvailableReferent

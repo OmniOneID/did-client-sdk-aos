@@ -19,12 +19,13 @@ Android DataModel
 ==
 
 - Topic: DataModel
-- Author: Sangjun Kim
-- Date: 2024-08-28
-- Version: v1.0.0
+- Author: Eunjeong Kim
+- Date: 2026-10-28
+- Version: v3.0.0
 
 | Version | Date       | Changes                    |
 | ------- | ---------- | -------------------------- |
+| v3.0.0  | 2026-10-30 | Add OID4VC models          |
 | v1.0.0  | 2024-08-28 | Initial version            |
 
 <div style="page-break-after: always;"></div>
@@ -50,7 +51,7 @@ Android DataModel
             - [5.1.1. Profile](#511-profile)
                 - [5.1.1.1. CredentialSchema](#5111-credentialschema)
                 - [5.1.1.2. Process](#5112-process)
-        - [5.2 VerifyProfile](#51-verifyprofile)
+        - [5.2 VerifyProfile](#52-verifyprofile)
             - [5.2.1. Profile](#521-profile)
                 - [5.2.1.1. ProfileFilter](#5211-profilefilter)
                     - [5.2.1.1.1. CredentialSchema](#52111-credentialschema)
@@ -98,12 +99,32 @@ Android DataModel
     - [5. Offer](#5-offer)
         - [5.1. IssueOfferPayload](#51-issueofferpayload)
         - [5.2. VerifyOfferPayload](#52-verifyofferpayload)
-    - [6. Issue VC](#6-issue-vc)
+    - [6. Issue VC](#6-vc)
         - [6.1. ReqVC](#61-reqvc)
             - [6.1.1. Profile](#611-profile)
         - [6.2. VCPlanList](#62-vcplanlist)
             - [6.2.1. VCPlan](#621-vcplan)
                 - [6.2.1.1. Option](#6211-option)
+- [OID4VCVo](#oid4vcvo)
+    - [1. OID4VCCredentialItem](#1-oid4vccredentialitem)
+        - [1.1. SdJwtCredentialItem](#11-sdjwtcredentialitem)
+            - [1.1.1. SdJwt](#111-sdjwt)
+        - [1.2. MdocCredentialItem](#12-mdoccredentialitem)
+            - [1.2.1. Mdoc](#121-mdoc)
+    - [2. AuthorizationRequest](#2-authorizationrequest)
+        - [2.1. ClientMetadata](#21-clientmetadata)
+        - [2.2. DCQLQuery](#22-dcqlquery)
+            - [2.2.1. CredentialQuery](#221-credentialquery)
+                - [2.2.1.1. ClaimQuery](#2211-claimquery)
+                - [2.2.1.2. TrustedAuthority](#2212-trustedauthority)
+            - [2.2.2. CredentialSetQuery](#222-credentialsetquery)
+    - [3. MatchedCredential](#3-matchedcredential)
+    - [4. MdocRequestedDocument](#4-mdocrequesteddocument)
+    - [5. MdocDeviceResponse](#5-mdocdeviceresponse)
+        - [5.1. MdocDeviceAuthMethod](#51-mdocdeviceauthmethod)
+    - [6. IssuerMetadataResponse](#6-issuermetadataresponse)
+    - [7. TokenResponse](#7-tokenresponse)
+    - [8. OIDV4VPChallenge](#8-oidv4vpchallenge)
 - [Enumerators](#enumerators)
     - [1. DID_KEY_TYPE](#1-did_key_type)
     - [2. DID_SERVICE_TYPE](#2-did_service_type)
@@ -126,6 +147,7 @@ Android DataModel
     - [19. ROLE_TYPE](#19-role_type)
     - [20. SERVER_TOKEN_PURPOSE](#20-server_token_purpose)
     - [21. WALLET_TOKEN_PURPOSE](#21-wallet_token_purpose)
+    - [22. CREDENTIAL_FORMAT](#22-credential_format)
 - [Apis](#apis)
     - [1. deserialize](#1-deserialize)
     - [2. convertFrom](#2-convertfrom)
@@ -430,8 +452,8 @@ public class Claim {
 | code      | String                            | Claim code                     |    M    |                                           |
 | caption   | String                            | Claim name                     |    M    |                                           |
 | value     | String                            | Claim value                    |    M    |                                           |
-| type      | CLAIM_TYPE                        | Claim type                     |    M    | [CLAIM_TYPE](#11-claim_type)              |
-| format    | CLAIM_FORMAT                      | Claim format                   |    M    | [CLAIM_FORMAT](#12-claim_format)          |
+| type      | CLAIM_TYPE                        | Claim type                     |    M    | [CLAIM_TYPE](#10-claim_type)              |
+| format    | CLAIM_FORMAT                      | Claim format                   |    M    | [CLAIM_FORMAT](#11-claim_format)          |
 | hideValue | Bool                              | Hide value                     |    O    | Default (false)                           |
 | location  | LOCATION                          | Value location                 |    O    | Default (inline) <br> [LOCATION](#12-location) |
 | digestSRI | String                            | Digest Subresource Integrity   |    O    |                                           |
@@ -1189,6 +1211,7 @@ public class P210RequestVo extends BaseRequestVo {
     AccE2e accE2e;
     String encReqVc;
     String vcId;
+    String userId;
 }
 ```
 
@@ -1206,6 +1229,7 @@ public class P210RequestVo extends BaseRequestVo {
 | accE2e       | AccE2e            | E2E encryption data     |    M    | [AccE2e](#33-acce2e) |
 | encReqVc     | String            | Encrypted Verifiable Credential request data |    M    |          |
 | vcId         | String            | Verifiable Credential ID       |    M    |          |
+| userId       | String            | User ID |    O    | Set by the app using the SDK |
 
 <br>
 
@@ -2039,6 +2063,542 @@ public static class Option {
 <br>
 
 
+# OID4VCVo
+
+## 1. OID4VCCredentialItem
+
+### Description
+
+`Common view of a stored OID4VC credential, returned by getAllOID4VCs and getOID4VCs. The concrete type is SdJwtCredentialItem or MdocCredentialItem.`
+
+### Declaration
+
+```java
+public interface OID4VCCredentialItem {
+    String getId();
+    CredentialFormat getFormat();
+    String getConfigurationId();
+    String getKid();
+    String getCredentialIdentifier();
+    String getRawCredential();
+}
+```
+
+### Property
+
+| Name                 | Type             | Description                          | **M/O** | **Note** |
+|----------------------|------------------|--------------------------------------|---------|----------|
+| id                   | String           | Stored credential ID                 |    M    |          |
+| format               | CredentialFormat | Credential format                    |    M    | [CREDENTIAL_FORMAT](#22-credential_format) |
+| configurationId      | String           | Credential configuration identifier  |    M    |          |
+| kid                  | String           | Holder key ID bound to the credential |    M    |          |
+| credentialIdentifier | String           | Credential identifier                |    O    |          |
+| rawCredential        | String           | Compact form of the stored credential |    M    |          |
+
+<br>
+
+## 1.1. SdJwtCredentialItem
+
+### Description
+
+`OID4VCCredentialItem for an SD-JWT VC`
+
+### Declaration
+
+```java
+public final class SdJwtCredentialItem implements OID4VCCredentialItem {
+    String id;
+    CredentialFormat format;
+    String configurationId;
+    String kid;
+    String credentialIdentifier;
+    SdJwt sdjwt;
+}
+```
+
+### Property
+
+| Name   | Type  | Description                                     | **M/O** | **Note** |
+|--------|-------|-------------------------------------------------|---------|----------|
+| sdjwt  | SdJwt | Parsed SD-JWT. `getRawCredential()` returns `sdjwt.getCompact()` |    M    | [SdJwt](#111-sdjwt) |
+
+The other properties are the same as [OID4VCCredentialItem](#1-oid4vccredentialitem).
+
+<br>
+
+## 1.1.1. SdJwt
+
+### Description
+
+`Parsed SD-JWT VC`
+
+### Declaration
+
+```java
+public final class SdJwt {
+    String compact;
+    String credentialJwt;
+    JsonObject jwtPayload;
+    Map<String, Object> disclosedClaims;
+}
+```
+
+### Property
+
+| Name            | Type                | Description                          | **M/O** | **Note** |
+|-----------------|---------------------|--------------------------------------|---------|----------|
+| compact         | String              | Compact SD-JWT                       |    M    |          |
+| credentialJwt   | String              | Issuer-signed JWT part               |    M    |          |
+| jwtPayload      | JsonObject          | Payload of the issuer-signed JWT     |    M    | `getIssuer()` returns `iss`, `getVct()` returns `vct` (null if absent) |
+| disclosedClaims | Map<String, Object> | Disclosed claims                     |    M    |          |
+
+<br>
+
+## 1.2. MdocCredentialItem
+
+### Description
+
+`OID4VCCredentialItem for an mdoc (mso_mdoc-did)`
+
+### Declaration
+
+```java
+public final class MdocCredentialItem implements OID4VCCredentialItem {
+    String id;
+    CredentialFormat format;
+    String configurationId;
+    String kid;
+    String credentialIdentifier;
+    Mdoc mdoc;
+}
+```
+
+### Property
+
+| Name | Type | Description                                     | **M/O** | **Note** |
+|------|------|-------------------------------------------------|---------|----------|
+| mdoc | Mdoc | Parsed mdoc. `getRawCredential()` returns `mdoc.getCompact()` |    M    | [Mdoc](#121-mdoc) |
+
+The other properties are the same as [OID4VCCredentialItem](#1-oid4vccredentialitem).
+
+<br>
+
+## 1.2.1. Mdoc
+
+### Description
+
+`Parsed mdoc`
+
+### Declaration
+
+```java
+public final class Mdoc {
+    String compact;
+    String docType;
+    Map<String, Map<String, Object>> nameSpaces;
+    MdocMso mso;
+}
+```
+
+### Property
+
+| Name       | Type                             | Description                          | **M/O** | **Note** |
+|------------|----------------------------------|--------------------------------------|---------|----------|
+| compact    | String                           | Compact form of the mdoc             |    M    |          |
+| docType    | String                           | mdoc docType                         |    O    |          |
+| nameSpaces | Map<String, Map<String, Object>> | Claims per namespace                 |    M    | `getFlatClaims()` returns them as one map |
+| mso        | MdocMso                          | Mobile security object               |    M    |          |
+
+<br>
+
+## 2. AuthorizationRequest
+
+### Description
+
+`Verifier's OID4VP authorization request, passed to matchCredentials and createVpToken`
+
+### Declaration
+
+```java
+public class AuthorizationRequest {
+    @SerializedName("client_id")       String clientId;
+    @SerializedName("nonce")           String nonce;
+    @SerializedName("state")           String state;
+    @SerializedName("response_mode")   String responseMode;
+    @SerializedName("response_uri")    String responseUri;
+    @SerializedName("dcql_query")      DCQLQuery dcqlQuery;
+    @SerializedName("client_metadata") ClientMetadata clientMetadata;
+}
+```
+
+### Property
+
+| Name           | Type           | Description                    | **M/O** | **Note** |
+|----------------|----------------|--------------------------------|---------|----------|
+| clientId       | String         | Verifier client ID             |    M    |          |
+| nonce          | String         | Nonce                          |    M    |          |
+| state          | String         | State                          |    O    |          |
+| responseMode   | String         | Response mode                  |    O    | null is treated as `direct_post`. Only `direct_post` and `direct_post.jwt` are supported |
+| responseUri    | String         | Response URI                   |    M    |          |
+| dcqlQuery      | DCQLQuery      | DCQL query                     |    M    | [DCQLQuery](#22-dcqlquery) |
+| clientMetadata | ClientMetadata | Verifier client metadata       |    O    | Required when responseMode is `direct_post.jwt` |
+
+<br>
+
+## 2.1. ClientMetadata
+
+### Description
+
+`Verifier client metadata`
+
+### Declaration
+
+```java
+public class ClientMetadata {
+    @SerializedName("client_name")                             String clientName;
+    @SerializedName("jwks")                                    JsonObject jwks;
+    @SerializedName("encrypted_response_enc_values_supported") List<String> encryptedResponseEncValuesSupported;
+    @SerializedName("authorization_encrypted_response_alg")    String authorizationEncryptedResponseAlg;
+}
+```
+
+### Property
+
+| Name                                | Type         | Description                           | **M/O** | **Note** |
+|-------------------------------------|--------------|---------------------------------------|---------|----------|
+| clientName                          | String       | Verifier name                         |    M    |          |
+| jwks                                | JsonObject   | Verifier JWK Set                      |    O    | Required when responseMode is `direct_post.jwt` (EC P-256 key). `jwkKeys()` returns its keys |
+| encryptedResponseEncValuesSupported | List<String> | Supported response encryption `enc` values |    O    |          |
+| authorizationEncryptedResponseAlg   | String       | Response encryption `alg`             |    -    |          |
+
+<br>
+
+## 2.2. DCQLQuery
+
+### Description
+
+`DCQL query`
+
+### Declaration
+
+```java
+public class DCQLQuery {
+    @SerializedName("credentials")     List<CredentialQuery> credentials;
+    @SerializedName("credential_sets") List<CredentialSetQuery> credentialSets;
+}
+```
+
+### Property
+
+| Name           | Type                     | Description            | **M/O** | **Note** |
+|----------------|--------------------------|------------------------|---------|----------|
+| credentials    | List<CredentialQuery>    | Credential queries     |    M    | [CredentialQuery](#221-credentialquery) |
+| credentialSets | List<CredentialSetQuery> | Credential set queries |    O    | [CredentialSetQuery](#222-credentialsetquery) |
+
+<br>
+
+## 2.2.1. CredentialQuery
+
+### Description
+
+`Credential query in DCQL`
+
+### Declaration
+
+```java
+public class CredentialQuery {
+    @SerializedName("id")                  String id;
+    @SerializedName("format")              String format;
+    @SerializedName("meta")                Map<String, Object> meta;
+    @SerializedName("claims")              List<ClaimQuery> claims;
+    @SerializedName("claim_sets")          List<List<String>> claimSets;
+    @SerializedName("trusted_authorities") List<TrustedAuthority> trustedAuthorities;
+}
+```
+
+### Property
+
+| Name               | Type                   | Description             | **M/O** | **Note** |
+|--------------------|------------------------|-------------------------|---------|----------|
+| id                 | String                 | Query ID                |    M    |          |
+| format             | String                 | Requested credential format |    M    |          |
+| meta               | Map<String, Object>    | Format-specific metadata |    M    |          |
+| claims             | List<ClaimQuery>       | Claim queries           |    O    | [ClaimQuery](#2211-claimquery) |
+| claimSets          | List<List<String>>     | Claim sets (lists of claim query IDs) |    O    |          |
+| trustedAuthorities | List<TrustedAuthority> | Trusted authorities     |    O    | [TrustedAuthority](#2212-trustedauthority) |
+
+<br>
+
+## 2.2.1.1. ClaimQuery
+
+### Description
+
+`Claim query in DCQL`
+
+### Declaration
+
+```java
+public class ClaimQuery {
+    @SerializedName("id")         String id;
+    @SerializedName("path")       List<Object> path;
+    @SerializedName("values")     List<Object> values;
+    @SerializedName("namespace")  String namespace;
+    @SerializedName("claim_name") String claimName;
+}
+```
+
+### Property
+
+| Name      | Type         | Description           | **M/O** | **Note** |
+|-----------|--------------|-----------------------|---------|----------|
+| id        | String       | Claim query ID        |    O    |          |
+| path      | List<Object> | Claim path            |    O    |          |
+| values    | List<Object> | Accepted values       |    O    |          |
+| namespace | String       | mdoc namespace        |    O    |          |
+| claimName | String       | mdoc claim name       |    O    |          |
+
+<br>
+
+## 2.2.1.2. TrustedAuthority
+
+### Description
+
+`Trusted authority in DCQL`
+
+### Declaration
+
+```java
+public class TrustedAuthority {
+    @SerializedName("type")   String type;
+    @SerializedName("values") List<String> values;
+}
+```
+
+### Property
+
+| Name   | Type         | Description         | **M/O** | **Note** |
+|--------|--------------|---------------------|---------|----------|
+| type   | String       | Authority type      |    M    |          |
+| values | List<String> | Authority values    |    O    |          |
+
+<br>
+
+## 2.2.2. CredentialSetQuery
+
+### Description
+
+`Credential set query in DCQL`
+
+### Declaration
+
+```java
+public class CredentialSetQuery {
+    @SerializedName("options")  List<List<String>> options;
+    @SerializedName("required") Boolean required;
+    @SerializedName("purpose")  Object purpose;
+}
+```
+
+### Property
+
+| Name     | Type               | Description                            | **M/O** | **Note** |
+|----------|--------------------|----------------------------------------|---------|----------|
+| options  | List<List<String>> | Options (lists of credential query IDs) |    M    |          |
+| required | Boolean            | Whether the set is required            |    O    | `isRequired()` returns true when null |
+| purpose  | Object             | Purpose                                |    M    |          |
+
+<br>
+
+## 3. MatchedCredential
+
+### Description
+
+`Stored credential and claims matched to a DCQL credential query, returned by matchCredentials and passed to createVpToken`
+
+### Declaration
+
+```java
+public class MatchedCredential {
+    String queryId;
+    String credentialId;
+    List<String> claimCodes;
+}
+```
+
+### Property
+
+| Name         | Type         | Description                   | **M/O** | **Note** |
+|--------------|--------------|-------------------------------|---------|----------|
+| queryId      | String       | DCQL credential query ID      |    M    |          |
+| credentialId | String       | Stored credential ID          |    M    |          |
+| claimCodes   | List<String> | Claim codes to present        |    M    |          |
+
+<br>
+
+## 4. MdocRequestedDocument
+
+### Description
+
+`Stored mdoc matched to one document request of an ISO 18013-5 DeviceRequest, returned by matchMdocRequest and passed to createDeviceResponse`
+
+### Declaration
+
+```java
+public final class MdocRequestedDocument {
+    int docRequestIndex;
+    String docType;
+    String credentialId;
+    List<String> claimCodes;
+    Map<String, Boolean> intentToRetain;
+    List<String> missing;
+}
+```
+
+### Property
+
+| Name            | Type                 | Description                          | **M/O** | **Note** |
+|-----------------|----------------------|--------------------------------------|---------|----------|
+| docRequestIndex | int                  | Index of the docRequest in the DeviceRequest |    M    |          |
+| docType         | String               | Requested docType                    |    M    |          |
+| credentialId    | String               | Stored credential ID                 |    M    |          |
+| claimCodes      | List<String>         | Claim codes to present               |    M    |          |
+| intentToRetain  | Map<String, Boolean> | Verifier's intent to retain, per claim code |    M    |          |
+| missing         | List<String>         | Requested claim codes the credential does not hold |    M    |          |
+
+<br>
+
+## 5. MdocDeviceResponse
+
+### Description
+
+`ISO 18013-5 DeviceResponse, returned by createDeviceResponse`
+
+### Declaration
+
+```java
+public final class MdocDeviceResponse {
+    byte[] response;
+    Map<String, MdocDeviceAuthMethod> authMethods;
+}
+```
+
+### Property
+
+| Name        | Type                              | Description                     | **M/O** | **Note** |
+|-------------|-----------------------------------|---------------------------------|---------|----------|
+| response    | byte[]                            | Encoded DeviceResponse          |    M    |          |
+| authMethods | Map<String, MdocDeviceAuthMethod> | Device authentication method per credential ID |    M    | [MdocDeviceAuthMethod](#51-mdocdeviceauthmethod) |
+
+<br>
+
+## 5.1. MdocDeviceAuthMethod
+
+### Description
+
+`mdoc device authentication method`
+
+### Declaration
+
+```java
+public enum MdocDeviceAuthMethod {
+    DEVICE_SIGNATURE,
+    DEVICE_MAC
+}
+```
+
+<br>
+
+## 6. IssuerMetadataResponse
+
+### Description
+
+`OID4VCI credential issuer metadata, passed to requestIssueOID4VC and requestRevokeOID4VC`
+
+### Declaration
+
+```java
+public final class IssuerMetadataResponse {
+    @NonNull  String credentialIssuer;
+    @NonNull  String credentialEndpoint;
+    @NonNull  String tokenEndpoint;
+    @Nullable List<String> authorizationServers;
+    @NonNull  Map<String, CredentialConfigDescriptor> configurationsSupported;
+    @Nullable CredentialResponseEncryptionSpec responseEncryption;
+    @Nullable String nonceEndpoint;
+    @Nullable String credentialRevocationEndpoint;
+}
+```
+
+### Property
+
+| Name                         | Type                                    | Description                         | **M/O** | **Note** |
+|------------------------------|-----------------------------------------|-------------------------------------|---------|----------|
+| credentialIssuer             | String                                  | Credential issuer identifier        |    M    |          |
+| credentialEndpoint           | String                                  | Credential endpoint                 |    M    |          |
+| tokenEndpoint                | String                                  | Token endpoint                      |    M    |          |
+| authorizationServers         | List<String>                            | Authorization servers               |    O    |          |
+| configurationsSupported      | Map<String, CredentialConfigDescriptor> | Supported credential configurations by ID |    M    | `configForId(configurationId)` returns one |
+| responseEncryption           | CredentialResponseEncryptionSpec        | Credential response encryption      |    O    |          |
+| nonceEndpoint                | String                                  | Nonce endpoint                      |    O    | Required by requestRevokeOID4VC |
+| credentialRevocationEndpoint | String                                  | Credential revocation endpoint      |    O    | Required by requestRevokeOID4VC |
+
+<br>
+
+## 7. TokenResponse
+
+### Description
+
+`OID4VCI token response, passed to requestIssueOID4VC`
+
+### Declaration
+
+```java
+public final class TokenResponse {
+    @NonNull  String accessToken;
+    @Nullable String tokenType;
+    @Nullable Integer expiresIn;
+    @Nullable String cNonce;
+    @Nullable Integer cNonceExpiresIn;
+}
+```
+
+### Property
+
+| Name            | Type    | Description           | **M/O** | **Note** |
+|-----------------|---------|-----------------------|---------|----------|
+| accessToken     | String  | Access token          |    M    |          |
+| tokenType       | String  | Token type            |    O    |          |
+| expiresIn       | Integer | Expires in            |    O    |          |
+| cNonce          | String  | c_nonce               |    O    |          |
+| cNonceExpiresIn | Integer | c_nonce expires in |    O    |          |
+
+<br>
+
+## 8. OIDV4VPChallenge
+
+### Description
+
+`Domain and challenge passed to createVp`
+
+### Declaration
+
+```java
+public class OIDV4VPChallenge extends BaseObject {
+    @SerializedName("domain")    String domain;
+    @SerializedName("challenge") String challenge;
+}
+```
+
+### Property
+
+| Name      | Type   | Description  | **M/O** | **Note** |
+|-----------|--------|--------------|---------|----------|
+| domain    | String | Domain       |    M    |          |
+| challenge | String | Challenge    |    M    |          |
+
+<br>
+
+
 # Enumerators
 
 ## 1. DID_KEY_TYPE
@@ -2172,7 +2732,8 @@ public enum PRESENCE {
 ```java
 public enum PROFILE_TYPE {
     issueProfile("IssueProfile"),
-    verifyProfile("VerifyProfile");
+    verifyProfile("VerifyProfile"),
+    proofRequestProfile("ProofRequestProfile");
 }
 ```
 
@@ -2408,7 +2969,7 @@ public enum SERVER_TOKEN_PURPOSE {
     UPDATE_DID(6),
     RESTORE_DID(7),
     ISSUE_VC(8),
-    REMOVE_VC(9),
+    REVOKE_VC(9),
     PRESENT_VP(10),
     CREATE_DID_AND_ISSUE_VC(13);
 }
@@ -2443,8 +3004,25 @@ public enum WALLET_TOKEN_PURPOSE {
 }
 ```
 
+<br>
 
+## 22. CREDENTIAL_FORMAT
 
+### Description
+
+`OID4VC credential formats`
+
+### Declaration
+
+```java
+public enum CredentialFormat {
+    OPENDID_VC("opendid_vc"),
+    SD_JWT_VC("dc+sd-jwt-did"),
+    MSO_MDOC("mso_mdoc-did");
+}
+```
+
+<br>
 
 # APIs
 

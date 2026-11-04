@@ -20,12 +20,15 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.JsonObject;
 import com.nimbusds.jose.EncryptionMethod;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.ECDHEncrypter;
 import com.nimbusds.jose.jwk.ECKey;
+
+import java.text.ParseException;
 
 import org.omnione.did.sdk.core.exception.WalletCoreErrorCode;
 import org.omnione.did.sdk.core.exception.WalletCoreException;
@@ -47,7 +50,7 @@ public final class VPResponseEncryptor {
         ECKey recipientKey;
         try {
             recipientKey = ECKey.parse(recipientJwk.toString());
-        } catch (Exception e) {
+        } catch (ParseException | RuntimeException e) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_UNSUPPORTED_JWE_KEY,
                     "Invalid verifier encryption key: " + e.getMessage());
         }
@@ -60,7 +63,7 @@ public final class VPResponseEncryptor {
             JWEObject jwe = new JWEObject(header, new Payload(plaintextJson));
             jwe.encrypt(new ECDHEncrypter(recipientKey.toPublicJWK()));
             return jwe.serialize();
-        } catch (Exception e) {
+        } catch (JOSEException | RuntimeException e) {
             throw new WalletCoreException(WalletCoreErrorCode.ERR_CODE_OID4VC_FAILED_TO_ENCRYPT,
                     "Failed to encrypt VP response: " + e.getMessage());
         }

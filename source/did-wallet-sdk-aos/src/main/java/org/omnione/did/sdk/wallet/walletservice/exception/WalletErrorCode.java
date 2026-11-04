@@ -53,6 +53,7 @@ public enum WalletErrorCode {
     ERR_CODE_WALLET_SAVE_KEYSTORE_FAIL(WALLET_BASE, 43, "Failed to save keystore"),
     ERR_CODE_WALLET_INCORRECT_PASSCODE(WALLET_BASE, 44, "Incorrect passcode"),
     ERR_CODE_WALLET_NOT_FOUND_WALLET_ID(WALLET_BASE, 45, "Wallet ID not found"),
+    ERR_CODE_WALLET_NOT_PERSONALIZED(WALLET_BASE, 46, "Wallet has not been personalized"),
 
     ERR_CODE_WALLET_REGISTER_USER_FAIL(WALLET_BASE, 50, "Failed to register user"),
     ERR_CODE_WALLET_RESTORE_USER_FAIL(WALLET_BASE, 51, "Failed to restore user"),

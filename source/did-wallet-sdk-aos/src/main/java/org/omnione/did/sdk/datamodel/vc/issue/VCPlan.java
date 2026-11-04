@@ -23,6 +23,7 @@ import org.omnione.did.sdk.datamodel.profile.LogoImage;
 import org.omnione.did.sdk.datamodel.vc.CredentialSchema;
 import org.omnione.did.sdk.datamodel.zkp.CredentialDefinition;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class VCPlan {
@@ -163,11 +164,15 @@ public class VCPlan {
     }
 
     public String[] getEndpoints() {
-        return endpoints;
+        return endpoints == null ? null : endpoints.clone();
     }
 
     public void setEndpoints(String[] endpoints) {
-        this.endpoints = endpoints;
+        if (endpoints == null) {
+            this.endpoints = null;
+        } else {
+            this.endpoints = Arrays.copyOf(endpoints, endpoints.length);
+        }
     }
 
     public CredentialSchema getCredentialSchema() {

@@ -92,7 +92,7 @@ class DIDManager<E extends BaseObject> {
             VerificationMethod method = new VerificationMethod();
             method.setId(keyInfo.getKeyInfo().getId());
             method.setType(DIDKeyType.DID_KEY_TYPE.secp256r1VerificationKey2018);
-            method.setController(controller);
+            method.setController(verificationMethodController(keyInfo, did));
             method.setPublicKeyMultibase(keyInfo.getKeyInfo().getPublicKey());
             method.setAuthType(keyInfo.getKeyInfo().getAuthType());
             verificationMethod.add(method);
@@ -108,7 +108,6 @@ class DIDManager<E extends BaseObject> {
      *
      * @param keyInfos   A list of {@link DIDKeyInfo} objects containing the new key information to be included in the
      *                   updated document. Each key info is used to create a new {@link VerificationMethod}.
-     * @param controller The identifier of the controller for the new verification methods.
      * @param service    A list of {@link Service} objects to be included in the document.
      *                   (Note: This parameter is accepted but not directly used in the current implementation shown.
      *                   It might be used in other methods called internally or intended for future use.)
@@ -116,7 +115,7 @@ class DIDManager<E extends BaseObject> {
      *                             such as if the original document does not exist.
      * @throws UtilityException If a utility-related error occurs, for instance during data processing or conversion.
      */
-    public void updateDocument(List<DIDKeyInfo> keyInfos, String controller, List<Service> service) throws WalletCoreException, UtilityException {
+    public void updateDocument(List<DIDKeyInfo> keyInfos, List<Service> service) throws WalletCoreException, UtilityException {
 
         DIDDocument didDoc = getDocument();
         ArrayList<VerificationMethod> verificationMethod = new ArrayList<VerificationMethod>();
@@ -124,7 +123,7 @@ class DIDManager<E extends BaseObject> {
             VerificationMethod method = new VerificationMethod();
             method.setId(keyInfo.getKeyInfo().getId());
             method.setType(DIDKeyType.DID_KEY_TYPE.secp256r1VerificationKey2018);
-            method.setController(controller);
+            method.setController(verificationMethodController(keyInfo, didDoc.getId()));
             method.setPublicKeyMultibase(keyInfo.getKeyInfo().getPublicKey());
             method.setAuthType(keyInfo.getKeyInfo().getAuthType());
             verificationMethod.add(method);
@@ -392,6 +391,11 @@ class DIDManager<E extends BaseObject> {
         }
         return temp.contains(keyId);
     }
+    private static String verificationMethodController(DIDKeyInfo keyInfo, String did) {
+        String controller = keyInfo.getController();
+        return controller == null || controller.isEmpty() ? did : controller;
+    }
+
     private void updateTime() {
         didDocument.setUpdated(getDate());
     }

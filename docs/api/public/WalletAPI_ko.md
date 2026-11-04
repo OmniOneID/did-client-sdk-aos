@@ -19,12 +19,13 @@ Android Wallet API
 ==
 
 - Subject: WalletAPI
-- Writer: Dongjun Park
-- Date: 2025-10-14
-- Version: v2.0.1
+- Writer: 김은정
+- Date: 2026-10-28
+- Version: v3.0.0
 
 | Version | Date       | History                                      |
 | ------- | ---------- | -------------------------------------------- |
+| v3.0.0  | 2026-10-30 | OID4VC · OID4VP · Proximity API 및 createVp 추가, 시그니처 소스 정합 |
 | v2.0.1  | 2025-10-14 | DID 관련 함수 및 authenticatePin 추가 |
 | v2.0.0  | 2024-04-30 | ZKP 추가                                     |
 | v1.0.0  | 2024-08-19 | 초기 작성                                    |
@@ -41,10 +42,11 @@ Android Wallet API
         - [2.3. deleteWallet](#23-deletewallet)
         - [2.4. createWalletTokenSeed](#24-createwallettokenseed)
         - [2.5. createNonceForWalletToken](#25-createnonceforwallettoken)
-        - [2.6. bindUser](#26-bindUser)
-        - [2.7. unbindUser](#27-unbinduser)
-        - [2.8. requestRegisterUser](#28-requestregisteruser)
-        - [2.9. getSignedWalletInfo](#29-getsignedwalletinfo)
+        - [2.6. createLocalWalletToken](#26-createlocalwallettoken)
+        - [2.7. bindUser](#27-binduser)
+        - [2.8. unbindUser](#28-unbinduser)
+        - [2.9. requestRegisterUser](#29-requestregisteruser)
+        - [2.10. getSignedWalletInfo](#210-getsignedwalletinfo)
     - [3. DIDKey](#3-didkey)
         - [3.1. createHolderDIDDoc](#31-createholderdiddoc)
         - [3.2. createSignedDIDDoc](#32-createsigneddiddoc)
@@ -65,6 +67,7 @@ Android Wallet API
         - [4.6. createEncVp](#46-createencvp)
         - [4.7. addProofsToDocument](#47-addproofstodocument)
         - [4.8. isAnyCredentialsSaved](#48-isanycredentialssaved)
+        - [4.9. createVp](#49-createvp)
     - [5. ZKP](#5-zkp)
         - [5.1. createZkpReferent](#51-createzkpreferent)
         - [5.2. createEncZkpProof](#52-createenczkpproof)
@@ -74,13 +77,26 @@ Android Wallet API
         - [5.6. getZkpCredentials](#56-getzkpcredentials)
     - [6. SecurityAuth](#6-securityauth)
         - [6.1. registerLock](#61-registerlock)
-        - [6.2. authenticateLock](#61-authenticatelock)
-        - [6.3. isLock](#61-islock)
+        - [6.2. authenticateLock](#62-authenticatelock)
+        - [6.3. isLock](#63-islock)
         - [6.4. registerBioKey](#64-registerbiokey)
         - [6.5. authenticateBioKey](#65-authenticatebiokey)
         - [6.6. changePin](#66-changepin)
         - [6.7. changeLock](#67-changelock)
         - [6.8. authenticatePin](#68-authenticatepin)
+    - [7. OID4VC](#7-oid4vc)
+        - [7.1. requestIssueOID4VC](#71-requestissueoid4vc)
+        - [7.2. requestRevokeOID4VC](#72-requestrevokeoid4vc)
+        - [7.3. getAllOID4VCs](#73-getalloid4vcs)
+        - [7.4. getOID4VCs](#74-getoid4vcs)
+        - [7.5. deleteOID4VCs](#75-deleteoid4vcs)
+        - [7.6. isAnyOID4VCSaved](#76-isanyoid4vcsaved)
+    - [8. OID4VP](#8-oid4vp)
+        - [8.1. matchCredentials](#81-matchcredentials)
+        - [8.2. createVpToken](#82-createvptoken)
+    - [9. Proximity](#9-proximity)
+        - [9.1. matchMdocRequest](#91-matchmdocrequest)
+        - [9.2. createDeviceResponse](#92-createdeviceresponse)
 - [Enumerators](#enumerators)
     - [1. WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)
 - [Value Object](#value-object)
@@ -163,7 +179,7 @@ boolean exists = walletApi.isExistWallet();
 #### Declaration
 
 ```java
-public boolean createWallet() throws Exception
+public boolean createWallet(String walletUrl, String tasUrl) throws Exception
 ```
 
 #### Parameters
@@ -183,7 +199,7 @@ public boolean createWallet() throws Exception
 #### Usage
 
 ```java
-boolean success = walletApi.createWallet();
+boolean success = walletApi.createWallet(walletUrl, tasUrl);
 ```
 
 <br>
@@ -259,30 +275,74 @@ WalletTokenSeed tokenSeed = walletApi.createWalletTokenSeed(purpose, "org.opendi
 #### Declaration
 
 ```java
-public String createNonceForWalletToken(WalletTokenData walletTokenData) throws Exception
+public String createNonceForWalletToken(String apiGateWayUrl, WalletTokenData walletTokenData) throws Exception
 ```
 
 #### Parameters
 
-| Name           | Type           | Description                  | **M/O** | **Note** |
-|----------------|----------------|-----------------------|---------|----------|
-| walletTokenData | WalletTokenData | 월렛 토큰 데이터      | M       |[WalletTokenData](#2-wallettokendata)          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| apiGateWayUrl | String | API Gateway URL | M |  |
+| walletTokenData | WalletTokenData | 월렛 토큰 데이터 | M | [WalletTokenData](#2-wallettokendata) |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| String | 월렛 토큰 생성용 nonce | M |  |
+
+#### Usage
+
+```java
+String nonce = walletApi.createNonceForWalletToken(apiGateWayUrl, walletTokenData);
+```
+
+<br>
+
+### 2.6. createLocalWalletToken
+
+#### Description
+`CAS 와 통신하지 않고 월렛 토큰을 로컬에서 발급한다.`
+
+월렛이 온라인 개인화(`bindUser`)를 한 번 거친 뒤부터, 조회·제출 목적(`LIST_VC`, `DETAIL_VC`,
+`PRESENT_VP`, `LIST_VC_AND_PRESENT_VP`)에 한해 사용할 수 있다. 동기 함수이며 네트워크 통신이
+없다. `createNonceForWalletToken` 과 달리 nonce 가 아니라 hWalletToken 자체를 반환한다. 저장된
+토큰은 교체되므로, 어느 경로로든 이전에 받은 토큰은 더 이상 검증되지 않는다.
+
+#### Declaration
+
+```java
+public String createLocalWalletToken(WalletTokenPurpose.WALLET_TOKEN_PURPOSE purpose, String pkgName) throws Exception
+```
+
+#### Parameters
+
+| Name      | Type   | Description                             | **M/O** | **Note** |
+|-----------|--------|----------------------------------|---------|----------|
+| purpose   | WALLET_TOKEN_PURPOSE | token 사용 목적. 위 4종 중 하나      | M       |[WALLET_TOKEN_PURPOSE](#1-wallet_token_purpose)         |
+| pkgName   | String | 인가앱 Package Name                       | M       |          |
 
 #### Returns
 
 | Type    | Description              | **M/O** | **Note** |
 |---------|-------------------|---------|----------|
-| String  | wallet token 생성을 위한 nonce | M       |          |
+| String  | 해당 purpose 를 받는 API 에 전달할 hWalletToken | M       |          |
+
+#### Throws
+
+- `MSDKWLT05002` (`ERR_CODE_WALLET_VERIFY_PARAMETER_FAIL`): `pkgName` 이 비어 있거나 `purpose` 가 4종 밖
+- `MSDKWLT05046` (`ERR_CODE_WALLET_NOT_PERSONALIZED`): 월렛이 개인화된 적이 없음
 
 #### Usage
 
 ```java
-String nonce = walletApi.createNonceForWalletToken(walletTokenData);
+String hWalletToken = walletApi.createLocalWalletToken(WalletTokenPurpose.WALLET_TOKEN_PURPOSE.LIST_VC, "org.opendid.did.ca");
+List<VerifiableCredential> credentials = walletApi.getAllCredentials(hWalletToken);
 ```
 
 <br>
 
-### 2.6. bindUser
+### 2.7. bindUser
 
 #### Description
 `Wallet에 사용자 개인화를 수행한다.`
@@ -313,7 +373,7 @@ boolean success = walletApi.bindUser("hWalletToken");
 
 <br>
 
-### 2.7. unbindUser
+### 2.8. unbindUser
 
 #### Description
 `사용자 비개인화를 수행한다.`
@@ -345,7 +405,7 @@ boolean success = walletApi.unbindUser("hWalletToken");
 <br>
 
 
-### 2.8. requestRegisterUser
+### 2.9. requestRegisterUser
 
 #### Description
 `사용자 등록을 요청한다.`
@@ -375,13 +435,13 @@ public CompletableFuture<String> requestRegisterUser(String hWalletToken, String
 #### Usage
 
 ```java
-String _M132_RequestRegisterUser = walletApi.requestRegisterUser("hWalletToken", "txId", "hServerToken", signedDIDDoc).get();
+String _M132_RequestRegisterUser = walletApi.requestRegisterUser("hWalletToken", tasUrl, "txId", "hServerToken", signedDIDDoc).get();
 ```
 
 <br>
 
 
-### 2.9. getSignedWalletInfo
+### 2.10. getSignedWalletInfo
 
 #### Description
 `서명된 Wallet 정보를 조회한다.`
@@ -501,7 +561,7 @@ public DIDDocument getDIDDocument(int type) throws Exception
 #### Usage
 
 ```java
-DIDDocument didDoc = walletApi.getDIDDocument("hWalletToken", 1);
+DIDDocument didDoc = walletApi.getDIDDocument(1);
 ```
 
 <br>
@@ -690,7 +750,7 @@ CompletableFuture<String> requestUpdateUser(String hWalletToken, String tasUrl, 
 #### Usage
 
 ```java
-walletApi.requestUpdateUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAuth, signedDidDoc, txId).get();
+walletApi.requestUpdateUser(hWalletToken, tasUrl, hServerToken, didAuth, signedDidDoc, txId).get();
 ```
 
 <br>
@@ -725,7 +785,7 @@ CompletableFuture<String> requestRestoreUser(String hWalletToken, String tasUrl,
 #### Usage
 
 ```java
-walletApi.requestRestoreUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAuth, txId).get();
+walletApi.requestRestoreUser(hWalletToken, tasUrl, hServerToken, didAuth, txId).get();
 ```
 
 <br>
@@ -740,31 +800,32 @@ walletApi.requestRestoreUser(hWalletToken, tasUrl, ASE_URL, hServerToken, didAut
 #### Declaration
 
 ```java
-public CompletableFuture<String> requestIssueVc(String hWalletToken, String txId, String serverToken, String refId, String authNonce, IssueProfile profile, DIDAuth signedDIDAuth) throws Exception
+public CompletableFuture<String> requestIssueVc(String hWalletToken, String url, String apiGateWayUrl, String serverToken, String refId, IssueProfile profile, DIDAuth signedDIDAuth, String txId) throws Exception
 ```
 
 #### Parameters
 
-| Name        | Type           | Description                        | **M/O** | **Note** |
-|-------------|----------------|-----------------------------|---------|----------|
-| tasUrl | String         | TAS URL                  | M       |          |
-| hWalletToken | String         | 월렛토큰                   | M       |          |
-| txId     | String       | 거래코드               | M       |          |
-| serverToken     | String       | 서버토큰                | M       |          |
-| refId     | String       | 참조번호                | M       |          |
-| profile|IssueProfile | Issue Profile   | M       |[데이터모델 참조]          |
-| signedDIDAuth|DIDAuth | 서명된 DID 인증 객체   | M       |[DIDAuth](#6-didauth)         |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| url | String | TAS 또는 Proxy URL | M |  |
+| apiGateWayUrl | String | API Gateway URL | M |  |
+| serverToken | String | 서버토큰 | M |  |
+| refId | String | 참조번호 | M |  |
+| profile | IssueProfile | Issue Profile | M |  |
+| signedDIDAuth | DIDAuth | 서명된 DID 인증 객체 | M | [DIDAuth](#6-didauth) |
+| txId | String | 거래코드 | M |  |
 
 #### Returns
 
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| String | VC ID | M       |성공 시 발급된 VC의 ID를 반환한다          |
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| String | VC ID | M | 성공 시 발급된 VC의 ID를 반환한다 |
 
 #### Usage
 
 ```java
-String vcId = walletApi.requestIssueVc("hWalletToken", "txId", "hServerToken", "refId", profile, signedDIDAuth).get();
+String vcId = walletApi.requestIssueVc("hWalletToken", url, apiGateWayUrl, "hServerToken", "refId", profile, signedDIDAuth, "txId").get();
 ```
 
 <br>
@@ -777,33 +838,32 @@ String vcId = walletApi.requestIssueVc("hWalletToken", "txId", "hServerToken", "
 #### Declaration
 
 ```java
-public CompletableFuture<String> requestRevokeVc(String hWalletToken, String serverToken, String txId, String vcId, String issuerNonce, String passcode) throws Exception
-
+public CompletableFuture<String> requestRevokeVc(String hWalletToken, String url, String serverToken, String txId, String vcId, String issuerNonce, String passcode, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws Exception
 ```
 
 #### Parameters
 
-| Name        | Type           | Description                        | **M/O** | **Note** |
-|-------------|----------------|-----------------------------|---------|----------|
-| hWalletToken | String         | 월렛토큰                   | M       |          |
-| tasUrl | String         | TAS URL                   | M       |          |
-| txId     | String       | 거래코드               | M       |          |
-| serverToken     | String       | 서버토큰                | M       |          |
-| vcId     | String       | VC ID                | M       |          |
-| issuerNonce|String | 발급처 nonce   | M       |[데이터모델 참조]          |
-| passcode|String | 서명용 PIN   | M       |[DIDAuth](#6-didauth)         |
-| authType|VERIFY_AUTH_TYPE | 제출 인증수단 타입   | M       |       |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| url | String | TAS 또는 Proxy URL | M |  |
+| serverToken | String | 서버토큰 | M |  |
+| txId | String | 거래코드 | M |  |
+| vcId | String | VC ID | M |  |
+| issuerNonce | String | 발급처 nonce | M |  |
+| passcode | String | 서명용 PIN | M |  |
+| authType | VERIFY_AUTH_TYPE | 제출 인증수단 타입 | M |  |
 
 #### Returns
 
-| Type    | Description                | **M/O** | **Note** |
-|---------|---------------------|---------|----------|
-| String | txId | M       |성공 시 거래코드를 반환한다          |
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| String | txId | M | 성공 시 거래코드를 반환한다 |
 
 #### Usage
 
 ```java
-String result = walletApi.requestRevokeVc("hWalletToken", "hServerToken", "txId", "vcId", "issuerNonce", "123456").get();
+String result = walletApi.requestRevokeVc("hWalletToken", url, "hServerToken", "txId", "vcId", "issuerNonce", "123456", VERIFY_AUTH_TYPE.PIN).get();
 ```
 
 <br>
@@ -903,41 +963,37 @@ walletApi.deleteCredentials("hWalletToken", "vcId");
 ### 4.6. createEncVp
 
 #### Description
-`암호화된 VP를 생성한다.`
+`검증자 가입증명서 VC 를 검증한 뒤 암호화된 VP 와 accE2e 를 생성한다.`
 
 #### Declaration
 
 ```java
-public ReturnEncVP createEncVp(String hWalletToken, String vcId, List<String> claimCode, ReqE2e reqE2e, String passcode, String nonce, VerifyAuthType.VERIFY_AUTH_TYPE authType) throws Exception
-
+public ReturnEncVP createEncVp(String hWalletToken, List<ClaimInfo> claimInfos, VerifyProfile verifyProfile, String apiGateWayUrl, String passcode) throws Exception
 ```
 
 #### Parameters
 
-| Name        | Type           | Description                        | **M/O** | **Note** |
-|-------------|----------------|-----------------------------|---------|----------|
-| hWalletToken | String         | 월렛토큰                   | M       |          |
-| vcId     | String       | VC ID               | M       |          |
-| claimCode     | List&lt;String&gt;       | 제출할 클레임 코드                | M       |          |
-| reqE2e     | ReqE2e       | E2E 암복호화 정보                | M       |데이터모델 참조        |
-|passcode|String | 서명용 PIN   | M       |          |
-| nonce|String | nonce   | M       |       |
-| authType|VERIFY_AUTH_TYPE | 제출 인증수단 타입   | M       |       |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| claimInfos | List&lt;ClaimInfo&gt; | 제출할 VC ID 와 클레임 코드 목록 | M | [ClaimInfo](../private/VCManager_ko.md#2-claiminfo) |
+| verifyProfile | VerifyProfile | 검증자 정보와 E2E 요청을 담은 검증 프로파일 | M |  |
+| apiGateWayUrl | String | 검증자 가입증명서 VC 검증에 쓰는 API Gateway URL | M |  |
+| passcode | String | 서명용 PIN | O | PIN 키로 서명할 때 |
 
 #### Returns
 
-| Type   | Description              | **M/O** | **Note** |
-|--------|-------------------|---------|----------|
-| ReturnEncVP  | 암호화 VP 객체| M       |acce2e 객체, encVp 멀티베이스 인코딩 값      |
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| ReturnEncVP | 암호화된 VP 객체 | M | acce2e 객체, encVp 멀티베이스 인코딩 값 |
 
 #### Usage
 
 ```java
-EncVP encVp = walletApi.createEncVp("hWalletToken", "vcId", List.of("claim_code"), reqE2e, "123456", "nonce", VERIFY_AUTH_TYPE.PIN);
+ReturnEncVP encVp = walletApi.createEncVp("hWalletToken", List.of(new ClaimInfo("vcId", List.of("claim_code"))), verifyProfile, apiGateWayUrl, "123456");
 ```
 
 <br>
-
 
 ### 4.7. addProofsToDocument
 
@@ -978,12 +1034,12 @@ DIDDocument signedDIDDoc = (DIDDocument) walletApi.addProofsToDocument(didDocume
 ### 4.8. isAnyCredentialsSaved
 
 #### Description
-`사용자의 지갑에 증명서가 저장되어 있는지 확인합니다.`
+`Holder 의 월렛에 저장된 VC 가 있는지 확인한다.`
 
 #### Declaration
 
 ```java
-public void isAnyCredentialsSaved() throws WalletException
+public boolean isAnyCredentialsSaved() throws WalletException
 ```
 
 #### Parameters
@@ -991,15 +1047,52 @@ public void isAnyCredentialsSaved() throws WalletException
 N/A
 
 #### Returns
-boolean
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| boolean | VC 가 하나 이상 저장돼 있으면 `true` | M |  |
 
 #### Usage
 
 ```java
-
 if (!walletApi.isAnyCredentialsSaved()) {
     ...
 }
+```
+
+<br>
+
+### 4.9. createVp
+
+#### Description
+`지정한 클레임으로 VP 를 생성한다(암호화하지 않음).`
+
+#### Declaration
+
+```java
+public VerifiablePresentation createVp(String hWalletToken, List<ClaimInfo> claimInfos, String passcode, String verifierNonce, OIDV4VPChallenge challenge) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| claimInfos | List&lt;ClaimInfo&gt; | 제출할 VC ID 와 클레임 코드 목록 | M | [ClaimInfo](../private/VCManager_ko.md#2-claiminfo) |
+| passcode | String | 서명용 PIN | O | PIN 키로 서명할 때 |
+| verifierNonce | String | 검증자 nonce | M |  |
+| challenge | OIDV4VPChallenge | domain 과 challenge | M | [OIDV4VPChallenge](./DataModel_ko.md#8-oidv4vpchallenge) |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| VerifiablePresentation | VP | M |  |
+
+#### Usage
+
+```java
+VerifiablePresentation vp = walletApi.createVp("hWalletToken", claimInfos, "123456", verifierNonce, challenge);
 ```
 
 <br>
@@ -1041,35 +1134,36 @@ ReferentInfo referentInfo = WalletApi.getInstance(getContext()).createZkpReferen
 ### 5.2. createEncZkpProof
 
 #### Description
-`사용자의 자격 증명과 참조 정보를 기반으로 ZKP 증명을 생성`
+`사용자의 크리덴셜과 referent 를 기반으로 ZKP 증명을 생성한다.`
 
 #### Declaration
 
 ```java
-public P311RequestVo createEncZkpProof(String hWalletToken, ProofRequestProfile proofRequestProfile,
-                                        List<ProofParam> proofParams, Map<String, String> selfAttributes, String txId) throws Exception
+public P311RequestVo createEncZkpProof(String hWalletToken, List<ProofParam> proofParams, Map<String, String> selfAttributes,
+                                       ProofRequestProfile proofRequestProfile, String txId, String apiGateWayUrl) throws Exception
 ```
 
 #### Parameters
 
-| Name                | Type   | Description                                                   | **M/O** | **Note** |
-| ------------------- | ------ | ------------------------------------------------------------- | ------- | -------- |
-| walletToken         | String | 월렛 토큰                                                        | M       |          |
-| proofRequestProfile | String | 요청된 속성 및 술어와 같은 검증자의 증명 요구 사항을 포함하는 프로필           | M       |          |
-| proofParams         | String | ZKP 생성에 필요한 자격 증명, 참조 정보 및 기타 정보를 포함한 증명 매개변수 목록 | M       |          |
-| selfAttributes      | String | 자격 증명에 의해 뒷받침되지 않지만 증명자가 주장하는 자체 증명 속성의 맵        | M       |          |
-| txId                | String | 증명 생성 프로세스를 추적하거나 기록하는 데 사용되는 거래 ID                 | M       |          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| proofParams | List&lt;ProofParam&gt; | 크리덴셜과 referent 를 포함한 증명 파라미터 목록 | M |  |
+| selfAttributes | Map&lt;String, String&gt; | 자기 진술 속성 | M |  |
+| proofRequestProfile | ProofRequestProfile | 검증자의 증명 요청을 담은 프로파일 | M |  |
+| txId | String | 거래코드 | M |  |
+| apiGateWayUrl | String | 검증자 검증에 쓰는 API Gateway URL | M |  |
 
 #### Returns
 
-| Type          | Description                                          | **M/O** | **Note** |
-| ------------- | ---------------------------------------------------- | ------- | -------- |
-| P311RequestVo | 검증 가능한 표현에 사용될 생성된 ZKP를 나타내는 객체             | M       |          |
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| P311RequestVo | 암호화된 ZKP 증명을 담은 요청 객체 | M |  |
 
 #### Usage
 
 ```java
-P311RequestVo requestVo = walletApi.createEncZkpProof(hWalletToken, vpProfile, proofParams, selfAttr, txId);
+P311RequestVo requestVo = WalletApi.getInstance(context).createEncZkpProof(hWalletToken, proofParams, selfAttr, proofRequestProfile, txId, apiGateWayUrl);
 ```
 
 <br>
@@ -1141,7 +1235,7 @@ List<Credential> zkpVcList = walletApi.getAllZkpCredentials(hWalletToken);
 
 ### 5.5. isAnyZkpCredentialsSaved
 
-### Description
+#### Description
 `자격 증명이 저장되었는지 확인`
 
 #### Declaration
@@ -1263,7 +1357,7 @@ Void
 #### Usage
 
 ```java
-walletApi.authenticateLock("hWalletToken", "123456");
+walletApi.authenticateLock("123456");
 ```
 
 <br>
@@ -1301,27 +1395,28 @@ boolean isLocked = walletApi.isLock();
 ### 6.4. registerBioKey
 
 #### Description
-`서명용 생체 인증 키를 등록한다.`
+`서명용 생체인증 키를 등록한다.`
 
 #### Declaration
 
 ```java
-public void registerBioKey(Context context)
+public void registerBioKey(Context ctx) throws WalletException
 ```
 
 #### Parameters
 
-| Name         | Type     | Description                        | **M/O** | **Note** |
-|--------------|----------|-----------------------------|---------|----------|
-| context       | Context   |        | M       |          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| ctx | Context |  | M |  |
 
 #### Returns
+
 N/A
 
 #### Usage
 
 ```java
-walletApi.registerBioKey("hWalletToken", context);
+walletApi.registerBioKey(context);
 ```
 
 <br>
@@ -1329,21 +1424,19 @@ walletApi.registerBioKey("hWalletToken", context);
 ### 6.5. authenticateBioKey
 
 #### Description
-`서명을 위한 생체 인증 키를 사용하기 위하여 인증을 수행한다.`
+`서명용 생체인증 키 사용을 위한 인증을 진행한다.`
 
 #### Declaration
 
 ```java
-public void authenticateBioKey(Fragment fragment, Context context) throws Exception
+public void authenticateBioKey(Context ctx) throws WalletCoreException, WalletException
 ```
 
 #### Parameters
 
-| Name         | Type     | Description                        | **M/O** | **Note** |
-|--------------|----------|-----------------------------|---------|----------|
-| hWalletToken | String   | 월렛토큰                   | M       |          |
-| fragment       | Fragment   |       | M       |          |
-| context       | Context   |        | M       |          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| ctx | Context |  | M |  |
 
 #### Returns
 
@@ -1352,11 +1445,10 @@ N/A
 #### Usage
 
 ```java
-walletApi.authenticateBioKey(fragment.this, context);
+walletApi.authenticateBioKey(context);
 ```
 
 <br>
-
 
 ### 6.6. changePin
 
@@ -1393,30 +1485,29 @@ walletApi.changePin(Constants.KEY_ID_PIN, oldPin, newPin);
 ### 6.7. changeLock
 
 #### Description
-`Unlock PIN 변경`
+`잠금용 PIN 을 변경한다.`
 
 #### Declaration
 
 ```java
-public void changeLock(String oldPin, String newPin) throws Exception
+public void changeLock(String oldPassCode, String newPassCode) throws Exception
 ```
 
 #### Parameters
 
-| Name   | Type   | Description   | **M/O** | **Note** |
-| ------ | ------ | ------------- | ------- | -------- |
-| oldPIN | String | 현재 PIN      | M       |          |
-| newPIN | String | 변경할 PIN    | M       |          |
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| oldPassCode | String | old PIN | M |  |
+| newPassCode | String | new PIN | M |  |
 
 #### Returns
 
+N/A
 
 #### Usage
 
 ```java
-String oldPin = "123456";
-String newPin = "654321";
-walletApi.changeLock(oldPin, newPin);
+walletApi.changeLock("123456", "654321");
 ```
 
 <br>
@@ -1429,7 +1520,7 @@ walletApi.changeLock(oldPin, newPin);
 #### Declaration
 
 ```java
-public void authenticatePin(String id, byte[] pin) throws WalletException
+public void authenticatePin(String id, byte[] pin) throws Exception
 ```
 
 #### Parameters
@@ -1455,6 +1546,356 @@ try {
 
 
 
+## 7. OID4VC
+
+### 7.1. requestIssueOID4VC
+
+#### Description
+`발급자에게 OID4VC 크리덴셜을 요청하고 저장한다.` proof JWT 는 holder DID 키(`#pin` 또는 `#bio`)로 서명한다.
+
+#### Declaration
+
+```java
+public CompletableFuture<String> requestIssueOID4VC(String hWalletToken, IssuerMetadataResponse metadata, TokenResponse token, String passcode, String configurationId, String credentialIdentifier, String apiGatewayUrl) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| metadata | IssuerMetadataResponse | 발급자 메타데이터 | M | [IssuerMetadataResponse](./DataModel_ko.md#6-issuermetadataresponse) |
+| token | TokenResponse | 토큰 응답 | M | [TokenResponse](./DataModel_ko.md#7-tokenresponse) |
+| passcode | String | 서명용 PIN. `null` 또는 빈 값이면 BIO 키로 서명 | O |  |
+| configurationId | String | 크리덴셜 configuration 식별자 | M |  |
+| credentialIdentifier | String | 크리덴셜 식별자. `null` 이면 토큰에서 구한다 | O |  |
+| apiGatewayUrl | String | 발급자 서명 검증에 쓰는 API Gateway URL | M |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| String | 저장된 크리덴셜 ID | M |  |
+
+#### Usage
+
+```java
+String vcId = walletApi.requestIssueOID4VC("hWalletToken", metadata, token, "123456", configurationId, null, apiGatewayUrl).get();
+```
+
+<br>
+
+### 7.2. requestRevokeOID4VC
+
+#### Description
+`저장된 OID4VC(SD-JWT VC / mdoc) 의 폐기를 발급자에게 요청한다.` nonce 를 받아 JWT 폐기 토큰에 서명한 뒤 `credential_revocation_endpoint` 로 POST 한다.
+
+#### Declaration
+
+```java
+public CompletableFuture<Void> requestRevokeOID4VC(String hWalletToken, IssuerMetadataResponse metadata, String vcId, String passcode) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| metadata | IssuerMetadataResponse | 발급자 메타데이터. `nonce_endpoint` 와 `credential_revocation_endpoint` 필수 | M | [IssuerMetadataResponse](./DataModel_ko.md#6-issuermetadataresponse) |
+| vcId | String | 폐기할 저장 OID4VC 의 ID | M |  |
+| passcode | String | 저장된 kid 가 pin 이면 필수. bio 이면 생체인증을 쓴다 | O |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| CompletableFuture&lt;Void&gt; | 발급자가 200 OK 로 응답하면 정상 완료 | M |  |
+
+#### Throws
+
+- `ExecutionException`: nonce 요청 또는 폐기 POST 실패. 폐기 POST 실패의 cause 는 `CommunicationException`
+
+#### Usage
+
+```java
+walletApi.requestRevokeOID4VC("hWalletToken", metadata, "vcId", "123456").get();
+```
+
+<br>
+
+### 7.3. getAllOID4VCs
+
+#### Description
+`저장된 OID4VC 크리덴셜을 모두 조회한다.`
+
+#### Declaration
+
+```java
+public List<OID4VCCredentialItem> getAllOID4VCs(String hWalletToken) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| List&lt;OID4VCCredentialItem&gt; | OID4VC 크리덴셜 전체 | M | [OID4VCCredentialItem](./DataModel_ko.md#1-oid4vccredentialitem) |
+
+#### Usage
+
+```java
+List<OID4VCCredentialItem> items = walletApi.getAllOID4VCs("hWalletToken");
+```
+
+<br>
+
+### 7.4. getOID4VCs
+
+#### Description
+`지정한 식별자의 OID4VC 크리덴셜을 조회한다.`
+
+#### Declaration
+
+```java
+public List<OID4VCCredentialItem> getOID4VCs(String hWalletToken, List<String> identifiers) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| identifiers | List&lt;String&gt; | 크리덴셜 식별자 목록 | M |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| List&lt;OID4VCCredentialItem&gt; | 식별자에 해당하는 OID4VC 크리덴셜 | M | [OID4VCCredentialItem](./DataModel_ko.md#1-oid4vccredentialitem) |
+
+#### Usage
+
+```java
+List<OID4VCCredentialItem> items = walletApi.getOID4VCs("hWalletToken", List.of("vcId"));
+```
+
+<br>
+
+### 7.5. deleteOID4VCs
+
+#### Description
+`지정한 식별자의 OID4VC 크리덴셜을 삭제한다.`
+
+#### Declaration
+
+```java
+public void deleteOID4VCs(String hWalletToken, List<String> identifiers) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| identifiers | List&lt;String&gt; | 크리덴셜 식별자 목록 | M |  |
+
+#### Returns
+
+N/A
+
+#### Usage
+
+```java
+walletApi.deleteOID4VCs("hWalletToken", List.of("vcId"));
+```
+
+<br>
+
+### 7.6. isAnyOID4VCSaved
+
+#### Description
+`Holder 의 월렛에 저장된 OID4VC 크리덴셜이 있는지 확인한다.`
+
+#### Declaration
+
+```java
+public boolean isAnyOID4VCSaved() throws WalletException
+```
+
+#### Parameters
+
+N/A
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| boolean | 하나 이상 저장돼 있으면 `true` | M |  |
+
+#### Usage
+
+```java
+if (!walletApi.isAnyOID4VCSaved()) {
+    ...
+}
+```
+
+<br>
+
+## 8. OID4VP
+
+### 8.1. matchCredentials
+
+#### Description
+`검증자의 OID4VP 인가 요청(DCQL)에 저장된 크리덴셜을 매칭한다.`
+
+#### Declaration
+
+```java
+public List<MatchedCredential> matchCredentials(String hWalletToken, AuthorizationRequest authRequest) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| authRequest | AuthorizationRequest | DCQL 쿼리를 담은 검증자 인가 요청 | M | [AuthorizationRequest](./DataModel_ko.md#2-authorizationrequest) |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| List&lt;MatchedCredential&gt; | 쿼리를 만족하는 제출 가능 항목 | M | [MatchedCredential](./DataModel_ko.md#3-matchedcredential) |
+
+#### Usage
+
+```java
+List<MatchedCredential> matched = walletApi.matchCredentials("hWalletToken", authRequest);
+```
+
+<br>
+
+### 8.2. createVpToken
+
+#### Description
+`선택한 크리덴셜로 OID4VP 응답 본문을 만든다.` form-urlencoded `vp_token` 제출이거나, `direct_post.jwt` 이면 암호화된 `response` 다.
+
+#### Declaration
+
+```java
+public byte[] createVpToken(String hWalletToken, AuthorizationRequest authRequest, List<MatchedCredential> matchedCredentials, String passcode) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| authRequest | AuthorizationRequest | 검증자 인가 요청 | M | [AuthorizationRequest](./DataModel_ko.md#2-authorizationrequest) |
+| matchedCredentials | List&lt;MatchedCredential&gt; | 제출할 크리덴셜·클레임. 비어 있으면 안 된다 | M | [MatchedCredential](./DataModel_ko.md#3-matchedcredential) |
+| passcode | String | PIN 바인딩 키면 PIN, BIO 키면 `null` | O |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| byte[] | 앱이 제출할 form-urlencoded 응답 본문 | M |  |
+
+#### Throws
+
+- `MSDKWLT06000` (`ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER`): `matchedCredentials` 가 null 이거나 비어 있음
+
+#### Usage
+
+```java
+byte[] body = walletApi.createVpToken("hWalletToken", authRequest, matched, "123456");
+```
+
+<br>
+
+## 9. Proximity
+
+### 9.1. matchMdocRequest
+
+#### Description
+`근접 통신으로 받은 mdoc DeviceRequest 에 저장된 mdoc 크리덴셜을 매칭한다.`
+
+#### Declaration
+
+```java
+public List<MdocRequestedDocument> matchMdocRequest(String hWalletToken, byte[] deviceRequest) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| deviceRequest | byte[] | CBOR 인코딩된 DeviceRequest. 비어 있으면 안 된다 | M |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| List&lt;MdocRequestedDocument&gt; | 요청 문서와 매칭된 크리덴셜 | M | [MdocRequestedDocument](./DataModel_ko.md#4-mdocrequesteddocument) |
+
+#### Throws
+
+- `MSDKWLT06000` (`ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER`): `deviceRequest` 가 null 이거나 비어 있음
+
+#### Usage
+
+```java
+List<MdocRequestedDocument> docs = walletApi.matchMdocRequest("hWalletToken", deviceRequest);
+```
+
+<br>
+
+### 9.2. createDeviceResponse
+
+#### Description
+`선택한 문서로 mdoc DeviceResponse 를 만든다.`
+
+#### Declaration
+
+```java
+public MdocDeviceResponse createDeviceResponse(String hWalletToken, byte[] deviceRequest, byte[] sessionTranscript, List<MdocRequestedDocument> selected, String passcode) throws Exception
+```
+
+#### Parameters
+
+| Name | Type | Description | **M/O** | **Note** |
+|------|------|-------------|---------|----------|
+| hWalletToken | String | 월렛토큰 | M |  |
+| deviceRequest | byte[] | CBOR 인코딩된 DeviceRequest. 비어 있으면 안 된다 | M |  |
+| sessionTranscript | byte[] | CBOR 인코딩된 SessionTranscript(태그 없음 또는 #6.24 태그). 비어 있으면 안 된다 | M |  |
+| selected | List&lt;MdocRequestedDocument&gt; | `matchMdocRequest` 결과에서 고른 문서 | M | [MdocRequestedDocument](./DataModel_ko.md#4-mdocrequesteddocument) |
+| passcode | String | PIN 바인딩 키면 PIN, BIO 키면 `null` | O |  |
+
+#### Returns
+
+| Type | Description | **M/O** | **Note** |
+|------|-------------|---------|----------|
+| MdocDeviceResponse | DeviceResponse 바이트와 문서별 device 인증 방식 | M | [MdocDeviceResponse](./DataModel_ko.md#5-mdocdeviceresponse) |
+
+#### Throws
+
+- `MSDKWLT06000` (`ERR_CODE_OID4VC_MANAGER_INVALID_PARAMETER`): `deviceRequest` 또는 `sessionTranscript` 가 null 이거나 비어 있음
+
+#### Usage
+
+```java
+MdocDeviceResponse res = walletApi.createDeviceResponse("hWalletToken", deviceRequest, sessionTranscript, selected, "123456");
+```
+
+<br>
+
 # Enumerators
 ## 1. WALLET_TOKEN_PURPOSE
 
@@ -1472,13 +1913,14 @@ public enum WALLET_TOKEN_PURPOSE {
     CONFIGLOCK(4),
     CREATE_DID(5),
     UPDATE_DID(6),
-    ISSUE_VC(7),
-    REMOVE_VC(8),
-    PRESENT_VP(9),
-    LIST_VC(10),
-    DETAIL_VC(11),
-    CREATE_DID_AND_ISSUE_VC(12),
-    LIST_VC_AND_PRESENT_VP(13);
+    RESTORE_DID(7),
+    ISSUE_VC(8),
+    REMOVE_VC(9),
+    PRESENT_VP(10),
+    LIST_VC(11),
+    DETAIL_VC(12),
+    CREATE_DID_AND_ISSUE_VC(13),
+    LIST_VC_AND_PRESENT_VP(14);
 }
 ```
 <br>

@@ -20,23 +20,24 @@ Android ZKPManager API
 
 ==
 - 주제: ZKPManager
-- 작성: Dongjun Park
-- 일자: 2025-04-30
-- 버전: v1.0.0
+- 작성: 김은정
+- 일자: 2026-10-28
+- 버전: v3.0.0
 
 | 버전     | 일자         | 변경 내용 |
 | ------ | ---------- | ----- |
+| v3.0.0 | 2026-10-30 | Referent 속성을 referent key 로 보관 |
 | v1.0.0 | 2025-04-30 | 최초 작성 |
 
 # 목차
 
 - [APIs](#api-목록)
   - [1. constructor](#1-constructor)
-  - [2. addCredentials](#2-addcredentials)
-  - [3. getCredentials](#3-getcredentials)
-  - [4. getAllCredentials](#4-getallcredentials)
-  - [5. deleteCredentials](#5-deletecredentials)
-  - [6. deleteAllCredentials](#6-deleteallcredentials)
+  - [2. getCredentials](#2-getcredentials)
+  - [3. getAllCredentials](#3-getallcredentials)
+  - [4. deleteCredentials](#4-deletecredentials)
+  - [5. deleteAllCredentials](#5-deleteallcredentials)
+  - [6. isAnyCredentialsSaved](#6-isanycredentialssaved)
   - [7. createCredentialRequest](#7-createcredentialrequest)
   - [8. verifyAndStoreCredential](#8-verifyandstorecredential)
   - [9. searchCredentials](#9-searchcredentials)
@@ -260,11 +261,12 @@ ZkpSearchCredentialBuilder searchCredentials(ProofRequest proofRequest)
 ### Description
 
 사용자가 선택한 Referent 정보를 기반으로 각 credential에 대한 Referent 생성
+각 속성은 referent key 로 보관하고, 속성 이름은 `ReferentAttributeValue` 에 담는다. 같은 credential 에 같은 referent key 가 두 번 오면 `MSDKWLT04603` 을 던진다.
 
 ### Declaration
 
 ```java
-ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
+ReferentInfo createReferent(List<UserReferent> customReferents) throws WalletCoreException, UtilityException
 ```
 
 ### Parameters
@@ -278,7 +280,7 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 
 | Type                     | Description      | **M/O** | **비고** |
 | ------------------------ | ---------------- | ------- | -------- |
-| ZkpCreateReferentBuilder | Referent Builder | M       |          |
+| ReferentInfo             | Referent 정보    | M       |          |
 |                          |                  |         |          |
 
 ## 11. createProof
@@ -286,9 +288,10 @@ ZkpCreateReferentBuilder createReferent(List<UserReferent> customReferents)
 ### Description
 
 사용자의 credential과 referent을 기반으로 ZKP proof 생성
+요청된 모든 attribute · predicate 는 referent key 별로 정확히 한 번 선택되어야 하며, 이름이 proof request 와 같고 credential 에 있어야 한다. 아니면 `MSDKWLT04500` · `MSDKWLT04501` · `MSDKWLT04603` · `MSDKWLT04000`(알 수 없는 referent key) 을 던진다.
 
 ### Declaration
-ㄴ
+
 ```java
 Proof createProof(ProofRequest proofRequest, List<ProofParam> proofParams, Map<String, String> selfAttributes)
 ```
