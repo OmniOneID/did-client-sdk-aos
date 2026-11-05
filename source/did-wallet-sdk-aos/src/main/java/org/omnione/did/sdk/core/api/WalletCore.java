@@ -257,6 +257,16 @@ class WalletCore implements WalletCoreInterface {
         return didDocument;
     }
 
+    public String getSavedVersionId(int type) throws WalletCoreException, UtilityException, WalletException {
+        if(WalletApi.isLock)
+            throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_LOCKED_WALLET);
+        if(type == Constants.DID_DOC_TYPE_DEVICE)
+            return deviceDIDManager.getSavedVersionId();
+        else if(type == Constants.DID_DOC_TYPE_HOLDER)
+            return didManager.getSavedVersionId();
+        throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_FAIL);
+    }
+
     @Override
     public void saveDocument(int type) throws WalletCoreException, UtilityException, WalletException {
         if(WalletApi.isLock)

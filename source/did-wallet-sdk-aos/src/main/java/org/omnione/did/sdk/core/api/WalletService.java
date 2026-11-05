@@ -681,6 +681,7 @@ public class WalletService implements WalletServiceInterface {
 
     @Override
     public ProofContainer addProofsToDocument(ProofContainer document, List<String> keyIds, String did, int type, String passcode, boolean isDIDAuth, OIDV4VPChallenge challenge) throws WalletException, WalletCoreException, UtilityException {
+        String versionId = walletCore.getSavedVersionId(type);
         List<Proof> proofs = new ArrayList<>();
         for(String keyId : keyIds) {
             Proof proof = new Proof();
@@ -688,15 +689,15 @@ public class WalletService implements WalletServiceInterface {
                 case Constants.KEY_ID_ASSERT:
                 case Constants.KEY_ID_PIN:
                 case Constants.KEY_ID_BIO:
-                    proof = createProof(did, ProofPurpose.PROOF_PURPOSE.assertionMethod, keyId);
+                    proof = createProof(did, versionId, ProofPurpose.PROOF_PURPOSE.assertionMethod, keyId);
                     if(isDIDAuth)
-                        proof = createProof(did, ProofPurpose.PROOF_PURPOSE.authentication, keyId);
+                        proof = createProof(did, versionId, ProofPurpose.PROOF_PURPOSE.authentication, keyId);
                     break;
                 case Constants.KEY_ID_AUTH:
-                    proof = createProof(did, ProofPurpose.PROOF_PURPOSE.authentication, keyId);
+                    proof = createProof(did, versionId, ProofPurpose.PROOF_PURPOSE.authentication, keyId);
                     break;
                 case Constants.KEY_ID_KEY_AGREE:
-                    proof = createProof(did, ProofPurpose.PROOF_PURPOSE.keyAgreement, keyId);
+                    proof = createProof(did, versionId, ProofPurpose.PROOF_PURPOSE.keyAgreement, keyId);
                     break;
                 default:
                     throw new WalletException(WalletErrorCode.ERR_CODE_WALLET_CREATE_PROOF_FAIL);
@@ -984,12 +985,12 @@ public class WalletService implements WalletServiceInterface {
         return MdocProximityPresenter.createDeviceResponse(selected, storedById, signersById, sessionTranscript);
     }
 
-    private Proof createProof(String did, ProofPurpose.PROOF_PURPOSE proofPurpose, String keyId) {
+    private Proof createProof(String did, String versionId, ProofPurpose.PROOF_PURPOSE proofPurpose, String keyId) {
         Proof proof = new Proof();
         proof.setCreated(WalletUtil.getDate());
         proof.setProofPurpose(proofPurpose);
         proof.setType(ProofType.PROOF_TYPE.secp256r1Signature2018);
-        proof.setVerificationMethod(did + "?versionId=1#" + keyId);
+        proof.setVerificationMethod(did + "?versionId=" + versionId + "#" + keyId);
         return proof;
     }
 

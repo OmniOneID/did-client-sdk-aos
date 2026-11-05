@@ -77,6 +77,38 @@ public class DIDManagerControllerTest {
         assertAllControllers(DID, document);
     }
 
+    private static final class SwitchableDIDManager extends DIDManager<DIDDocument> {
+        boolean saved;
+        DIDDocument stored;
+
+        @Override
+        public boolean isSaved() {
+            return saved;
+        }
+
+        @Override
+        protected DIDDocument loadSavedDocument() {
+            return stored;
+        }
+    }
+
+    @Test
+    public void savedVersionIdStaysAtStoredVersionWhileUpdateIsPending() throws Exception {
+        SwitchableDIDManager manager = new SwitchableDIDManager();
+        manager.createDocument(DID, keyInfos(null, "pin", "keyagree"), TAS, null);
+        assertEquals("1", manager.getSavedVersionId());
+
+        manager.stored = new DIDDocument();
+        manager.stored.setVersionId("1");
+        manager.saved = true;
+        manager.updateDocument(keyInfos(null, "pin", "bio", "keyagree"), null);
+        assertEquals("2", manager.getDocument().getVersionId());
+        assertEquals("1", manager.getSavedVersionId());
+
+        manager.stored.setVersionId("2");
+        assertEquals("2", manager.getSavedVersionId());
+    }
+
     @Test
     public void deviceCreateUsesDocumentIdAsVerificationMethodController() throws Exception {
         DIDManager<DIDDocument> manager = new UnsavedDIDManager();

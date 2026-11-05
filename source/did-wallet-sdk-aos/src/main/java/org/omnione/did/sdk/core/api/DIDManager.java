@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 OmniOne.
+ * Copyright 2024-2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,6 +146,14 @@ class DIDManager<E extends BaseObject> {
             didDocument = storageManager.getAllItems().get(0).getItem();
         }
         return didDocument;
+    }
+
+    public String getSavedVersionId() throws WalletCoreException, UtilityException {
+        return isSaved() ? loadSavedDocument().getVersionId() : getDocument().getVersionId();
+    }
+
+    protected DIDDocument loadSavedDocument() throws WalletCoreException, UtilityException {
+        return storageManager.getAllItems().get(0).getItem();
     }
 
     /**
